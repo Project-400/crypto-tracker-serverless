@@ -1,0 +1,54 @@
+Resources:
+  GeneralTable:
+    Type: 'AWS::DynamoDB::Table'
+    Properties:
+      AttributeDefinitions:
+        - AttributeName: 'pk'
+          AttributeType: 'S'
+        - AttributeName: 'sk'
+          AttributeType: 'S'
+        - AttributeName: 'sk2'
+          AttributeType: 'S'
+        - AttributeName: 'sk3'
+          AttributeType: 'S'
+        - AttributeName: 'entity'
+          AttributeType: 'S'
+      KeySchema:
+        - AttributeName: 'pk'
+          KeyType: 'HASH'
+        - AttributeName: 'sk'
+          KeyType: 'RANGE'
+      BillingMode: PAY_PER_REQUEST
+      TableName: ${self:custom.stage}-${self:custom.generalTableName}
+      GlobalSecondaryIndexes:
+        - IndexName: entity-sk-index
+          KeySchema:
+            - AttributeName: entity
+              KeyType: HASH
+            - AttributeName: sk
+              KeyType: RANGE
+          Projection:
+            ProjectionType: "ALL"
+        - IndexName: entity-sk2-index
+          KeySchema:
+            - AttributeName: entity
+              KeyType: HASH
+            - AttributeName: sk2
+              KeyType: RANGE
+          Projection:
+            ProjectionType: "ALL"
+        - IndexName: entity-sk3-index
+          KeySchema:
+            - AttributeName: entity
+              KeyType: HASH
+            - AttributeName: sk3
+              KeyType: RANGE
+          Projection:
+            ProjectionType: "ALL"
+
+Outputs:
+  GeneralTable:
+    Value:
+      Ref: GeneralTable
+    Export:
+      Name: ${self:custom.stage}-${self:custom.generalTableName}

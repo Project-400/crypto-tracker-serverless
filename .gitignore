@@ -1,0 +1,20 @@
+# package directories
+node_modules
+jspm_packages
+
+# Serverless directories
+.serverless
+
+# Webpack directories
+.webpack
+
+# IDE
+.idea
+
+# Environment variables
+environment/env.ts
+
+# Local DynamodDB
+.dynamodb
+
+.DS_Store
