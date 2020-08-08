@@ -4,5 +4,5 @@ custom:
     prod: prod
     dev: dev
   resourcesStage: ${self:custom.resourcesStages.${self:custom.stage}, self:custom.resourcesStages.dev}
-  projectName: TestProject
-  generalTableName: TestProject-GENERAL
+  projectName: CryptoTracker
+  generalTableName: CryptoTracker-GENERAL
