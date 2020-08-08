@@ -13,9 +13,8 @@ import * as qs from 'qs';
 export class CoinsController {
 
 	public getCoins: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		console.log('IN FUNCTION');
-
 		let dataString: string = '';
+
 		const coins: any = await new Promise((resolve: any, reject: any): void => {
 			const data: string = qs.stringify({
 				timestamp: new Date().getTime(),
