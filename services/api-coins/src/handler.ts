@@ -1,6 +1,8 @@
-import { ApiHandler } from '../../api-shared-modules/src';
+import { ApiHandler, UnitOfWork } from '../../api-shared-modules/src';
 import { CoinsController } from './coins.controller';
 
-const controller: CoinsController = new CoinsController();
+const unitOfWork: UnitOfWork = new UnitOfWork();
+const controller: CoinsController = new CoinsController(unitOfWork);
 
 export const getCoins: ApiHandler = controller.getCoins;
+export const gatherUserCoins: ApiHandler = controller.gatherUserCoins;

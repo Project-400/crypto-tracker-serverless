@@ -9,7 +9,7 @@ export interface DynamoDbItem {
 }
 
 // TODO: Implement a mechanism to change this automatically based on environment
-@table('CryptoTracker-GENERAL')
+@table('dev-CryptoTracker-GENERAL')
 export class DynamoDbItem implements DynamoDbItem {
 	@hashKey()
 	public pk!: string;

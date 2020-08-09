@@ -2,5 +2,5 @@ import { Coin } from '../..';
 
 export interface ICoinRepository {
 	// getAll(): Promise<Coin[]>;
-	saveAll(coins: Coin): Promise<Coin>;
+	saveSingle(coin: Coin): Promise<Coin>;
 }

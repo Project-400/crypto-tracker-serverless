@@ -44,6 +44,13 @@ functions:
           path: /coins
           method: get
           cors: true
+  gatherUserCoins:
+    handler: src/handler.gatherUserCoins
+    events:
+      - http:
+          path: /coins/gather
+          method: get
+          cors: true
 #          authorizer: aws_iam
 #
 #resources:
