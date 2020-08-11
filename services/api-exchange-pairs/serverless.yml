@@ -1,0 +1,50 @@
+service: api-user-service-${self:custom.projectName}
+frameworkVersion: ">=1.44.0"
+
+custom:
+  # Our stage is based on what is passed in when running serverless
+  # commands. Or falls back to what we have set in the provider section.
+  stage: ${opt:stage, self:provider.stage}
+  projectName: ${file(../../serverless.common.yml):custom.projectName}
+
+provider:
+  name: aws
+  runtime: nodejs10.x
+  stage: dev
+  region: eu-west-1
+  environment:
+    tableName: ${file(../../serverless.common.yml):custom.generalTableName}
+  apiGateway:
+    restApiId:
+      'Fn::ImportValue': ${self:custom.stage}-${self:custom.projectName}-ApiGatewayRestApiId
+    restApiRootResourceId:
+      'Fn::ImportValue': ${self:custom.stage}-${self:custom.projectName}-ApiGatewayRestApiRootResourceId
+  iamRoleStatements:
+    - Effect: Allow
+      Action:
+        - dynamodb:DescribeTable
+        - dynamodb:Query
+        - dynamodb:Scan
+        - dynamodb:GetItem
+        - dynamodb:PutItem
+        - dynamodb:UpdateItem
+        - dynamodb:DeleteItem
+      Resource:
+        - '*'
+
+plugins:
+  - serverless-offline
+  - serverless-webpack
+
+functions:
+  gatherAllExchangePairs:
+    handler: src/handler.gatherAllExchangePairs
+    events:
+      - http:
+          path: /exchange-pairs/gather-all
+          method: get
+          cors: true
+#          authorizer: aws_iam
+#
+#resources:
+#    - ${file(../resources/cognito-policy.yml)}
