@@ -90,7 +90,7 @@ export interface PairPrice {
 
 export interface PriceBatch {
 	prices: PairPrice[];
-	base: string;
+	quote: string;
 	times: {
 		createdAt: Date | string;
 	};

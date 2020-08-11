@@ -25,20 +25,20 @@ export class PriceBatchRepository extends Repository implements IPriceBatchRepos
 		return batches;
 	}
 
-	public async savePriceBatch(prices: PairPrice[], base: string): Promise<PriceBatch> {
+	public async savePriceBatch(prices: PairPrice[], quote: string): Promise<PriceBatch> {
 		const millis: number = 1000 * 60 * 5;
 		const date: Date = new Date();
 		const rounded: string = new Date(Math.round(date.getTime() / millis) * millis).toISOString();
 
 		return this.db.put(Object.assign(new PriceBatchItem(), {
-			pk: `priceBatch#${base}`,
+			pk: `priceBatch#${quote}`,
 			sk: `createdAt#${rounded}`,
 			entity: 'priceBatch',
 			times: {
 				createdAt: date
 			},
 			prices,
-			base
+			quote
 		}));
 	}
 

@@ -109,7 +109,7 @@ export class TrendsController {
 			}));
 
 		await Promise.all(priceChangeStats.map((stats: PriceChangeStats) =>
-			this.unitOfWork.PriceChangeStats.savePriceChangeStatsBatch(stats)));
+			this.unitOfWork.PriceChangeStats.savePriceChangeStats(stats)));
 
 		try {
 			return ResponseBuilder.ok({ priceChangeStats });
@@ -170,25 +170,24 @@ export class TrendsController {
 
 		console.log(separatedBatches);
 
-		// await Promise.all(Object.keys(separatedBatches).map((base: string) =>
-		// 	this.unitOfWork.PriceBatches.savePriceBatch(separatedBatches[base], base)));
+		await Promise.all(Object.keys(separatedBatches).map((quote: string) =>
+			this.unitOfWork.PriceBatches.savePriceBatch(separatedBatches[quote], quote)));
 
-		const pulled: PriceBatch[] = await this.updatePriceTrends(separatedBatches);
+		const stats: PriceChangeStats[] = await this.updatePriceTrends(separatedBatches);
 
 		try {
 			return ResponseBuilder.ok({
 				totalPairs: prices.length,
 				batches:
 				Object.keys(separatedBatches).length,
-				pulled,
-				pulledCount: pulled.length
+				stats
 			});
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
 
-	private updatePriceTrends = async (separatedBatches: SeparatedPriceBatches): Promise<PriceBatch[]> => {
+	private updatePriceTrends = async (separatedBatches: SeparatedPriceBatches): Promise<PriceChangeStats[]> => {
 		const fiveMintutesAgo: string = this.previousTime(5);
 		// const tenMintutesAgo: string = this.previousTime(10);
 		// const thirtyMintutesAgo: string = this.previousTime(30);
@@ -206,43 +205,27 @@ export class TrendsController {
 		// const sixHoursBatches: PriceBatch[] = await this.unitOfWork.PriceBatches.getPriceBatches(sixHoursAgo);
 		// const twelveHoursBatches: PriceBatch[] = await this.unitOfWork.PriceBatches.getPriceBatches(twelveHoursAgo);
 		// const oneDayBatches: PriceBatch[] = await this.unitOfWork.PriceBatches.getPriceBatches(oneDayAgo);
-		//
-		// const stats: Array<Partial<PriceChangeStats>> = [];
-		// const updatedUSDT: PairPrice[] = separatedBatches.USDT;
-		// const previousUSDT: PairPrice[] = fiveMinutesBatches.find((batch: PriceBatch) => batch.base === 'USDT').prices;
-		//
-		// previousUSDT.forEach((pairPrice: PairPrice) => {
-		// 	const matching: PairPrice = updatedUSDT.find((updatedPairPrice: PairPrice) => pairPrice.symbol === updatedPairPrice.symbol);
-		// 	const diff: number = matching.price - pairPrice.price;
-		// 	const pc: number = (diff / pairPrice.price) * 100;
-		//
-		// 	stats.push({
-		// 		pairSymbol: matching.symbol,
-		// 		prices: {
-		// 			min5: diff
-		// 			// min10: number;
-		// 			// min30: number;
-		// 			// hour: number;
-		// 			// hour3: number;
-		// 			// hour6: number;
-		// 			// hour12: number;
-		// 			// hour24: number;
-		// 		},
-		// 		priceChange: {
-		// 			min5: pc
-		// 			// min10: number;
-		// 			// min30: number;
-		// 			// hour: number;
-		// 			// hour3: number;
-		// 			// hour6: number;
-		// 			// hour12: number;
-		// 			// hour24: number;
-		// 		},
-		// 		currentPrice: matching.price
-		// 	});
-		// });
 
-		return fiveMinutesBatches;
+		if (!fiveMinutesBatches.length) return;
+
+		const stats: PriceChangeStats[] = await this.unitOfWork.PriceChangeStats.getAllPriceChangeStats();
+		const updatedUSDT: PairPrice[] = separatedBatches.USDT;
+		const previousUSDT: PairPrice[] = fiveMinutesBatches.find((batch: PriceBatch) => batch.quote === 'USDT').prices;
+
+		previousUSDT.map((pairPrice: PairPrice) => {
+			const matching: PairPrice = updatedUSDT.find((updatedPairPrice: PairPrice) => pairPrice.symbol === updatedPairPrice.symbol);
+			const matchingStats: PriceChangeStats = stats.find((s: PriceChangeStats) => pairPrice.symbol === s.symbol);
+			const diff: number = matching.price - pairPrice.price;
+			const pcDiff: number = (diff / pairPrice.price) * 100;
+
+			matchingStats.currentPrice = matching.price;
+			matchingStats.prices.min5 = diff;
+			matchingStats.priceChanges.min5 = pcDiff;
+			matchingStats.times.updatedAt = new Date().toISOString();
+		});
+
+		await Promise.all(stats.map((s: PriceChangeStats) =>
+			this.unitOfWork.PriceChangeStats.update(s.symbol, s)));
 	}
 
 	private previousTime = (minutes: number): string => {

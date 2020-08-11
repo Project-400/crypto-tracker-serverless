@@ -3,7 +3,6 @@ import { Repository } from './Repository';
 import { QueryKey, IPriceChangeStatsRepository } from '../interfaces';
 import { QueryIterator, QueryOptions } from '@aws/dynamodb-data-mapper';
 import { PriceChangeStatsItem } from '../../models/core';
-import { v4 as uuid } from 'uuid';
 
 export class PriceChangeStatsRepository extends Repository implements IPriceChangeStatsRepository {
 
@@ -23,12 +22,11 @@ export class PriceChangeStatsRepository extends Repository implements IPriceChan
 		return priceChangeStats;
 	}
 
-	public async savePriceChangeStatsBatch(pcs: PriceChangeStats): Promise<PriceChangeStats> {
+	public async savePriceChangeStats(pcs: PriceChangeStats): Promise<PriceChangeStats> {
 		const date: string = new Date().toISOString();
-		const id: string = uuid();
 
 		return this.db.put(Object.assign(new PriceChangeStatsItem(), {
-			pk: `priceChangeStats#${id}`,
+			pk: `priceChangeStats#${pcs.symbol}`,
 			sk: `symbol#${pcs.symbol}`,
 			entity: 'priceChangeStats',
 			times: {
@@ -37,6 +35,16 @@ export class PriceChangeStatsRepository extends Repository implements IPriceChan
 			},
 			...pcs
 		}));
+	}
+
+	public async update(id: string, changes: Partial<PriceChangeStats>): Promise<PriceChangeStats> {
+		return this.db.update(Object.assign(new PriceChangeStatsItem(), {
+			pk: `priceChangeStats#${changes.symbol}`,
+			sk: `symbol#${changes.symbol}`,
+			...changes
+		}), {
+			onMissing: 'skip'
+		});
 	}
 
 }

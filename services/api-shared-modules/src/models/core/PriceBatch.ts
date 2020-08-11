@@ -8,7 +8,7 @@ export class PriceBatchItem extends DynamoDbItem implements PriceBatch {
 	public prices: PairPrice[];
 
 	@attribute()
-	public base: string;
+	public quote: string;
 
 	@attribute()
 	public times: {
