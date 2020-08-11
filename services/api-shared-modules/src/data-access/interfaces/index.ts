@@ -3,6 +3,9 @@ import { BaseFunctionExpressionPredicate, BetweenExpressionPredicate, BinaryComp
 export { IUserRepository } from './IUserRepository';
 export { ISubscriptionRepository } from './ISubscriptionRepository';
 export { ICoinRepository } from './ICoinRepository';
+export { IPriceBatchRepository } from './IPriceBatchRepository';
+export { IPriceChangeStatsRepository } from './IPriceChangeStatsRepository';
+export { IExchangePairRepository } from './IExchangePairRepository';
 
 export interface QueryKey {
 	pk?: string;

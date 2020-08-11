@@ -29,7 +29,7 @@ export interface User extends DBItem {
 		createdAt: Date | string;
 		lastLogin?: Date | string;
 
-	},
+	};
 	connections: UserConnection[]; // Websocket connection ids (can be connected to multiple at same time)
 }
 
@@ -81,4 +81,66 @@ export interface Coin {
 	isLegalMoney: boolean;
 	trading: boolean;
 	networkList: CoinNetwork[];
+}
+
+export interface PairPrice {
+	symbol: string;
+	price: number;
+}
+
+export interface PriceBatch {
+	prices: PairPrice[];
+	base: string;
+	times: {
+		createdAt: Date | string;
+	};
+}
+
+export interface PriceChangeStats {
+	symbol: string; // Pair symbol
+	prices: {
+		min5: number;
+		min10: number;
+		min30: number;
+		hour: number;
+		hour3: number;
+		hour6: number;
+		hour12: number;
+		hour24: number;
+	};
+	priceChanges: {
+		min5: number;
+		min10: number;
+		min30: number;
+		hour: number;
+		hour3: number;
+		hour6: number;
+		hour12: number;
+		hour24: number;
+	};
+	currentPrice: number;
+	times: {
+		createdAt: Date | string;
+		updatedAt: Date | string;
+	};
+}
+
+export interface ExchangePair {
+	symbol: string;
+	base: string;
+	quote: string;
+	times: {
+		createdAt: Date | string;
+		updatedAt: Date | string;
+	};
+}
+
+export interface BinanceExchangeInfoSymbol {
+	symbol: string;
+	baseAsset: string;
+	quoteAsset: string;
+}
+
+export interface BinanceExchangeInfoResponse {
+	symbols: BinanceExchangeInfoSymbol[];
 }
