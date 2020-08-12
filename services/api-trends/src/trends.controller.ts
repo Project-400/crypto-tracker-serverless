@@ -6,7 +6,7 @@ import {
 	ApiContext,
 	UnitOfWork,
 	PairPrice,
-	PriceBatch, ExchangePair, PriceChangeStats,
+	PriceBatch, ExchangePair, PriceChangeStats, ErrorCode,
 } from '../../api-shared-modules/src';
 import { ClientRequest, IncomingMessage } from 'http';
 import * as https from 'https';
@@ -17,12 +17,7 @@ export class TrendsController {
 
 	public getBestPerformers: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		const stats: PriceChangeStats[] = await this.unitOfWork.PriceChangeStats.getAllPriceChangeStats();
-
-		const sortedStats: PriceChangeStats[] = stats.sort((a: PriceChangeStats, b: PriceChangeStats) => {
-			if (a.pricePercentageChanges.min5 < b.pricePercentageChanges.min5) return 1;
-			if (a.pricePercentageChanges.min5 > b.pricePercentageChanges.min5) return -1;
-			return 0;
-		});
+		const sortedStats: PriceChangeStats[] = this.sortStats(stats);
 
 		try {
 			return ResponseBuilder.ok({ stats: sortedStats });
@@ -30,6 +25,27 @@ export class TrendsController {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
+
+	public getBestPerformersByQuoteCurrency: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.pathParameters || !event.pathParameters.quote)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const stats: PriceChangeStats[] = await this.unitOfWork.PriceChangeStats.getPriceChangeStatsByQuote(event.pathParameters.quote);
+		const sortedStats: PriceChangeStats[] = this.sortStats(stats);
+
+		try {
+			return ResponseBuilder.ok({ stats: sortedStats });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	private sortStats = (stats: PriceChangeStats[]): PriceChangeStats[] =>
+		stats.sort((a: PriceChangeStats, b: PriceChangeStats) => {
+			if (a.pricePercentageChanges.min5 < b.pricePercentageChanges.min5) return 1;
+			if (a.pricePercentageChanges.min5 > b.pricePercentageChanges.min5) return -1;
+			return 0;
+		})
 
 	public savePriceChangeStats: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		const exchangePairs: ExchangePair[] = await this.unitOfWork.ExchangePairs.getAllPairs();
