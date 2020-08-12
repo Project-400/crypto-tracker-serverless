@@ -15,65 +15,21 @@ export class TrendsController {
 
 	public constructor(private unitOfWork: UnitOfWork) { }
 
-	// public getBestPerformers: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-	// 	const dataString: string = await new Promise((resolve: any, reject: any): void => {
-	// 		let ds: string = '';
-	//
-	// 		const req: ClientRequest = https.get(`https://api.binance.com/api/v3/ticker/price`, {
-	// 			headers: {
-	// 				'X-MBX-APIKEY': '5EEJO4BQMHaVTVMZFHyBTEPBWSYAwt1va0rbuo9hrL1o6p7ls4xDHsSILCu4DANj'
-	// 			}
-	// 		}, (res: IncomingMessage) => {
-	// 			res.on('data', (chunk: any) => ds += chunk);
-	// 			res.on('end', () => {
-	// 				resolve(ds);
-	// 			});
-	// 		});
-	//
-	// 		req.on('error', reject);
-	// 	});
-	//
-	// 	const prices: PairPrice[] = JSON.parse(dataString);
-	//
-	// 	const separatedBatches: SeparatedPriceBatches = prices.reduce((sep: SeparatedPriceBatches, pair: PairPrice) => {
-	// 		const symbol: string = pair.symbol.toUpperCase();
-	// 		if (symbol.endsWith('USDT')) sep.USDT.push(pair);
-	// 		else if (symbol.endsWith('BTC')) sep.BTC.push(pair);
-	// 		else if (symbol.endsWith('BNB')) sep.BNB.push(pair);
-	// 		else if (symbol.endsWith('ETH')) sep.ETH.push(pair);
-	// 		else if (symbol.endsWith('XRP')) sep.XRP.push(pair);
-	// 		else if (symbol.endsWith('BUSD')) sep.BUSD.push(pair);
-	// 		else if (symbol.endsWith('TUSD')) sep.TUSD.push(pair);
-	// 		else if (symbol.endsWith('USDC')) sep.USDC.push(pair);
-	// 		else if (symbol.endsWith('EUR')) sep.EUR.push(pair);
-	// 		else if (symbol.endsWith('GBP')) sep.GBP.push(pair);
-	// 		else if (symbol.endsWith('PAX')) sep.PAX.push(pair);
-	// 		else sep.OTHER.push(pair);
-	// 		return sep;
-	// 	}, {
-	// 		USDT: [],
-	// 		BTC: [],
-	// 		BNB: [],
-	// 		ETH: [],
-	// 		XRP: [],
-	// 		BUSD: [],
-	// 		TUSD: [],
-	// 		USDC: [],
-	// 		PAX: [],
-	// 		EUR: [],
-	// 		GBP: [],
-	// 		OTHER: []
-	// 	});
-	//
-	// 	await Promise.all(Object.keys(separatedBatches).map((base: string) =>
-	// 		this.unitOfWork.PriceBatches.savePriceBatch(separatedBatches[base], base)));
-	//
-	// 	try {
-	// 		return ResponseBuilder.ok({ totalPairs: prices.length, batches: Object.keys(separatedBatches).length });
-	// 	} catch (err) {
-	// 		return ResponseBuilder.internalServerError(err, err.message);
-	// 	}
-	// }
+	public getBestPerformers: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		const stats: PriceChangeStats[] = await this.unitOfWork.PriceChangeStats.getAllPriceChangeStats();
+
+		const sortedStats: PriceChangeStats[] = stats.sort((a: PriceChangeStats, b: PriceChangeStats) => {
+			if (a.pricePercentageChanges.min5 < b.pricePercentageChanges.min5) return 1;
+			if (a.pricePercentageChanges.min5 > b.pricePercentageChanges.min5) return -1;
+			return 0;
+		});
+
+		try {
+			return ResponseBuilder.ok({ stats: sortedStats });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
 
 	public savePriceChangeStats: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		const exchangePairs: ExchangePair[] = await this.unitOfWork.ExchangePairs.getAllPairs();
@@ -127,8 +83,6 @@ export class TrendsController {
 	}
 
 	public logNewPriceBatch: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		console.log('BEGIN CRON');
-		const start: Date = new Date();
 		const dataString: string = await new Promise((resolve: any, reject: any): void => {
 			let ds: string = '';
 
@@ -182,9 +136,6 @@ export class TrendsController {
 			this.unitOfWork.PriceBatches.savePriceBatch(separatedBatches[quote], quote)));
 
 		await this.updatePriceTrends(separatedBatches);
-
-		const end: Date = new Date();
-		console.log((end.getTime() - start.getTime()) / 1000);
 
 		try {
 			return ResponseBuilder.ok({ });
