@@ -98,7 +98,9 @@ export interface PriceBatch {
 
 export interface PriceChangeStats {
 	symbol: string; // Pair symbol
-	prices: {
+	base: string;
+	quote: string;
+	previousPrices: {
 		min5: number;
 		min10: number;
 		min30: number;
@@ -109,6 +111,16 @@ export interface PriceChangeStats {
 		hour24: number;
 	};
 	priceChanges: {
+		min5: number;
+		min10: number;
+		min30: number;
+		hour: number;
+		hour3: number;
+		hour6: number;
+		hour12: number;
+		hour24: number;
+	};
+	pricePercentageChanges: {
 		min5: number;
 		min10: number;
 		min30: number;
