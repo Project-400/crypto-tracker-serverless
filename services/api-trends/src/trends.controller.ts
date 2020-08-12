@@ -40,6 +40,19 @@ export class TrendsController {
 		}
 	}
 
+	public getPriceChangeStatsByBaseCurrency: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.pathParameters || !event.pathParameters.base)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const stats: PriceChangeStats[] = await this.unitOfWork.PriceChangeStats.getPriceChangeStatsByBase(event.pathParameters.base);
+
+		try {
+			return ResponseBuilder.ok({ stats });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 	private sortStats = (stats: PriceChangeStats[]): PriceChangeStats[] =>
 		stats.sort((a: PriceChangeStats, b: PriceChangeStats) => {
 			if (a.pricePercentageChanges.min5 < b.pricePercentageChanges.min5) return 1;

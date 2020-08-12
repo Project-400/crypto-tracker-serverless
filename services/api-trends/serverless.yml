@@ -67,7 +67,15 @@ functions:
     handler: src/handler.getBestPerformersByQuoteCurrency
     events:
       - http:
-          path: /trends/best-performers/{quote}
+          path: /trends/quote/{quote}
+          method: get
+          cors: true
+#          authorizer: aws_iam
+  getPriceChangeStatsByBaseCurrency:
+    handler: src/handler.getPriceChangeStatsByBaseCurrency
+    events:
+      - http:
+          path: /trends/base/{base}
           method: get
           cors: true
 #          authorizer: aws_iam

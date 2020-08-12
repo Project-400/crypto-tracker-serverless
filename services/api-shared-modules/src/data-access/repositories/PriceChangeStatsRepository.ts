@@ -39,6 +39,23 @@ export class PriceChangeStatsRepository extends Repository implements IPriceChan
 		return priceChangeStats;
 	}
 
+	public async getPriceChangeStatsByBase(base: string): Promise<PriceChangeStats[]> {
+		const keyCondition: QueryKey = {
+			entity: 'priceChangeStats',
+			sk3: `base#${base}`
+		};
+
+		const queryOptions: QueryOptions = {
+			indexName: 'entity-sk3-index'
+		};
+
+		const queryIterator: QueryIterator<PriceChangeStatsItem> = this.db.query(PriceChangeStatsItem, keyCondition, queryOptions);
+		const priceChangeStats: PriceChangeStatsItem[] = [];
+		for await (const stats of queryIterator) priceChangeStats.push(stats);
+
+		return priceChangeStats;
+	}
+
 	public async savePriceChangeStats(pcs: PriceChangeStats): Promise<PriceChangeStats> {
 		const date: string = new Date().toISOString();
 
@@ -46,6 +63,7 @@ export class PriceChangeStatsRepository extends Repository implements IPriceChan
 			pk: `priceChangeStats#${pcs.symbol}`,
 			sk: `symbol#${pcs.symbol}`,
 			sk2: `quote#${pcs.quote}`,
+			sk3: `base#${pcs.base}`,
 			entity: 'priceChangeStats',
 			times: {
 				createdAt: date,
