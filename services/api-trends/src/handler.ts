@@ -7,5 +7,5 @@ const controller: TrendsController = new TrendsController(unitOfWork);
 export const logNewPriceBatch: ApiHandler = controller.logNewPriceBatch;
 export const savePriceChangeStats: ApiHandler = controller.savePriceChangeStats;
 export const getBestPerformers: ApiHandler = controller.getBestPerformers;
-export const getBestPerformersByQuoteCurrency: ApiHandler = controller.getBestPerformersByQuoteCurrency;
-export const getPriceChangeStatsByBaseCurrency: ApiHandler = controller.getPriceChangeStatsByBaseCurrency;
+export const getBestPerformersByQuote: ApiHandler = controller.getBestPerformersByQuoteCurrency;
+export const getPriceChangeStatsByBase: ApiHandler = controller.getPriceChangeStatsByBaseCurrency;

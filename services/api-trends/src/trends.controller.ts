@@ -18,9 +18,10 @@ export class TrendsController {
 	public getBestPerformers: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		const stats: PriceChangeStats[] = await this.unitOfWork.PriceChangeStats.getAllPriceChangeStats();
 		const sortedStats: PriceChangeStats[] = this.sortStats(stats);
+		const limit: PriceChangeStats[] = sortedStats.slice(0, 20);
 
 		try {
-			return ResponseBuilder.ok({ stats: sortedStats });
+			return ResponseBuilder.ok({ stats: limit });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
@@ -201,6 +202,7 @@ export class TrendsController {
 				batch.prices.map((pairPrice: PairPrice) => {
 					const matching: PairPrice = updatedBatch.find((updatedPairPrice: PairPrice) => pairPrice.symbol === updatedPairPrice.symbol);
 					const matchingStats: PriceChangeStats = stats.find((s: PriceChangeStats) => pairPrice.symbol === s.symbol);
+					if (!matching || !matchingStats) return;
 					const diff: number = matching.price - pairPrice.price;
 					const pcDiff: number = (diff / pairPrice.price) * 100;
 
@@ -220,6 +222,7 @@ export class TrendsController {
 				batch.prices.map((pairPrice: PairPrice) => {
 					const matching: PairPrice = updatedBatch.find((updatedPairPrice: PairPrice) => pairPrice.symbol === updatedPairPrice.symbol);
 					const matchingStats: PriceChangeStats = stats.find((s: PriceChangeStats) => pairPrice.symbol === s.symbol);
+					if (!matching || !matchingStats) return;
 					const diff: number = matching.price - pairPrice.price;
 					const pcDiff: number = (diff / pairPrice.price) * 100;
 
@@ -239,6 +242,7 @@ export class TrendsController {
 				batch.prices.map((pairPrice: PairPrice) => {
 					const matching: PairPrice = updatedBatch.find((updatedPairPrice: PairPrice) => pairPrice.symbol === updatedPairPrice.symbol);
 					const matchingStats: PriceChangeStats = stats.find((s: PriceChangeStats) => pairPrice.symbol === s.symbol);
+					if (!matching || !matchingStats) return;
 					const diff: number = matching.price - pairPrice.price;
 					const pcDiff: number = (diff / pairPrice.price) * 100;
 
@@ -258,6 +262,7 @@ export class TrendsController {
 				batch.prices.map((pairPrice: PairPrice) => {
 					const matching: PairPrice = updatedBatch.find((updatedPairPrice: PairPrice) => pairPrice.symbol === updatedPairPrice.symbol);
 					const matchingStats: PriceChangeStats = stats.find((s: PriceChangeStats) => pairPrice.symbol === s.symbol);
+					if (!matching || !matchingStats) return;
 					const diff: number = matching.price - pairPrice.price;
 					const pcDiff: number = (diff / pairPrice.price) * 100;
 
@@ -277,6 +282,7 @@ export class TrendsController {
 				batch.prices.map((pairPrice: PairPrice) => {
 					const matching: PairPrice = updatedBatch.find((updatedPairPrice: PairPrice) => pairPrice.symbol === updatedPairPrice.symbol);
 					const matchingStats: PriceChangeStats = stats.find((s: PriceChangeStats) => pairPrice.symbol === s.symbol);
+					if (!matching || !matchingStats) return;
 					const diff: number = matching.price - pairPrice.price;
 					const pcDiff: number = (diff / pairPrice.price) * 100;
 
@@ -296,6 +302,7 @@ export class TrendsController {
 				batch.prices.map((pairPrice: PairPrice) => {
 					const matching: PairPrice = updatedBatch.find((updatedPairPrice: PairPrice) => pairPrice.symbol === updatedPairPrice.symbol);
 					const matchingStats: PriceChangeStats = stats.find((s: PriceChangeStats) => pairPrice.symbol === s.symbol);
+					if (!matching || !matchingStats) return;
 					const diff: number = matching.price - pairPrice.price;
 					const pcDiff: number = (diff / pairPrice.price) * 100;
 
@@ -315,6 +322,7 @@ export class TrendsController {
 				batch.prices.map((pairPrice: PairPrice) => {
 					const matching: PairPrice = updatedBatch.find((updatedPairPrice: PairPrice) => pairPrice.symbol === updatedPairPrice.symbol);
 					const matchingStats: PriceChangeStats = stats.find((s: PriceChangeStats) => pairPrice.symbol === s.symbol);
+					if (!matching || !matchingStats) return;
 					const diff: number = matching.price - pairPrice.price;
 					const pcDiff: number = (diff / pairPrice.price) * 100;
 
@@ -334,6 +342,7 @@ export class TrendsController {
 				batch.prices.map((pairPrice: PairPrice) => {
 					const matching: PairPrice = updatedBatch.find((updatedPairPrice: PairPrice) => pairPrice.symbol === updatedPairPrice.symbol);
 					const matchingStats: PriceChangeStats = stats.find((s: PriceChangeStats) => pairPrice.symbol === s.symbol);
+					if (!matching || !matchingStats) return;
 					const diff: number = matching.price - pairPrice.price;
 					const pcDiff: number = (diff / pairPrice.price) * 100;
 

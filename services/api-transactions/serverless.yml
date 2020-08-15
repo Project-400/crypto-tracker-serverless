@@ -1,4 +1,4 @@
-service: api-coins-service-${self:custom.projectName}
+service: api-transactions-service-${self:custom.projectName}
 frameworkVersion: ">=1.44.0"
 
 custom:
@@ -35,20 +35,14 @@ provider:
 plugins:
   - serverless-offline
   - serverless-webpack
+  - serverless-offline-scheduler
 
 functions:
-  getCoins:
-    handler: src/handler.getCoins
+  buyCurrency:
+    handler: src/handler.buyCurrency
     events:
       - http:
-          path: /coins
-          method: get
-          cors: true
-  gatherUserCoins:
-    handler: src/handler.gatherUserCoins
-    events:
-      - http:
-          path: /coins/gather
+          path: /transactions/buy
           method: get
           cors: true
 #          authorizer: aws_iam

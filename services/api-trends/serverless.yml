@@ -1,4 +1,4 @@
-service: api-user-service-${self:custom.projectName}
+service: api-trends-service-${self:custom.projectName}
 frameworkVersion: ">=1.44.0"
 
 custom:
@@ -38,14 +38,14 @@ plugins:
   - serverless-offline-scheduler
 
 functions:
-  logNewPriceBatch:
-    handler: src/handler.logNewPriceBatch
-    events:
-      - schedule: rate(5 minutes)
-      - http:
-          path: /price-batch/log-new-price-batch
-          method: get
-          cors: true
+#  logNewPriceBatch:
+#    handler: src/handler.logNewPriceBatch
+#    events:
+#      - schedule: rate(5 minutes)
+#      - http:
+#          path: /price-batch/log-new-price-batch
+#          method: get
+#          cors: true
 #          authorizer: aws_iam
   savePriceChangeStats:
     handler: src/handler.savePriceChangeStats
@@ -63,16 +63,16 @@ functions:
           method: get
           cors: true
 #          authorizer: aws_iam
-  getBestPerformersByQuoteCurrency:
-    handler: src/handler.getBestPerformersByQuoteCurrency
+  getBestPerformersByQuote:
+    handler: src/handler.getBestPerformersByQuote
     events:
       - http:
           path: /trends/quote/{quote}
           method: get
           cors: true
 #          authorizer: aws_iam
-  getPriceChangeStatsByBaseCurrency:
-    handler: src/handler.getPriceChangeStatsByBaseCurrency
+  getPriceChangeStatsByBase:
+    handler: src/handler.getPriceChangeStatsByBase
     events:
       - http:
           path: /trends/base/{base}

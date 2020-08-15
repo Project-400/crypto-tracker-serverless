@@ -1,4 +1,4 @@
-service: api-user-service-${self:custom.projectName}
+service: api-exchange-pairs-service-${self:custom.projectName}
 frameworkVersion: ">=1.44.0"
 
 custom:
