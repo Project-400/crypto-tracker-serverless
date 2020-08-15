@@ -5,25 +5,34 @@ import {
 	ApiEvent,
 	ApiContext,
 	UnitOfWork,
+	ErrorCode,
 } from '../../api-shared-modules/src';
 import { ClientRequest, IncomingMessage } from 'http';
 import * as https from 'https';
-import { BINANCE_API_KEY, BINANCE_API_SECRET_KEY } from '../../../environment/env';
+import { BINANCE_API_HOST, BINANCE_API_KEY, BINANCE_API_SECRET_KEY } from '../../../environment/env';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
+import { BuyCurrencyData, SellCurrencyData } from './transactions.interfaces';
 
 export class TransactionsController {
 
 	public constructor(private unitOfWork: UnitOfWork) { }
 
 	public buyCurrency: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
+
+		const buyInfo: Partial<BuyCurrencyData> = JSON.parse(event.body);
+
+		if (!buyInfo.symbol || !buyInfo.quantity)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
 		const dataString: string = await new Promise((resolve: any, reject: any): void => {
 			let ds: string = '';
 
 			const data: string = qs.stringify({
-				symbol: 'ASTBTC',
+				symbol: buyInfo.symbol,
 				side: 'BUY',
-				quoteOrderQty: 0.0001,
+				quoteOrderQty: buyInfo.quantity,
 				type: 'MARKET',
 				timestamp: new Date().getTime(),
 				recvWindow: 10000
@@ -35,18 +44,68 @@ export class TransactionsController {
 				.update(data)
 				.digest('hex');
 
-			console.log('Requesting');
-
 			const req: ClientRequest = https.get({ // https.request not working - Using https.get with POST method (It works?)
-				host: 'api.binance.com',
+				host: BINANCE_API_HOST,
 				port: 443,
-				path: `/api/v3/order?${data}&signature=${signature}`,
+				path: `/api/v3/order${buyInfo.isTest ? '/test' : ''}?${data}&signature=${signature}`,
 				method: 'POST',
 				headers: {
 					'X-MBX-APIKEY': BINANCE_API_KEY
 				}
 			}, (res: IncomingMessage) => {
-				console.log(res);
+				res.on('data', (chunk: any) => ds += chunk);
+				res.on('end', () => {
+					resolve(ds);
+				});
+			});
+
+			req.on('error', reject);
+		});
+
+		const response: any = JSON.parse(dataString);
+
+		try {
+			return ResponseBuilder.ok({ response });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	public sellCurrency: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
+
+		const sellInfo: Partial<SellCurrencyData> = JSON.parse(event.body);
+
+		if (!sellInfo.symbol || !sellInfo.quantity)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const dataString: string = await new Promise((resolve: any, reject: any): void => {
+			let ds: string = '';
+
+			const data: string = qs.stringify({
+				symbol: sellInfo.symbol,
+				side: 'SELL',
+				quantity: sellInfo.quantity,
+				type: 'MARKET',
+				timestamp: new Date().getTime(),
+				recvWindow: 10000
+			});
+
+			const signature: string
+				= crypto
+				.createHmac('sha256', BINANCE_API_SECRET_KEY)
+				.update(data)
+				.digest('hex');
+
+			const req: ClientRequest = https.get({ // https.request not working - Using https.get with POST method (It works?)
+				host: BINANCE_API_HOST,
+				port: 443,
+				path: `/api/v3/order${sellInfo.isTest ? '/test' : ''}?${data}&signature=${signature}`,
+				method: 'POST',
+				headers: {
+					'X-MBX-APIKEY': BINANCE_API_KEY
+				}
+			}, (res: IncomingMessage) => {
 				res.on('data', (chunk: any) => ds += chunk);
 				res.on('end', () => {
 					resolve(ds);

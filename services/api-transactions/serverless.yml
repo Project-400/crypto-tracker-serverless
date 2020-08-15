@@ -43,7 +43,15 @@ functions:
     events:
       - http:
           path: /transactions/buy
-          method: get
+          method: post
+          cors: true
+#          authorizer: aws_iam
+  sellCurrency:
+    handler: src/handler.sellCurrency
+    events:
+      - http:
+          path: /transactions/sell
+          method: post
           cors: true
 #          authorizer: aws_iam
 #
