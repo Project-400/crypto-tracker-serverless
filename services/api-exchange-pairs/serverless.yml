@@ -37,11 +37,19 @@ plugins:
   - serverless-webpack
 
 functions:
-  gatherAllExchangePairs:
-    handler: src/handler.gatherAllExchangePairs
+  gatherAllExchangeInfo:
+    handler: src/handler.gatherAllExchangeInfo
     events:
       - http:
           path: /exchange-pairs/gather-all
+          method: get
+          cors: true
+#          authorizer: aws_iam
+  getSymbolExchangePair:
+    handler: src/handler.getSymbolExchangePair
+    events:
+      - http:
+          path: /exchange-pairs/single/{symbol}/{quote}
           method: get
           cors: true
 #          authorizer: aws_iam

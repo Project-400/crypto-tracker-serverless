@@ -22,6 +22,13 @@ export class ExchangePairRepository extends Repository implements IExchangePairR
 		return pairs;
 	}
 
+	public async getExchangePair(symbol: string, quote: string): Promise<ExchangePair> {
+		return this.db.get(Object.assign(new ExchangePairItem(), {
+			pk: `exchangePair#${symbol}`,
+			sk: `exchangePair#${quote}`
+		}));
+	}
+
 	public async saveExchangePair(pair: ExchangePair): Promise<ExchangePair> {
 		const date: string = new Date().toISOString();
 
