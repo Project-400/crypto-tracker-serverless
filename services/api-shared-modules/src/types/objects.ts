@@ -161,7 +161,7 @@ export interface ExchangeInfoSymbol {
 	isSpotTradingAllowed: boolean;
 	isMarginTradingAllowed: boolean;
 	filters: ExchangeInfoFilters[];
-	permissions: string[]
+	permissions: string[];
 }
 
 // export interface ExchangeInfo {

@@ -1,23 +1,50 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { ExchangeInfo, ExchangeInfoFilters, ExchangeInfoRateLimiters, ExchangeInfoSymbol } from '../../types';
+import { ExchangeInfoFilters, ExchangeInfoSymbol } from '../../types';
 
-export class ExchangeInfoItem extends DynamoDbItem implements ExchangeInfo {
-
-	@attribute()
-	public timezone: string;
+export class ExchangeInfoSymbolItem extends DynamoDbItem implements ExchangeInfoSymbol {
 
 	@attribute()
-	public serverTime: number;
+	public symbol: string;
 
 	@attribute()
-	public rateLimits: ExchangeInfoRateLimiters[];
+	public status: string;
 
 	@attribute()
-	public exchangeFilters: ExchangeInfoFilters[];
+	public baseAsset: string;
 
 	@attribute()
-	public symbols: ExchangeInfoSymbol[];
+	public baseAssetPrecision: number;
+
+	@attribute()
+	public quoteAsset: string;
+
+	@attribute()
+	public quotePrecision: number;
+
+	@attribute()
+	public quoteAssetPrecision: number;
+
+	@attribute()
+	public orderTypes: string[];
+
+	@attribute()
+	public icebergAllowed: boolean;
+
+	@attribute()
+	public ocoAllowed: boolean;
+
+	@attribute()
+	public isSpotTradingAllowed: boolean;
+
+	@attribute()
+	public isMarginTradingAllowed: boolean;
+
+	@attribute()
+	public filters: ExchangeInfoFilters[];
+
+	@attribute()
+	public permissions: string[];
 
 	@attribute()
 	public times: {

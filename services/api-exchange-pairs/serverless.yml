@@ -37,8 +37,8 @@ plugins:
   - serverless-webpack
 
 functions:
-  gatherAllExchangeInfo:
-    handler: src/handler.gatherAllExchangeInfo
+  gatherAllExchangePairs:
+    handler: src/handler.gatherAllExchangePairs
     events:
       - http:
           path: /exchange-pairs/gather-all

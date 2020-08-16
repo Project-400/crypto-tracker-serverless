@@ -39,6 +39,8 @@ export class ExchangeInfoController {
 		} catch (err) {
 			const allInfo: Array<Partial<ExchangeInfoSymbol>> = await this.requestExchangeInfo();
 
+			console.log(allInfo);
+
 			const newInfo: Partial<ExchangeInfoSymbol> = allInfo.find((s: ExchangeInfoSymbol) => s.symbol === event.pathParameters.symbol);
 			if (!newInfo) return ResponseBuilder.notFound(ErrorCode.InvalidId, 'Symbol exchange info not found');
 

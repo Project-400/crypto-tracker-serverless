@@ -1,8 +1,8 @@
 import { ApiHandler, UnitOfWork } from '../../api-shared-modules/src';
-import { ExchangeInfoController } from '../../api-exchange-info/src/exchange-info.controller';
+import { ExchangePairsController } from './exchange-pairs.controller';
 
 const unitOfWork: UnitOfWork = new UnitOfWork();
-const controller: ExchangeInfoController = new ExchangeInfoController(unitOfWork);
+const controller: ExchangePairsController = new ExchangePairsController(unitOfWork);
 
-export const gatherAllExchangeInfo: ApiHandler = controller.gatherAllExchangeInfo;
-export const getSymbolExchangeInfo: ApiHandler = controller.getSymbolExchangeInfo;
+export const gatherAllExchangePairs: ApiHandler = controller.gatherAllExchangePairs;
+export const getSymbolExchangePair: ApiHandler = controller.getSymbolExchangePair;
