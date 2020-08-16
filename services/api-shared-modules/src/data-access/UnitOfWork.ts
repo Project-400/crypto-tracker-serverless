@@ -1,12 +1,12 @@
 import {
 	UserRepository,
 	SubscriptionRepository,
-	CoinRepository, PriceBatchRepository, ExchangePairRepository, TransactionRepository,
+	CoinRepository, PriceBatchRepository, ExchangePairRepository, TransactionRepository, ExchangeInfoRepository,
 } from './repositories';
 import {
 	IUserRepository,
 	ISubscriptionRepository,
-	ICoinRepository, IPriceBatchRepository, IExchangePairRepository, ITransactionRepository,
+	ICoinRepository, IPriceBatchRepository, IExchangePairRepository, ITransactionRepository, IExchangeInfoRepository,
 } from './interfaces';
 import { DataMapper } from '@aws/dynamodb-data-mapper';
 import { DynamoDB } from 'aws-sdk';
@@ -21,6 +21,7 @@ export class UnitOfWork {
 	public PriceBatches: IPriceBatchRepository;
 	public PriceChangeStats: IPriceChangeStatsRepository;
 	public ExchangePairs: IExchangePairRepository;
+	public ExchangeInfo: IExchangeInfoRepository;
 	public Transactions: ITransactionRepository;
 
 	public constructor() {
@@ -32,6 +33,7 @@ export class UnitOfWork {
 		this.PriceBatches = new PriceBatchRepository(db);
 		this.PriceChangeStats = new PriceChangeStatsRepository(db);
 		this.ExchangePairs = new ExchangePairRepository(db);
+		this.ExchangeInfo = new ExchangeInfoRepository(db);
 		this.Transactions = new TransactionRepository(db);
 	}
 

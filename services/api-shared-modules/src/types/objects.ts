@@ -147,14 +147,43 @@ export interface ExchangePair {
 	};
 }
 
-export interface BinanceExchangeInfoSymbol {
+export interface ExchangeInfoSymbol {
 	symbol: string;
+	status: string;
 	baseAsset: string;
+	baseAssetPrecision: number;
 	quoteAsset: string;
+	quotePrecision: number;
+	quoteAssetPrecision: number;
+	orderTypes: string[];
+	icebergAllowed: boolean;
+	ocoAllowed: boolean;
+	isSpotTradingAllowed: boolean;
+	isMarginTradingAllowed: boolean;
+	filters: ExchangeInfoFilters[];
+	permissions: string[]
 }
 
+// export interface ExchangeInfo {
+// 	timezone: string;
+// 	serverTime: number;
+// 	rateLimits: ExchangeInfoRateLimiters[];
+// 	exchangeFilters: ExchangeInfoFilters[];
+// 	symbols: ExchangeInfoSymbol[];
+// 	times: {
+// 		createdAt: Date | string;
+// 		updatedAt: Date | string;
+// 	};
+// }
+//
+// export interface BinanceExchangeInfoSymbol {
+// 	symbol: string;
+// 	baseAsset: string;
+// 	quoteAsset: string;
+// }
+
 export interface BinanceExchangeInfoResponse {
-	symbols: BinanceExchangeInfoSymbol[];
+	symbols: ExchangeInfoSymbol[];
 }
 
 export interface Transaction {
@@ -204,4 +233,15 @@ export interface TransactionFill {
 	commission: number;
 	commissionAsset: string;
 	tradeId: number;
+}
+
+export enum ExchangeInfoRateLimiters {
+	REQUEST_WEIGHT,
+	ORDERS,
+	RAW_REQUESTS
+}
+
+export enum ExchangeInfoFilters {
+	EXCHANGE_MAX_NUM_ORDERS,
+	EXCHANGE_MAX_NUM_ALGO_ORDERS
 }
