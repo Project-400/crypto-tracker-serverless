@@ -5,7 +5,7 @@ import {
 	ApiEvent,
 	ApiContext,
 	UnitOfWork,
-	ErrorCode,
+	ErrorCode, Transaction, TransactionRequest,
 } from '../../api-shared-modules/src';
 import { ClientRequest, IncomingMessage } from 'http';
 import * as https from 'https';
@@ -23,20 +23,22 @@ export class TransactionsController {
 
 		const buyInfo: Partial<BuyCurrencyData> = JSON.parse(event.body);
 
-		if (!buyInfo.symbol || !buyInfo.quantity)
+		if (!buyInfo.symbol || !buyInfo.base || !buyInfo.quote || !buyInfo.quantity)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const request: TransactionRequest = {
+			symbol: buyInfo.symbol,
+			side: 'BUY',
+			quoteOrderQty: buyInfo.quantity,
+			type: 'MARKET',
+			timestamp: new Date().getTime(),
+			recvWindow: 10000
+		};
 
 		const dataString: string = await new Promise((resolve: any, reject: any): void => {
 			let ds: string = '';
 
-			const data: string = qs.stringify({
-				symbol: buyInfo.symbol,
-				side: 'BUY',
-				quoteOrderQty: buyInfo.quantity,
-				type: 'MARKET',
-				timestamp: new Date().getTime(),
-				recvWindow: 10000
-			});
+			const data: string = qs.stringify(request);
 
 			const signature: string
 				= crypto
@@ -64,8 +66,19 @@ export class TransactionsController {
 
 		const response: any = JSON.parse(dataString);
 
+		const transaction: Partial<Transaction> = {
+			request,
+			response,
+			symbol: buyInfo.symbol,
+			base: buyInfo.base,
+			quote: buyInfo.quote,
+			completed: !(response.code && response.msg)
+		};
+
+		const savedTransaction: Transaction = await this.unitOfWork.Transactions.save(transaction);
+
 		try {
-			return ResponseBuilder.ok({ response });
+			return ResponseBuilder.ok({ transaction: savedTransaction });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
@@ -76,20 +89,22 @@ export class TransactionsController {
 
 		const sellInfo: Partial<SellCurrencyData> = JSON.parse(event.body);
 
-		if (!sellInfo.symbol || !sellInfo.quantity)
+		if (!sellInfo.symbol || !sellInfo.base || !sellInfo.quote || !sellInfo.quantity)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const request: TransactionRequest = {
+			symbol: sellInfo.symbol,
+			side: 'SELL',
+			quantity: sellInfo.quantity,
+			type: 'MARKET',
+			timestamp: new Date().getTime(),
+			recvWindow: 10000
+		};
 
 		const dataString: string = await new Promise((resolve: any, reject: any): void => {
 			let ds: string = '';
 
-			const data: string = qs.stringify({
-				symbol: sellInfo.symbol,
-				side: 'SELL',
-				quantity: sellInfo.quantity,
-				type: 'MARKET',
-				timestamp: new Date().getTime(),
-				recvWindow: 10000
-			});
+			const data: string = qs.stringify(request);
 
 			const signature: string
 				= crypto
@@ -117,8 +132,19 @@ export class TransactionsController {
 
 		const response: any = JSON.parse(dataString);
 
+		const transaction: Partial<Transaction> = {
+			request,
+			response,
+			symbol: sellInfo.symbol,
+			base: sellInfo.base,
+			quote: sellInfo.quote,
+			completed: !(response.code && response.msg)
+		};
+
+		const savedTransaction: Transaction = await this.unitOfWork.Transactions.save(transaction);
+
 		try {
-			return ResponseBuilder.ok({ response });
+			return ResponseBuilder.ok({ transaction: savedTransaction });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}

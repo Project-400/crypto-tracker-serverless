@@ -6,6 +6,7 @@ export { ICoinRepository } from './ICoinRepository';
 export { IPriceBatchRepository } from './IPriceBatchRepository';
 export { IPriceChangeStatsRepository } from './IPriceChangeStatsRepository';
 export { IExchangePairRepository } from './IExchangePairRepository';
+export { ITransactionRepository } from './ITransactionRepository';
 
 export interface QueryKey {
 	pk?: string;

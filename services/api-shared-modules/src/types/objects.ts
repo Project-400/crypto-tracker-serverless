@@ -156,3 +156,52 @@ export interface BinanceExchangeInfoSymbol {
 export interface BinanceExchangeInfoResponse {
 	symbols: BinanceExchangeInfoSymbol[];
 }
+
+export interface Transaction {
+	request: TransactionRequest;
+	response: TransactionResponse;
+	symbol: string;
+	base: string;
+	quote: string;
+	completed: boolean;
+	times: {
+		createdAt: Date | string;
+	};
+}
+
+export interface TransactionRequest {
+	symbol: string;
+	side: 'BUY' | 'SELL';
+	quantity?: number;
+	quoteOrderQty?: number;
+	type: string;
+	timestamp: number;
+	recvWindow: number;
+}
+
+export interface TransactionResponse {
+	symbol: string;
+	orderId: number;
+	orderListId: number;
+	clientOrderId: string;
+	transactTime: number;
+	price: number;
+	origQty: number;
+	executedQty: number;
+	cummulativeQuoteQty: number;
+	status: string;
+	timeInForce: string;
+	type: string;
+	side: 'BUY' | 'SELL';
+	fills: TransactionFill[];
+	code?: number;
+	msg?: string;
+}
+
+export interface TransactionFill {
+	price: number;
+	qty: number;
+	commission: number;
+	commissionAsset: string;
+	tradeId: number;
+}
