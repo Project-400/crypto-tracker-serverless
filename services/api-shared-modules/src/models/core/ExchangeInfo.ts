@@ -1,6 +1,6 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { ExchangeInfoFilters, ExchangeInfoSymbol } from '../../types';
+import { ExchangeInfoSymbol } from '../../types';
 
 export class ExchangeInfoSymbolItem extends DynamoDbItem implements ExchangeInfoSymbol {
 
@@ -41,7 +41,7 @@ export class ExchangeInfoSymbolItem extends DynamoDbItem implements ExchangeInfo
 	public isMarginTradingAllowed: boolean;
 
 	@attribute()
-	public filters: ExchangeInfoFilters[];
+	public filters: any[];
 
 	@attribute()
 	public permissions: string[];

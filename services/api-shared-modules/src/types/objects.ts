@@ -160,7 +160,7 @@ export interface ExchangeInfoSymbol {
 	ocoAllowed: boolean;
 	isSpotTradingAllowed: boolean;
 	isMarginTradingAllowed: boolean;
-	filters: ExchangeInfoFilters[];
+	filters: any[];
 	permissions: string[];
 }
 
@@ -239,9 +239,4 @@ export enum ExchangeInfoRateLimiters {
 	REQUEST_WEIGHT,
 	ORDERS,
 	RAW_REQUESTS
-}
-
-export enum ExchangeInfoFilters {
-	EXCHANGE_MAX_NUM_ORDERS,
-	EXCHANGE_MAX_NUM_ALGO_ORDERS
 }
