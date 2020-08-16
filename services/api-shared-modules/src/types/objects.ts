@@ -1,4 +1,5 @@
 // Preferably create a custom NPM package and move everything from this file to the package
+import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
 
 export type UserType = 'User' | 'Admin';
 
@@ -146,41 +147,6 @@ export interface ExchangePair {
 		updatedAt: Date | string;
 	};
 }
-
-export interface ExchangeInfoSymbol {
-	symbol: string;
-	status: string;
-	baseAsset: string;
-	baseAssetPrecision: number;
-	quoteAsset: string;
-	quotePrecision: number;
-	quoteAssetPrecision: number;
-	orderTypes: string[];
-	icebergAllowed: boolean;
-	ocoAllowed: boolean;
-	isSpotTradingAllowed: boolean;
-	isMarginTradingAllowed: boolean;
-	filters: any[];
-	permissions: string[];
-}
-
-// export interface ExchangeInfo {
-// 	timezone: string;
-// 	serverTime: number;
-// 	rateLimits: ExchangeInfoRateLimiters[];
-// 	exchangeFilters: ExchangeInfoFilters[];
-// 	symbols: ExchangeInfoSymbol[];
-// 	times: {
-// 		createdAt: Date | string;
-// 		updatedAt: Date | string;
-// 	};
-// }
-//
-// export interface BinanceExchangeInfoSymbol {
-// 	symbol: string;
-// 	baseAsset: string;
-// 	quoteAsset: string;
-// }
 
 export interface BinanceExchangeInfoResponse {
 	symbols: ExchangeInfoSymbol[];
