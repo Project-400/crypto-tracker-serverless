@@ -1,6 +1,6 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { ExchangeInfoSymbol } from '../../types';
+import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
 
 export class ExchangeInfoSymbolItem extends DynamoDbItem implements ExchangeInfoSymbol {
 

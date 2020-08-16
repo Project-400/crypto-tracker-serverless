@@ -7,10 +7,11 @@ import {
 	UnitOfWork,
 	ExchangePair,
 	BinanceExchangeInfoResponse,
-	ErrorCode, ExchangeInfoSymbol,
+	ErrorCode,
 } from '../../api-shared-modules/src';
 import { ClientRequest, IncomingMessage } from 'http';
 import * as https from 'https';
+import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
 
 export class ExchangePairsController {
 

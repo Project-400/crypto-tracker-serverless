@@ -66,31 +66,6 @@ export class TransactionsController {
 
 		const response: any = JSON.parse(dataString);
 
-		// const response: any = {
-		// 	"symbol": "WAVESBTC",
-		// 	"orderId": 148133651,
-		// 	"orderListId": -1,
-		// 	"clientOrderId": "eRzc6odXiHK8CfuxmT7w9L",
-		// 	"transactTime": 1597586336023,
-		// 	"price": "0.00000000",
-		// 	"origQty": "0.57000000",
-		// 	"executedQty": "0.57000000",
-		// 	"cummulativeQuoteQty": "0.00019750",
-		// 	"status": "FILLED",
-		// 	"timeInForce": "GTC",
-		// 	"type": "MARKET",
-		// 	"side": "BUY",
-		// 	"fills": [
-		// 		{
-		// 			"price": "0.00034100",
-		// 			"qty": "0.57000000",
-		// 			"commission": "0.00057000",
-		// 			"commissionAsset": "WAVES",
-		// 			"tradeId": 27496461
-		// 		}
-		// 	]
-		// };
-
 		const transaction: Partial<Transaction> = {
 			request,
 			response,
@@ -160,31 +135,6 @@ export class TransactionsController {
 		});
 
 		const response: any = JSON.parse(dataString);
-
-		// const response: any = {
-		// 	"symbol": "WAVESBTC",
-		// 	"orderId": 148134509,
-		// 	"orderListId": -1,
-		// 	"clientOrderId": "flBChVWHPVTRntje5rXZYs",
-		// 	"transactTime": 1597586390982,
-		// 	"price": "0.00000000",
-		// 	"origQty": "0.50000000",
-		// 	"executedQty": "0.50000000",
-		// 	"cummulativeQuoteQty": "0.00017215",
-		// 	"status": "FILLED",
-		// 	"timeInForce": "GTC",
-		// 	"type": "MARKET",
-		// 	"side": "SELL",
-		// 	"fills": [
-		// 		{
-		// 			"price": "0.00034430",
-		// 			"qty": "0.50000000",
-		// 			"commission": "0.00000017",
-		// 			"commissionAsset": "BTC",
-		// 			"tradeId": 27496591
-		// 		}
-		// 	]
-		// };
 
 		const transaction: Partial<Transaction> = {
 			request,

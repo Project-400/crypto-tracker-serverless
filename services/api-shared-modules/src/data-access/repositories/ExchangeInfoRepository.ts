@@ -1,7 +1,7 @@
-import { ExchangeInfoSymbol } from '../../types';
 import { Repository } from './Repository';
 import { IExchangeInfoRepository } from '../interfaces';
 import { ExchangeInfoSymbolItem } from '../../models/core/ExchangeInfo';
+import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
 
 export class ExchangeInfoRepository extends Repository implements IExchangeInfoRepository {
 

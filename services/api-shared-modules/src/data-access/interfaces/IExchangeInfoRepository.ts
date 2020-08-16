@@ -1,4 +1,4 @@
-import { ExchangeInfoSymbol } from '../..';
+import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
 
 export interface IExchangeInfoRepository {
 	saveExchangeInfo(pair: Partial<ExchangeInfoSymbol>): Promise<ExchangeInfoSymbol>;
