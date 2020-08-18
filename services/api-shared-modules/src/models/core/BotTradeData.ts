@@ -1,6 +1,6 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { ExchangeInfoSymbol, TransactionFillCommission, PositionState, ISymbolTraderData } from '@crypto-tracker/common-types';
+import { ExchangeInfoSymbol, TransactionFillCommission, PositionState, ISymbolTraderData, SymbolType } from '@crypto-tracker/common-types';
 
 export class BotTradeDataItem extends DynamoDbItem implements ISymbolTraderData {
 
@@ -23,6 +23,12 @@ export class BotTradeDataItem extends DynamoDbItem implements ISymbolTraderData 
 	public quoteQty: number;
 
 	@attribute()
+	public baseInitialQty: number;
+
+	@attribute()
+	public quoteQtySpent: number;
+
+	@attribute()
 	public profit: number;
 
 	@attribute()
@@ -38,6 +44,9 @@ export class BotTradeDataItem extends DynamoDbItem implements ISymbolTraderData 
 	public percentageDifference: number;
 
 	@attribute()
+	public percentageDroppedFromHigh: number;
+
+	@attribute()
 	public commissions: TransactionFillCommission[];
 
 	@attribute()
@@ -51,6 +60,15 @@ export class BotTradeDataItem extends DynamoDbItem implements ISymbolTraderData 
 
 	@attribute()
 	public baseStepSize: number;
+
+	@attribute()
+	public highestPriceReached: number;
+
+	@attribute()
+	public lowestPriceReached: number;
+
+	@attribute()
+	public symbolType: SymbolType;
 
 	@attribute()
 	public times: {
