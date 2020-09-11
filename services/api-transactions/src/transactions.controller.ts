@@ -93,8 +93,12 @@ export class TransactionsController {
 
 		const sellInfo: Partial<SellCurrencyData> = JSON.parse(event.body);
 
+		console.log(sellInfo);
+
 		if (!sellInfo.symbol || !sellInfo.base || !sellInfo.quote || !sellInfo.quantity)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		if (!sellInfo.quote) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid Quantity');
 
 		const request: TransactionRequest = {
 			symbol: sellInfo.symbol,

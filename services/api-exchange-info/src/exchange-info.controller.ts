@@ -55,7 +55,7 @@ export class ExchangeInfoController {
 		}
 	}
 
-	private requestExchangeInfo = async (): Promise<ExchangeInfoSymbol[]> => {
+	public requestExchangeInfo = async (): Promise<ExchangeInfoSymbol[]> => {
 		let dataString: string = '';
 
 		const pairsString: string = await new Promise((resolve: any, reject: any): void => {

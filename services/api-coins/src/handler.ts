@@ -6,3 +6,4 @@ const controller: CoinsController = new CoinsController(unitOfWork);
 
 export const getCoins: ApiHandler = controller.getCoins;
 export const gatherUserCoins: ApiHandler = controller.gatherUserCoins;
+export const getInvestmentChange: ApiHandler = controller.getInvestmentChange;

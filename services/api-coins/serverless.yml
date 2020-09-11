@@ -51,6 +51,13 @@ functions:
           path: /coins/gather
           method: get
           cors: true
+  getInvestmentChange:
+    handler: src/handler.getInvestmentChange
+    events:
+      - http:
+          path: /coins/invs
+          method: get
+          cors: true
 #          authorizer: aws_iam
 #
 #resources:
