@@ -86,16 +86,26 @@ export class CoinsController {
 		// const trades5: any = await this.getSymbolTrades('SRMBIDR');
 		// console.log(trades5.length);
 
-		const trades1: any = await this.getSymbolTrades('DOCKUSDT');
+		const trades1: any = await this.getSymbolTrades('KEYUSDT');
 		console.log(trades1.length);
-		const trades2: any = await this.getSymbolTrades('DOCKBTC');
+		const trades2: any = await this.getSymbolTrades('KEYETH');
 		console.log(trades2.length);
-		// const trades3: any = await this.getSymbolTrades('SRMBTC');
+
+		// const trades1: any = await this.getSymbolTrades('LENDUSDT');
+		// console.log(trades1.length);
+		// const trades2: any = await this.getSymbolTrades('LENDBTC');
+		// console.log(trades2.length);
+		// const trades3: any = await this.getSymbolTrades('LENDETH');
 		// console.log(trades3.length);
-		// const trades4: any = await this.getSymbolTrades('SRMBUSD');
+		// const trades4: any = await this.getSymbolTrades('LENDBUSD');
 		// console.log(trades4.length);
 		// const trades5: any = await this.getSymbolTrades('SRMBIDR');
 		// console.log(trades5.length);
+
+		// const trades1: any = await this.getSymbolTrades('DOCKUSDT');
+		// console.log(trades1.length);
+		// const trades2: any = await this.getSymbolTrades('DOCKBTC');
+		// console.log(trades2.length);
 
 		// const trades1: any = await this.getSymbolTrades('YFIUSDT');
 		// console.log(trades1.length);
@@ -105,7 +115,7 @@ export class CoinsController {
 		// console.log(trades3.length);
 		// const trades4: any = await this.getSymbolTrades('YFIBTC');
 		// console.log(trades4.length);
-
+		//
 		// const trades1: any = await this.getSymbolTrades('WINUSDT');
 		// console.log(trades1.length);
 		// const trades2: any = await this.getSymbolTrades('WINBNB');
@@ -115,43 +125,87 @@ export class CoinsController {
 		// const trades4: any = await this.getSymbolTrades('WINUSDC');
 		// console.log(trades4.length);
 
-		const sortedTrades: any = _.sortBy([ ...trades1, ...trades2 ], 'time');
+		const sortedTrades: any = _.sortBy([ ...trades1 ], 'time');
 
 		console.log(sortedTrades);
 
+		let totalQty: number = 0;
+		let totalInvestedValue: number = 0;
+		let currentValue: number = 0;
+		let currentProfitLoss: number = 0;
+		let takenProfitLoss: number = 0;
+
 		const totals: { value: number; costs: any } = sortedTrades.reduce((ts: { value: number; costs: any }, trade: any) => {
+			if (!ts.costs[trade.symbol]) ts.costs[trade.symbol] = 0;
+
+			const qty: number = Number(trade.qty);
+			const price: number = Number(trade.price);
+			const thisTradeInvestedValue: number = qty * price; // White
+			const currentTotalValue: number = totalQty * price; // Blue
+
 			if (trade.isBuyer) {
-				console.log(`+${trade.qty}`);
-				ts.value += Number(trade.qty);
+				totalInvestedValue += thisTradeInvestedValue; // Purple
+				totalQty += qty; // Pink
+				currentValue = currentTotalValue + thisTradeInvestedValue; // Green
+
+				// ts.value += Number(trade.qty);
+				// ts.costs[trade.symbol] += Number(trade.qty) * Number(trade.price);
 			}
 			if (!trade.isBuyer) {
-				console.log(`-${trade.qty}`);
-				ts.value -= Number(trade.qty);
+				totalInvestedValue -= thisTradeInvestedValue; // Purple
+				totalQty -= qty; // Pink
+				currentValue = currentTotalValue - thisTradeInvestedValue; // Green
+
+				// ts.value -= Number(trade.qty);
+				// ts.costs[trade.symbol] -= Number(trade.qty) * Number(trade.price);
 			}
 
-			if (trade.commissionAsset === 'DOCK') {
-				ts.value -= Number(trade.commission);
+			if (trade.commissionAsset === 'KEY') {
+				// totalInvestedValue -= thisTradeInvestedValue; // Purple
+				totalQty -= Number(trade.commission); // Pink
+
+				// ts.value -= Number(trade.commission);
+			}
+
+			const thisTradeProfitLoss: number = currentValue - totalInvestedValue; // Yellow
+
+			if (!trade.isBuyer) {
+				const percentageSold: number = (100 / currentTotalValue) * thisTradeInvestedValue;
+				const profitLossSold: number = (thisTradeProfitLoss / 100) * percentageSold;
+				takenProfitLoss += profitLossSold;
+				currentProfitLoss = thisTradeProfitLoss - profitLossSold;
 			}
 
 			return ts;
 		}, { value: 0, costs: { } });
 
+		const details = {
+			totalQty,
+			totalInvestedValue,
+			currentValue,
+			currentProfitLoss,
+			takenProfitLoss
+		};
+
 		const logs: any = await this.getDustLogs();
 
 		logs.map((log: any) => {
 
-			if (log.fromAsset === 'DOCK') {
+			if (log.fromAsset === 'KEY') {
 				console.log(log);
 				totals.value -= log.amount;
 			}
 		});
+
+		totals.roundedValue7 = totals.value.toFixed(7);
+		totals.roundedValue8 = totals.value.toFixed(8);
 
 		// const exchangeInfo: ExchangeInfoSymbol[] = await new ExchangeInfoController(this.unitOfWork).requestExchangeInfo();
 
 		// const sushi: ExchangeInfoSymbol = exchangeInfo.find((s: ExchangeInfoSymbol) => s.symbol === 'SUSHIUSDT');
 
 		const oldCost: number = sortedTrades[0].quoteQty;
-		const newCost: number = await this.getSymbolPrice('WINBNB') * sortedTrades[0].qty;
+		const newCost: number = await this.getSymbolPrice('LENDUSDT') * totals.roundedValue8;
 		const diff: number = ((newCost - oldCost) / oldCost) * 100;
 
 		// const coins: Coin[] = JSON.parse(coinsString);
@@ -159,7 +213,7 @@ export class CoinsController {
 		// await Promise.all(coins.map((coin: Coin) => this.unitOfWork.Coins.saveSingle(coin)));
 
 		try {
-			return ResponseBuilder.ok({ trades: sortedTrades.length, oldCost, newCost, diff, totals });
+			return ResponseBuilder.ok({ trades: sortedTrades.length, oldCost, newCost, diff, totals, details });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
@@ -204,7 +258,7 @@ export class CoinsController {
 		let dataString: string = '';
 
 		const priceString: string = await new Promise((resolve: any, reject: any): void => {
-			const req: ClientRequest = https.get(`https://api.binance.com/api/v3/ticker/price?symbol=WINBNB`, {
+			const req: ClientRequest = https.get(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`, {
 				headers: {
 					'X-MBX-APIKEY': '5EEJO4BQMHaVTVMZFHyBTEPBWSYAwt1va0rbuo9hrL1o6p7ls4xDHsSILCu4DANj'
 				}
@@ -261,7 +315,8 @@ export class CoinsController {
 		const logs: any = [
 			...JSON.parse(priceString).results.rows[0].logs,
 			...JSON.parse(priceString).results.rows[1].logs,
-			...JSON.parse(priceString).results.rows[2].logs
+			...JSON.parse(priceString).results.rows[2].logs,
+			...JSON.parse(priceString).results.rows[3].logs
 		];
 
 		return logs;
