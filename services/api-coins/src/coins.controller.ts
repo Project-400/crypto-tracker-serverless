@@ -135,13 +135,19 @@ export class CoinsController {
 		let currentProfitLoss: number = 0;
 		let takenProfitLoss: number = 0;
 
+		const usdtbtcPrice: number = await this.getSymbolPrice('BTCUSDT');
+
+		console.log('PRICE');
+		console.log(usdtbtcPrice);
+
 		const totals: { value: number; costs: any } = sortedTrades.reduce((ts: { value: number; costs: any }, trade: any) => {
 			if (!ts.costs[trade.symbol]) ts.costs[trade.symbol] = 0;
 
 			const qty: number = Number(trade.qty);
 			const price: number = Number(trade.price);
-			const thisTradeInvestedValue: number = qty * price; // White
-			const currentTotalValue: number = totalQty * price; // Blue
+			const btcPrice: number = price / usdtbtcPrice;
+			const thisTradeInvestedValue: number = qty * btcPrice; // White
+			const currentTotalValue: number = totalQty * btcPrice; // Blue
 
 			if (trade.isBuyer) {
 				totalInvestedValue += thisTradeInvestedValue; // Purple
@@ -197,7 +203,8 @@ export class CoinsController {
 		// const sushi: ExchangeInfoSymbol = exchangeInfo.find((s: ExchangeInfoSymbol) => s.symbol === 'SUSHIUSDT');
 
 		const currentPrice: number = await this.getSymbolPrice('KEYUSDT');
-		const newCost: number = currentPrice * totalQty;
+		const currentBtcPrice: number = currentPrice / usdtbtcPrice;
+		const newCost: number = currentBtcPrice * totalQty;
 		const diff: number = ((newCost - totalInvestedValue) / totalInvestedValue) * 100;
 
 		currentValue = newCost;
@@ -205,14 +212,22 @@ export class CoinsController {
 
 		const details = {
 			totalQty,
+			currentPrice,
+			currentBtcPrice,
 			totalInvestedValue,
 			currentValue,
 			currentProfitLoss,
 			takenProfitLoss,
-			currentPrice,
 			newCost,
 			diff
 		};
+
+		// totalInvestedValue: Number(totalInvestedValue.toFixed(2)),
+		// currentValue: Number(currentValue.toFixed(2)),
+		// currentProfitLoss: Number(currentProfitLoss.toFixed(2)),
+		// takenProfitLoss: Number(takenProfitLoss.toFixed(2)),
+		// newCost: Number(newCost.toFixed(2)),
+		// diff: Number(diff.toFixed(2))
 
 		// const coins: Coin[] = JSON.parse(coinsString);
 		//
@@ -278,11 +293,11 @@ export class CoinsController {
 			req.on('error', reject);
 		});
 
-		console.log(priceString);
-
 		const data: any = JSON.parse(priceString);
 
-		return data.price;
+		if (!data.price) return 0;
+
+		return Number(data.price);
 	}
 
 	private getDustLogs = async (): Promise<any> => {
