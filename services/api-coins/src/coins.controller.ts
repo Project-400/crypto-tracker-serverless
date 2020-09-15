@@ -211,15 +211,26 @@ export class CoinsController {
 		currentProfitLoss = newCost - totalInvestedValue;
 
 		const details = {
-			totalQty,
-			currentPrice,
-			currentBtcPrice,
-			totalInvestedValue,
-			currentValue,
-			currentProfitLoss,
-			takenProfitLoss,
-			newCost,
-			diff
+			BTC: {
+				totalQty,
+				currentPrice: currentBtcPrice,
+				totalInvestedValue,
+				currentValue,
+				currentProfitLoss,
+				takenProfitLoss,
+				newCost,
+				diff
+			},
+			USDT: {
+				totalQty,
+				currentPrice: this.BTCtoUSDT(usdtbtcPrice, currentBtcPrice),
+				totalInvestedValue: this.BTCtoUSDT(usdtbtcPrice, totalInvestedValue),
+				currentValue: this.BTCtoUSDT(usdtbtcPrice, currentValue),
+				currentProfitLoss: this.BTCtoUSDT(usdtbtcPrice, currentProfitLoss),
+				takenProfitLoss: this.BTCtoUSDT(usdtbtcPrice, takenProfitLoss),
+				newCost: this.BTCtoUSDT(usdtbtcPrice, newCost),
+				diff
+			}
 		};
 
 		// totalInvestedValue: Number(totalInvestedValue.toFixed(2)),
@@ -239,6 +250,8 @@ export class CoinsController {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
+
+	private BTCtoUSDT = (btcPrice: number, btcValue: number): number => btcValue * btcPrice;
 
 	private getSymbolTrades = async (symbol: string): Promise<any> => {
 		let dataString: string = '';
