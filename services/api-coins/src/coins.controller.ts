@@ -179,14 +179,6 @@ export class CoinsController {
 			return ts;
 		}, { value: 0, costs: { } });
 
-		const details = {
-			totalQty,
-			totalInvestedValue,
-			currentValue,
-			currentProfitLoss,
-			takenProfitLoss
-		};
-
 		const logs: any = await this.getDustLogs();
 
 		logs.map((log: any) => {
@@ -204,16 +196,30 @@ export class CoinsController {
 
 		// const sushi: ExchangeInfoSymbol = exchangeInfo.find((s: ExchangeInfoSymbol) => s.symbol === 'SUSHIUSDT');
 
-		const oldCost: number = sortedTrades[0].quoteQty;
-		const newCost: number = await this.getSymbolPrice('LENDUSDT') * totals.roundedValue8;
-		const diff: number = ((newCost - oldCost) / oldCost) * 100;
+		const currentPrice: number = await this.getSymbolPrice('KEYUSDT');
+		const newCost: number = currentPrice * totalQty;
+		const diff: number = ((newCost - totalInvestedValue) / totalInvestedValue) * 100;
+
+		currentValue = newCost;
+		currentProfitLoss = newCost - totalInvestedValue;
+
+		const details = {
+			totalQty,
+			totalInvestedValue,
+			currentValue,
+			currentProfitLoss,
+			takenProfitLoss,
+			currentPrice,
+			newCost,
+			diff
+		};
 
 		// const coins: Coin[] = JSON.parse(coinsString);
 		//
 		// await Promise.all(coins.map((coin: Coin) => this.unitOfWork.Coins.saveSingle(coin)));
 
 		try {
-			return ResponseBuilder.ok({ trades: sortedTrades.length, oldCost, newCost, diff, totals, details });
+			return ResponseBuilder.ok({ trades: sortedTrades.length, newCost, diff, totals, details });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
