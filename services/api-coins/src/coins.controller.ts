@@ -3,13 +3,14 @@ import {
 	ApiResponse,
 	ApiHandler,
 	ApiEvent,
-	ApiContext, Coin, UnitOfWork, ErrorCode,
+	ApiContext, Coin, UnitOfWork, ErrorCode, ExchangePair,
 } from '../../api-shared-modules/src';
 import { ClientRequest, IncomingMessage } from 'http';
 import * as https from 'https';
 import * as crypto from 'crypto';
 import * as qs from 'qs';
 import _ from 'underscore';
+import { ExchangePairsController } from '../../api-exchange-pairs/src/exchange-pairs.controller';
 
 export class CoinsController {
 
@@ -72,68 +73,32 @@ export class CoinsController {
 	}
 
 	public getInvestmentChange: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		// if (!event.pathParameters || !event.pathParameters.coin)
-		// 	return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+		if (!event.pathParameters || !event.pathParameters.coin)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 
-		// const trades1: any = await this.getSymbolTrades('SRMUSDT');
-		// console.log(trades1.length);
-		// const trades2: any = await this.getSymbolTrades('SRMBNB');
-		// console.log(trades2.length);
-		// const trades3: any = await this.getSymbolTrades('SRMBTC');
-		// console.log(trades3.length);
-		// const trades4: any = await this.getSymbolTrades('SRMBUSD');
-		// console.log(trades4.length);
-		// const trades5: any = await this.getSymbolTrades('SRMBIDR');
-		// console.log(trades5.length);
+		const coin: string = event.pathParameters.coin.toUpperCase();
 
-		const trades1: any = await this.getSymbolTrades('KEYUSDT');
-		console.log(trades1.length);
-		const trades2: any = await this.getSymbolTrades('KEYETH');
-		console.log(trades2.length);
+		const exchangePairs: ExchangePairsController = new ExchangePairsController(this.unitOfWork);
+		const pairs: Array<Partial<ExchangePair>> = await exchangePairs.requestExchangePairs();
+		const coinPairs: Array<Partial<ExchangePair>> = pairs.filter((p: ExchangePair) => p.base === coin);
 
-		// const trades1: any = await this.getSymbolTrades('LENDUSDT');
-		// console.log(trades1.length);
-		// const trades2: any = await this.getSymbolTrades('LENDBTC');
-		// console.log(trades2.length);
-		// const trades3: any = await this.getSymbolTrades('LENDETH');
-		// console.log(trades3.length);
-		// const trades4: any = await this.getSymbolTrades('LENDBUSD');
-		// console.log(trades4.length);
-		// const trades5: any = await this.getSymbolTrades('SRMBIDR');
-		// console.log(trades5.length);
+		let trades: any[] = [];
 
-		// const trades1: any = await this.getSymbolTrades('DOCKUSDT');
-		// console.log(trades1.length);
-		// const trades2: any = await this.getSymbolTrades('DOCKBTC');
-		// console.log(trades2.length);
+		await Promise.all(
+			coinPairs.map(async (pair: Partial<ExchangePair>) => {
+				const t: any = await this.getSymbolTrades(pair.symbol);
+				trades = [ ...trades, ...t ];
+			})
+		);
 
-		// const trades1: any = await this.getSymbolTrades('YFIUSDT');
-		// console.log(trades1.length);
-		// const trades2: any = await this.getSymbolTrades('YFIBNB');
-		// console.log(trades2.length);
-		// const trades3: any = await this.getSymbolTrades('YFIBUSD');
-		// console.log(trades3.length);
-		// const trades4: any = await this.getSymbolTrades('YFIBTC');
-		// console.log(trades4.length);
-		//
-		// const trades1: any = await this.getSymbolTrades('WINUSDT');
-		// console.log(trades1.length);
-		// const trades2: any = await this.getSymbolTrades('WINBNB');
-		// console.log(trades2.length);
-		// const trades3: any = await this.getSymbolTrades('WINTRX');
-		// console.log(trades3.length);
-		// const trades4: any = await this.getSymbolTrades('WINUSDC');
-		// console.log(trades4.length);
-
-		const sortedTrades: any = _.sortBy([ ...trades1 ], 'time');
-
-		console.log(sortedTrades);
+		const sortedTrades: any = _.sortBy(trades, 'time');
 
 		let totalQty: number = 0;
 		let totalInvestedValue: number = 0;
 		let currentValue: number = 0;
 		let currentProfitLoss: number = 0;
 		let takenProfitLoss: number = 0;
+		let btcPrice: number = 0;
 
 		const usdtbtcPrice: number = await this.getSymbolPrice('BTCUSDT');
 
@@ -145,7 +110,7 @@ export class CoinsController {
 
 			const qty: number = Number(trade.qty);
 			const price: number = Number(trade.price);
-			const btcPrice: number = price / usdtbtcPrice;
+			btcPrice = trade.symbol.endsWith('BTC') ? price : price / usdtbtcPrice;
 			const thisTradeInvestedValue: number = qty * btcPrice; // White
 			const currentTotalValue: number = totalQty * btcPrice; // Blue
 
@@ -166,7 +131,7 @@ export class CoinsController {
 				// ts.costs[trade.symbol] -= Number(trade.qty) * Number(trade.price);
 			}
 
-			if (trade.commissionAsset === 'KEY') {
+			if (trade.commissionAsset === 'PERL') {
 				// totalInvestedValue -= thisTradeInvestedValue; // Purple
 				totalQty -= Number(trade.commission); // Pink
 
@@ -188,21 +153,20 @@ export class CoinsController {
 		const logs: any = await this.getDustLogs();
 
 		logs.map((log: any) => {
-
-			if (log.fromAsset === 'KEY') {
+			if (log.fromAsset === 'PERL') {
 				console.log(log);
-				totals.value -= log.amount;
+				totalQty -= log.amount; // Pink
+				// totalInvestedValue -= (log.amount * btcPrice); // Purple
+				// totals.value -= log.amount;
 			}
 		});
 
-		totals.roundedValue7 = totals.value.toFixed(7);
-		totals.roundedValue8 = totals.value.toFixed(8);
-
+		// totals.roundedValue7 = totals.value.toFixed(7);
+		// totals.roundedValue8 = totals.value.toFixed(8);
 		// const exchangeInfo: ExchangeInfoSymbol[] = await new ExchangeInfoController(this.unitOfWork).requestExchangeInfo();
-
 		// const sushi: ExchangeInfoSymbol = exchangeInfo.find((s: ExchangeInfoSymbol) => s.symbol === 'SUSHIUSDT');
 
-		const currentPrice: number = await this.getSymbolPrice('KEYUSDT');
+		const currentPrice: number = await this.getSymbolPrice('PERLUSDT');
 		const currentBtcPrice: number = currentPrice / usdtbtcPrice;
 		const newCost: number = currentBtcPrice * totalQty;
 		const diff: number = ((newCost - totalInvestedValue) / totalInvestedValue) * 100;
@@ -223,12 +187,12 @@ export class CoinsController {
 			},
 			USDT: {
 				totalQty,
-				currentPrice: this.BTCtoUSDT(usdtbtcPrice, currentBtcPrice),
-				totalInvestedValue: this.BTCtoUSDT(usdtbtcPrice, totalInvestedValue),
-				currentValue: this.BTCtoUSDT(usdtbtcPrice, currentValue),
-				currentProfitLoss: this.BTCtoUSDT(usdtbtcPrice, currentProfitLoss),
-				takenProfitLoss: this.BTCtoUSDT(usdtbtcPrice, takenProfitLoss),
-				newCost: this.BTCtoUSDT(usdtbtcPrice, newCost),
+				currentPrice: this.BTCtoUSDTRounded(usdtbtcPrice, currentBtcPrice),
+				totalInvestedValue: this.BTCtoUSDTRounded(usdtbtcPrice, totalInvestedValue),
+				currentValue: this.BTCtoUSDTRounded(usdtbtcPrice, currentValue),
+				currentProfitLoss: this.BTCtoUSDTRounded(usdtbtcPrice, currentProfitLoss),
+				takenProfitLoss: this.BTCtoUSDTRounded(usdtbtcPrice, takenProfitLoss),
+				newCost: this.BTCtoUSDTRounded(usdtbtcPrice, newCost),
 				diff
 			}
 		};
@@ -251,7 +215,7 @@ export class CoinsController {
 		}
 	}
 
-	private BTCtoUSDT = (btcPrice: number, btcValue: number): number => btcValue * btcPrice;
+	private BTCtoUSDTRounded = (btcPrice: number, btcValue: number): number => Number((btcValue * btcPrice).toFixed(2));
 
 	private getSymbolTrades = async (symbol: string): Promise<any> => {
 		let dataString: string = '';
@@ -355,5 +319,40 @@ export class CoinsController {
 
 		return logs;
 	}
+
+	// private getAllCoins = async (): Promise<void> => {
+	// 	let dataString: string = '';
+	//
+	// 	const priceString: string = await new Promise((resolve: any, reject: any): void => {
+	// 		const data: string = qs.stringify({
+	// 			timestamp: new Date().getTime(),
+	// 			recvWindow: 10000
+	// 		});
+	//
+	// 		const signature: string
+	// 			= crypto
+	// 			.createHmac('sha256', 'PXxkSDbB86BKWlNOQYaQ1uujRQHBFoXiDjEUes2mNXAbsI07teWmVei8JPchIIoD')
+	// 			.update(data)
+	// 			.digest('hex');
+	//
+	// 		const req: ClientRequest = https.get(`https://api.binance.com/sapi/v1/capital/config/getall?${data}&signature=${signature}`, {
+	// 			headers: {
+	// 				'X-MBX-APIKEY': '5EEJO4BQMHaVTVMZFHyBTEPBWSYAwt1va0rbuo9hrL1o6p7ls4xDHsSILCu4DANj'
+	// 			}
+	// 		}, (res: IncomingMessage) => {
+	// 			res.on('data', (chunk: any) => dataString += chunk);
+	// 			res.on('end', () => {
+	// 				resolve(dataString);
+	// 			});
+	// 		});
+	//
+	// 		req.on('error', reject);
+	// 	});
+	//
+	// 	const d: any = JSON.parse(priceString);
+	//
+	// 	// return Number(data.price);
+	// 	return d;
+	// }
 
 }

@@ -58,7 +58,7 @@ export class ExchangePairsController {
 		}
 	}
 
-	private requestExchangePairs = async (): Promise<Array<Partial<ExchangePair>>> => {
+	public requestExchangePairs = async (): Promise<Array<Partial<ExchangePair>>> => {
 		let dataString: string = '';
 
 		const pairsString: string = await new Promise((resolve: any, reject: any): void => {
