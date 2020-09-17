@@ -114,7 +114,8 @@ export class CoinsController {
 			const qty: number = Number(trade.qty);
 			const price: number = Number(trade.price);
 			// const curUsdtbtcPrice: number = trade.id === 4232940 ? 11900 : 11000;
-			btcPrice = trade.symbol.endsWith('BTC') ? price : price / usdtbtcPrice;
+			btcPrice = trade.symbol.endsWith('BTC') ? price : price / 10430;
+			console.log(btcPrice);
 			const thisTradeInvestedValue: number = qty * btcPrice; // White
 			const currentTotalValue: number = totalQty * btcPrice; // Blue
 
@@ -175,7 +176,7 @@ export class CoinsController {
 		// const sushi: ExchangeInfoSymbol = exchangeInfo.find((s: ExchangeInfoSymbol) => s.symbol === 'SUSHIUSDT');
 
 		const currentPrice: number = await this.getSymbolPrice(`${coin}USDT`);
-		const currentBtcPrice: number = currentPrice / usdtbtcPrice;
+		const currentBtcPrice: number = Number((currentPrice / usdtbtcPrice).toFixed(8));
 		currentValue = currentBtcPrice * totalQty;
 		currentProfitLoss = currentValue - totalInvestedValueMinusCommission;
 		const diff: number = ((currentValue - totalInvestedValueMinusCommission) / totalInvestedValueMinusCommission) * 100;
