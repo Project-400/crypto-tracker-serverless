@@ -11,6 +11,7 @@ import * as crypto from 'crypto';
 import * as qs from 'qs';
 import _ from 'underscore';
 import { ExchangePairsController } from '../../api-exchange-pairs/src/exchange-pairs.controller';
+import { Trade } from '@crypto-tracker/common-types';
 
 export class CoinsController {
 
@@ -82,19 +83,23 @@ export class CoinsController {
 		const pairs: Array<Partial<ExchangePair>> = await exchangePairs.requestExchangePairs();
 		const coinPairs: Array<Partial<ExchangePair>> = pairs.filter((p: ExchangePair) => p.base === coin);
 
-		let trades: any[] = [];
+		let trades: Trade[] = [];
 
 		await Promise.all(
 			coinPairs.map(async (pair: Partial<ExchangePair>) => {
-				const t: any = await this.getSymbolTrades(pair.symbol);
+				const t: Trade[] = await this.getSymbolTrades(pair.symbol);
+				console.log(`${pair.symbol}: ${t.length}`);
 				trades = [ ...trades, ...t ];
 			})
 		);
 
-		const sortedTrades: any = _.sortBy(trades, 'time');
+		const sortedTrades: Trade[] = _.sortBy(trades, 'time');
+
+		console.log(sortedTrades);
 
 		let totalQty: number = 0;
 		let totalInvestedValue: number = 0;
+		let totalInvestedValueMinusCommission: number = 0;
 		let currentValue: number = 0;
 		let currentProfitLoss: number = 0;
 		let takenProfitLoss: number = 0;
@@ -102,20 +107,20 @@ export class CoinsController {
 
 		const usdtbtcPrice: number = await this.getSymbolPrice('BTCUSDT');
 
-		console.log('PRICE');
-		console.log(usdtbtcPrice);
-
-		const totals: { value: number; costs: any } = sortedTrades.reduce((ts: { value: number; costs: any }, trade: any) => {
-			if (!ts.costs[trade.symbol]) ts.costs[trade.symbol] = 0;
+		sortedTrades.map((trade: Trade) => {
+			// const totals: { value: number; costs: any } = sortedTrades.reduce((ts: { value: number; costs: any }, trade: any) => {
+			// 	if (!ts.costs[trade.symbol]) ts.costs[trade.symbol] = 0;
 
 			const qty: number = Number(trade.qty);
 			const price: number = Number(trade.price);
+			// const curUsdtbtcPrice: number = trade.id === 4232940 ? 11900 : 11000;
 			btcPrice = trade.symbol.endsWith('BTC') ? price : price / usdtbtcPrice;
 			const thisTradeInvestedValue: number = qty * btcPrice; // White
 			const currentTotalValue: number = totalQty * btcPrice; // Blue
 
 			if (trade.isBuyer) {
 				totalInvestedValue += thisTradeInvestedValue; // Purple
+				totalInvestedValueMinusCommission += thisTradeInvestedValue; // Purple
 				totalQty += qty; // Pink
 				currentValue = currentTotalValue + thisTradeInvestedValue; // Green
 
@@ -124,6 +129,7 @@ export class CoinsController {
 			}
 			if (!trade.isBuyer) {
 				totalInvestedValue -= thisTradeInvestedValue; // Purple
+				totalInvestedValueMinusCommission -= thisTradeInvestedValue; // Purple
 				totalQty -= qty; // Pink
 				currentValue = currentTotalValue - thisTradeInvestedValue; // Green
 
@@ -131,10 +137,10 @@ export class CoinsController {
 				// ts.costs[trade.symbol] -= Number(trade.qty) * Number(trade.price);
 			}
 
-			if (trade.commissionAsset === 'PERL') {
-				// totalInvestedValue -= thisTradeInvestedValue; // Purple
+			if (trade.commissionAsset === coin) {
+				totalInvestedValueMinusCommission -= (Number(trade.commission) * btcPrice); // Purple
 				totalQty -= Number(trade.commission); // Pink
-
+				currentValue = currentTotalValue - (Number(trade.commission) * btcPrice);
 				// ts.value -= Number(trade.commission);
 			}
 
@@ -146,17 +152,19 @@ export class CoinsController {
 				takenProfitLoss += profitLossSold;
 				currentProfitLoss = thisTradeProfitLoss - profitLossSold;
 			}
+		});
 
-			return ts;
-		}, { value: 0, costs: { } });
+			// return ts;
+		// }, { value: 0, costs: { } });
 
 		const logs: any = await this.getDustLogs();
 
 		logs.map((log: any) => {
-			if (log.fromAsset === 'PERL') {
+			if (log.fromAsset === coin) {
 				console.log(log);
 				totalQty -= log.amount; // Pink
-				// totalInvestedValue -= (log.amount * btcPrice); // Purple
+				totalInvestedValue -= (log.amount * btcPrice); // Purple
+				totalInvestedValueMinusCommission -= (log.amount * btcPrice); // Purple
 				// totals.value -= log.amount;
 			}
 		});
@@ -166,34 +174,32 @@ export class CoinsController {
 		// const exchangeInfo: ExchangeInfoSymbol[] = await new ExchangeInfoController(this.unitOfWork).requestExchangeInfo();
 		// const sushi: ExchangeInfoSymbol = exchangeInfo.find((s: ExchangeInfoSymbol) => s.symbol === 'SUSHIUSDT');
 
-		const currentPrice: number = await this.getSymbolPrice('PERLUSDT');
+		const currentPrice: number = await this.getSymbolPrice(`${coin}USDT`);
 		const currentBtcPrice: number = currentPrice / usdtbtcPrice;
-		const newCost: number = currentBtcPrice * totalQty;
-		const diff: number = ((newCost - totalInvestedValue) / totalInvestedValue) * 100;
-
-		currentValue = newCost;
-		currentProfitLoss = newCost - totalInvestedValue;
+		currentValue = currentBtcPrice * totalQty;
+		currentProfitLoss = currentValue - totalInvestedValueMinusCommission;
+		const diff: number = ((currentValue - totalInvestedValueMinusCommission) / totalInvestedValueMinusCommission) * 100;
 
 		const details = {
 			BTC: {
-				totalQty,
+				totalQty: Number(totalQty.toFixed(9)),
 				currentPrice: currentBtcPrice,
 				totalInvestedValue,
+				totalInvestedValueMinusCommission,
 				currentValue,
 				currentProfitLoss,
 				takenProfitLoss,
-				newCost,
-				diff
+				diff: Number(diff.toFixed(2))
 			},
 			USDT: {
-				totalQty,
-				currentPrice: this.BTCtoUSDTRounded(usdtbtcPrice, currentBtcPrice),
+				totalQty: Number(totalQty.toFixed(9)),
+				currentPrice: this.BTCtoUSDT(usdtbtcPrice, currentBtcPrice),
 				totalInvestedValue: this.BTCtoUSDTRounded(usdtbtcPrice, totalInvestedValue),
+				totalInvestedValueMinusCommission: this.BTCtoUSDTRounded(usdtbtcPrice, totalInvestedValueMinusCommission),
 				currentValue: this.BTCtoUSDTRounded(usdtbtcPrice, currentValue),
 				currentProfitLoss: this.BTCtoUSDTRounded(usdtbtcPrice, currentProfitLoss),
 				takenProfitLoss: this.BTCtoUSDTRounded(usdtbtcPrice, takenProfitLoss),
-				newCost: this.BTCtoUSDTRounded(usdtbtcPrice, newCost),
-				diff
+				diff: Number(diff.toFixed(2))
 			}
 		};
 
@@ -209,15 +215,17 @@ export class CoinsController {
 		// await Promise.all(coins.map((coin: Coin) => this.unitOfWork.Coins.saveSingle(coin)));
 
 		try {
-			return ResponseBuilder.ok({ trades: sortedTrades.length, newCost, diff, totals, details });
+			return ResponseBuilder.ok({ trades: sortedTrades.length, diff, details });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
 
-	private BTCtoUSDTRounded = (btcPrice: number, btcValue: number): number => Number((btcValue * btcPrice).toFixed(2));
+	private BTCtoUSDT = (btcPrice: number, btcValue: number): number => (btcValue * btcPrice);
 
-	private getSymbolTrades = async (symbol: string): Promise<any> => {
+	private BTCtoUSDTRounded = (btcPrice: number, btcValue: number): number => Number(this.BTCtoUSDT(btcPrice, btcValue).toFixed(2));
+
+	private getSymbolTrades = async (symbol: string): Promise<Trade[]> => {
 		let dataString: string = '';
 
 		const ordersString: string = await new Promise((resolve: any, reject: any): void => {
@@ -247,7 +255,7 @@ export class CoinsController {
 			req.on('error', reject);
 		});
 
-		const trades: any = JSON.parse(ordersString);
+		const trades: Trade[] = JSON.parse(ordersString);
 
 		return trades;
 	}
@@ -305,10 +313,6 @@ export class CoinsController {
 
 			req.on('error', reject);
 		});
-
-		// const logs = JSON.parse(priceString).results.rows.map((r) => r)
-
-		// console.log(JSON.parse(priceString).results.rows);
 
 		const logs: any = [
 			...JSON.parse(priceString).results.rows[0].logs,

@@ -10,7 +10,7 @@
   "dependencies": {
     "@aws/dynamodb-data-mapper": "^0.7.3",
     "@aws/dynamodb-data-mapper-annotations": "^0.7.3",
-    "@crypto-tracker/common-types": "^1.0.7",
+    "@crypto-tracker/common-types": "^1.1.0",
     "aws-sdk": "^2.624.0",
     "email-validator": "^2.0.4",
     "moment": "^2.24.0",
