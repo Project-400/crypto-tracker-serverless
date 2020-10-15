@@ -5,3 +5,4 @@ const unitOfWork: UnitOfWork = new UnitOfWork();
 const controller: BotsController = new BotsController(unitOfWork);
 
 export const saveTradeBotData: ApiHandler = controller.saveTradeBotData;
+export const testPublish: ApiHandler = controller.testPublish;

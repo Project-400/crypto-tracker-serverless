@@ -29,6 +29,14 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
+        - SNS:GetTopicAttributes
+        - SNS:SetTopicAttributes
+        - SNS:AddPermission
+        - SNS:RemovePermission
+        - SNS:Subscribe
+        - SNS:ListSubscriptionsByTopic
+        - SNS:Publish
+        - SNS:Receive
       Resource:
         - '*'
 
@@ -43,6 +51,13 @@ functions:
       - http:
           path: /bots/trade/save
           method: post
+          cors: true
+  testPublish:
+    handler: src/handler.testPublish
+    events:
+      - http:
+          path: /tets/publish
+          method: get
           cors: true
 #
 #resources:

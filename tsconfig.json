@@ -12,7 +12,8 @@
     "outDir": "lib",
     "emitDecoratorMetadata": true,
     "experimentalDecorators":true,
-    "allowJs": true
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true
   },
   "exclude": [
     "node_modules"

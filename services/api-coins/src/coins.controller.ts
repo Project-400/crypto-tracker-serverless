@@ -114,7 +114,7 @@ export class CoinsController {
 			const qty: number = Number(trade.qty);
 			const price: number = Number(trade.price);
 			// const curUsdtbtcPrice: number = trade.id === 4232940 ? 11900 : 11000;
-			btcPrice = trade.symbol.endsWith('BTC') ? price : price / 10430;
+			btcPrice = trade.symbol.endsWith('BTC') ? price : price / usdtbtcPrice;
 			console.log(btcPrice);
 			const thisTradeInvestedValue: number = qty * btcPrice; // White
 			const currentTotalValue: number = totalQty * btcPrice; // Blue
@@ -176,31 +176,33 @@ export class CoinsController {
 		// const sushi: ExchangeInfoSymbol = exchangeInfo.find((s: ExchangeInfoSymbol) => s.symbol === 'SUSHIUSDT');
 
 		const currentPrice: number = await this.getSymbolPrice(`${coin}USDT`);
-		const currentBtcPrice: number = Number((currentPrice / usdtbtcPrice).toFixed(8));
+		const currentBtcPrice: number = Number((currentPrice / usdtbtcPrice));
+		const currentBtcPriceRounded: number = Number((currentPrice / usdtbtcPrice).toFixed(8));
 		currentValue = currentBtcPrice * totalQty;
+		const currentValueRounded: number = Number((currentBtcPriceRounded * totalQty).toFixed(8));
 		currentProfitLoss = currentValue - totalInvestedValueMinusCommission;
-		const diff: number = ((currentValue - totalInvestedValueMinusCommission) / totalInvestedValueMinusCommission) * 100;
+		const diff: number = Number((((currentValue - totalInvestedValueMinusCommission) / totalInvestedValueMinusCommission) * 100).toFixed(2));
 
 		const details = {
 			BTC: {
 				totalQty: Number(totalQty.toFixed(9)),
-				currentPrice: currentBtcPrice,
+				currentPrice: currentBtcPriceRounded,
 				totalInvestedValue,
 				totalInvestedValueMinusCommission,
-				currentValue,
+				currentValue: currentValueRounded,
 				currentProfitLoss,
 				takenProfitLoss,
-				diff: Number(diff.toFixed(2))
+				diff
 			},
 			USDT: {
 				totalQty: Number(totalQty.toFixed(9)),
-				currentPrice: this.BTCtoUSDT(usdtbtcPrice, currentBtcPrice),
+				currentPrice: Number(this.BTCtoUSDT(usdtbtcPrice, currentBtcPrice).toFixed(7)),
 				totalInvestedValue: this.BTCtoUSDTRounded(usdtbtcPrice, totalInvestedValue),
 				totalInvestedValueMinusCommission: this.BTCtoUSDTRounded(usdtbtcPrice, totalInvestedValueMinusCommission),
 				currentValue: this.BTCtoUSDTRounded(usdtbtcPrice, currentValue),
 				currentProfitLoss: this.BTCtoUSDTRounded(usdtbtcPrice, currentProfitLoss),
 				takenProfitLoss: this.BTCtoUSDTRounded(usdtbtcPrice, takenProfitLoss),
-				diff: Number(diff.toFixed(2))
+				diff
 			}
 		};
 
