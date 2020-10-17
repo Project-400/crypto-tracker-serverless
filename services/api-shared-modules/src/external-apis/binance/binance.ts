@@ -34,11 +34,18 @@ export default class BinanceApi {
 	public static async GetSymbolPrice(symbol: string): Promise<number> {
 		const url: string = BinanceEndpoints.GetSymbolPrice(symbol);
 
-		const data: GetSymbolPriceDto = JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+		const priceData: GetSymbolPriceDto = JSON.parse(await HttpApi.get(url, BinanceApi.headers));
 
-		if (!data.price || !data.price) throw Error('Failed to retrieve Symbol Price');
+		if (!priceData.price || !priceData.symbol) throw Error('Failed to retrieve Symbol Price');
 
-		return Number(data.price);
+		return Number(priceData.price);
+	}
+
+	public static async GetDustLogs(): Promise<any> {
+		const data: any = BinanceApi.BinanceData();
+		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_DUST_LOGS, data);
+
+		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
 	}
 
 }
