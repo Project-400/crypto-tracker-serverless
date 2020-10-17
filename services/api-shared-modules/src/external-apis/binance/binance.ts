@@ -4,6 +4,8 @@ import { BINANCE_API_KEY } from '../../../../../environment/env';
 import { GetAllCoinsDto, GetAllSymbolPricesDto, GetDustLogsDto, GetSymbolPriceDto } from './binance.interfaces';
 import { Trade } from '@crypto-tracker/common-types';
 import { GetExchangeInfoDto } from './binance.interfaces/get-exchange-info.interfaces';
+import { TransactionRequest } from '../../types';
+import { BuyCurrencyFullDto } from './binance.interfaces/buy-currency.interfaces';
 
 export default class BinanceApi {
 
@@ -101,6 +103,20 @@ export default class BinanceApi {
 
 	public static async GetExchangeInfo(): Promise<GetExchangeInfoDto> {
 		const url: string = BinanceEndpoints.GetExchangeInfo();
+
+		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+	}
+
+	/*
+	* "Send in a new order"
+	* https://binance-docs.github.io/apidocs/spot/en/#new-order-trade
+	*
+	* This endpoint wis used to place an order (buy currency / token).
+	* */
+
+	public static async BuyCurrency(buyData: TransactionRequest): Promise<BuyCurrencyFullDto> {
+		const data: any = BinanceApi.BinanceData(buyData);
+		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.BUY_CURRENCY, data);
 
 		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
 	}

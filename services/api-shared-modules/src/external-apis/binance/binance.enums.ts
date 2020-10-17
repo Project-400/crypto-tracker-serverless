@@ -23,3 +23,18 @@ export enum BinanceExchangeFilter {
 	EXCHANGE_MAX_NUM_ORDERS = 'EXCHANGE_MAX_NUM_ORDERS',
 	EXCHANGE_MAX_NUM_ALGO_ORDERS = 'EXCHANGE_MAX_NUM_ALGO_ORDERS'
 }
+
+export enum BinanceTransactionSide {
+	BUY = 'BUY',
+	SELL = 'SELL'
+}
+
+export enum BinanceTransactionType {
+	MARKET = 'MARKET',
+	LIMIT = 'LIMIT',
+	STOP_LOSS = 'STOP_LOSS',
+	STOP_LOSS_LIMIT = 'STOP_LOSS_LIMIT',
+	TAKE_PROFIT = 'TAKE_PROFIT',
+	TAKE_PROFIT_LIMIT = 'TAKE_PROFIT_LIMIT',
+	LIMIT_MAKER = 'LIMIT_MAKER'
+}

@@ -1,5 +1,6 @@
 // Preferably create a custom NPM package and move everything from this file to the package
 import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
+import { BuyCurrencyFullDto } from '../external-apis/binance/binance.interfaces/buy-currency.interfaces';
 
 export type UserType = 'User' | 'Admin';
 
@@ -112,7 +113,7 @@ export interface ExchangePair {
 
 export interface Transaction {
 	request: TransactionRequest;
-	response: TransactionResponse;
+	response: BuyCurrencyFullDto;
 	symbol: string;
 	base: string;
 	quote: string;
@@ -128,27 +129,6 @@ export interface TransactionRequest {
 	quantity?: number;
 	quoteOrderQty?: number;
 	type: string;
-	timestamp: number;
-	recvWindow: number;
-}
-
-export interface TransactionResponse {
-	symbol: string;
-	orderId: number;
-	orderListId: number;
-	clientOrderId: string;
-	transactTime: number;
-	price: number;
-	origQty: number;
-	executedQty: number;
-	cummulativeQuoteQty: number;
-	status: string;
-	timeInForce: string;
-	type: string;
-	side: 'BUY' | 'SELL';
-	fills: TransactionFill[];
-	code?: number;
-	msg?: string;
 }
 
 export interface TransactionFill {

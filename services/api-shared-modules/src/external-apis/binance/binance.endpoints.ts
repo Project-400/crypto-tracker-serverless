@@ -17,6 +17,8 @@ export default class BinanceEndpoints {
 				return BinanceEndpoints.GetSymbolTrades(stringifiedData, signature);
 			case BinanceEndpoint.GET_DUST_LOGS:
 				return BinanceEndpoints.GetDustLogs(stringifiedData, signature);
+			case BinanceEndpoint.BUY_CURRENCY:
+				return BinanceEndpoints.BuyCurrency(stringifiedData, signature, true);
 			default:
 				return BinanceEndpoints.GetSystemStatus();
 		}
@@ -37,6 +39,8 @@ export default class BinanceEndpoints {
 
 	private static GetSystemStatus = (): string => `${BINANCE_API_DOMAIN}/wapi/v3/systemStatus.html`;
 
+	private static BuyCurrency = (data: string, signature: string, isTest: boolean = true): string => `/api/v3/order${isTest ? '/test' : ''}?${data}&signature=${signature}`;
+
 	public static GetExchangeInfo = (): string => `${BINANCE_API_DOMAIN}/api/v3/exchangeInfo`;
 
 	public static GetSymbolPrice = (symbol: string): string => `${BINANCE_API_DOMAIN}/api/v3/ticker/price?symbol=${symbol}`;
@@ -52,5 +56,6 @@ export enum BinanceEndpoint {
 	GET_DUST_LOGS,
 	GET_SYMBOL_PRICE,
 	GET_ALL_SYMBOL_PRICE,
-	GET_EXCHANGE_INFO
+	GET_EXCHANGE_INFO,
+	BUY_CURRENCY
 }
