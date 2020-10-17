@@ -2,11 +2,13 @@ import { BinanceTransactionSide, BinanceTransactionType } from '../binance.enums
 
 /*
 *
-*  https://binance-docs.github.io/apidocs/spot/en/#test-new-order-trade
+* This is for both buying and selling currency
+*
+* https://binance-docs.github.io/apidocs/spot/en/#test-new-order-trade
 *
 * */
 
-export interface BuyCurrencyFill {
+export interface ExchangeCurrencyFill {
 	price: string | number;
 	qty: string | number;
 	commission: string | number;
@@ -15,7 +17,7 @@ export interface BuyCurrencyFill {
 
 // newOrderRespType set to ACK
 
-export interface BuyCurrencyAckDto {
+export interface ExchangeCurrencyAckDto {
 	symbol: string;
 	orderId: number;
 	orderListId: number; // Unless OCO, value will be -1
@@ -25,7 +27,7 @@ export interface BuyCurrencyAckDto {
 
 // newOrderRespType set to RESULT
 
-export interface BuyCurrencyResultDto extends BuyCurrencyAckDto {
+export interface ExchangeCurrencyResultDto extends ExchangeCurrencyAckDto {
 	price: string | number;
 	origQty: string | number;
 	executedQty: string | number;
@@ -38,6 +40,6 @@ export interface BuyCurrencyResultDto extends BuyCurrencyAckDto {
 
 // Full Dto is returned when order type is MARKET or LIMIT or newOrderRespType set to FULL
 
-export interface BuyCurrencyFullDto extends BuyCurrencyResultDto {
-	fills: BuyCurrencyFill[];
+export interface ExchangeCurrencyFullDto extends ExchangeCurrencyResultDto {
+	fills: ExchangeCurrencyFill[];
 }
