@@ -13,6 +13,8 @@ export default class BinanceEndpoints {
 				return BinanceEndpoints.GetSystemStatus();
 			case BinanceEndpoint.GET_ALL_COINS:
 				return BinanceEndpoints.GetAllCoins(stringifiedData, signature);
+			case BinanceEndpoint.GET_SYMBOL_TRADES:
+				return BinanceEndpoints.GetSymbolTrades(stringifiedData, signature);
 			default:
 				return BinanceEndpoints.GetSystemStatus();
 		}
@@ -27,11 +29,14 @@ export default class BinanceEndpoints {
 
 	private static GetAllCoins = (data: string, signature: string): string => `${BINANCE_API_DOMAIN}/sapi/v1/capital/config/getall?${data}&signature=${signature}`;
 
+	private static GetSymbolTrades = (data: string, signature: string): string => `${BINANCE_API_DOMAIN}/api/v3/myTrades?${data}&signature=${signature}`;
+
 	private static GetSystemStatus = (): string => `${BINANCE_API_DOMAIN}/wapi/v3/systemStatus.html`;
 
 }
 
 export enum BinanceEndpoint {
 	SYSTEM_STATUS,
-	GET_ALL_COINS
+	GET_ALL_COINS,
+	GET_SYMBOL_TRADES
 }
