@@ -18,12 +18,28 @@ export default class BinanceApi {
 			...params
 		})
 
+	/*
+	* "Get information of coins (available for deposit and withdraw) for user"
+	* https://binance-docs.github.io/apidocs/spot/en/#all-coins-39-information-user_data
+	*
+	* This endpoint will return a list of all the coins / currencies / tokens the user has invested in.
+	* It include the amount of a particular token, the name, the network list (tokens that it can be exchanged with)
+	* */
+
 	public static async GetAllCoins(): Promise<GetAllCoinsDto> {
 		const data: any = BinanceApi.BinanceData();
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_ALL_COINS, data);
 
 		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
 	}
+
+	/*
+	* "Get trades for a specific account and symbol"
+	* https://binance-docs.github.io/apidocs/spot/en/#account-trade-list-user_data
+	*
+	* This endpoint will return a list of trades the user has made through a specific Symbol.
+	* A maximum of 1000 trades can be returned in a single call. Pagination will be required for large volumes.
+	* */
 
 	public static async GetSymbolTrades(symbol: string): Promise<Trade[]> {
 		const data: any = BinanceApi.BinanceData({ symbol });
@@ -32,11 +48,28 @@ export default class BinanceApi {
 		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
 	}
 
+	/*
+	* "Latest price for a symbol or symbols"
+	* https://binance-docs.github.io/apidocs/spot/en/#symbol-price-ticker
+	*
+	* This endpoint will return the current price for a given symbol, eg. LTCBTC
+	* */
+
 	public static async GetSymbolPrice(symbol: string): Promise<GetSymbolPriceDto> {
 		const url: string = BinanceEndpoints.GetSymbolPrice(symbol);
 
 		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
 	}
+
+	/*
+	* "Fetch small amounts of assets exchanged BNB records"
+	* https://binance-docs.github.io/apidocs/spot/en/#dustlog-user_data
+	*
+	* Binance gives the user the option to exchange any of their currencies worth less than 0.001 BTC (approx exchange rate) for BNB.
+	* Doing this will remove all of the selected low value currencies and the user receives BNB (multiple exchanges per action).
+	* This generates a log of these minor transactions, called Dust Logs.
+	* This endpoint will return all of the logs from which the user had exchange their low value coins for BNB tokens.
+	* */
 
 	public static async GetDustLogs(): Promise<GetDustLogsDto> {
 		const data: any = BinanceApi.BinanceData();
@@ -46,9 +79,10 @@ export default class BinanceApi {
 	}
 
 	/*
-	* Current exchange trading rules and symbol information
+	* "Current exchange trading rules and symbol information"
+	* https://binance-docs.github.io/apidocs/spot/en/#exchange-information
 	*
-	* This endpoint will return all of the current Symbols on Binance
+	* This endpoint will return all of the current Symbols on Binance.
 	* This includes each trading pair and their associated rules, eg. Precision, Status, etc.
 	* */
 
