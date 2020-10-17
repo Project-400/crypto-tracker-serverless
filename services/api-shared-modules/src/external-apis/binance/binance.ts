@@ -1,7 +1,7 @@
 import BinanceEndpoints, { BinanceEndpoint } from './binance.endpoints';
 import { HttpApi } from '../http-api';
 import { BINANCE_API_KEY } from '../../../../../environment/env';
-import { Coin, GetSymbolPriceDto } from './binance.interfaces';
+import { Coin, GetDustLogsDto, GetSymbolPriceDto } from './binance.interfaces';
 import { Trade } from '@crypto-tracker/common-types';
 
 export default class BinanceApi {
@@ -41,7 +41,7 @@ export default class BinanceApi {
 		return Number(priceData.price);
 	}
 
-	public static async GetDustLogs(): Promise<any> {
+	public static async GetDustLogs(): Promise<GetDustLogsDto> {
 		const data: any = BinanceApi.BinanceData();
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_DUST_LOGS, data);
 

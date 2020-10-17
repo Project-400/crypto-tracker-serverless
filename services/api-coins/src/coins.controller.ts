@@ -1,17 +1,17 @@
 import {
-	ResponseBuilder,
-	ApiResponse,
-	ApiHandler,
-	ApiEvent,
 	ApiContext,
-	UnitOfWork,
+	ApiEvent,
+	ApiHandler,
+	ApiResponse,
 	ErrorCode,
 	ExchangePair,
+	ResponseBuilder,
+	UnitOfWork,
 } from '../../api-shared-modules/src';
 import _ from 'underscore';
 import { ExchangePairsController } from '../../api-exchange-pairs/src/exchange-pairs.controller';
 import { Trade } from '@crypto-tracker/common-types';
-import { Coin } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
+import { Coin, DustLog, DustLogRow, GetDustLogsDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 
 export class CoinsController {
@@ -207,20 +207,17 @@ export class CoinsController {
 		return trades;
 	}
 
-	private getSymbolPrice = async (symbol: string): Promise<number> => {
-		return BinanceApi.GetSymbolPrice(symbol);
-	}
+	private getSymbolPrice = async (symbol: string): Promise<number> => BinanceApi.GetSymbolPrice(symbol);
 
-	private getDustLogs = async (): Promise<any> => {
-		const dustLogsDetails: any = await BinanceApi.GetDustLogs();
+	private getDustLogs = async (): Promise<DustLog[]> => {
+		const dustLogsDetails: GetDustLogsDto = await BinanceApi.GetDustLogs();
 
-		// Temporarily - Only works for 4 sets of logs
-		return [
-			...dustLogsDetails.results.rows[0].logs,
-			...dustLogsDetails.results.rows[1].logs,
-			...dustLogsDetails.results.rows[2].logs,
-			...dustLogsDetails.results.rows[3].logs
-		];
+		if (!dustLogsDetails.results.total) return [];
+
+		return dustLogsDetails.results.rows.reduce((allLogs: DustLog[], logRow: DustLogRow) => {
+			allLogs.push(...logRow.logs);
+			return allLogs;
+		}, []);
 	}
 
 }
