@@ -6,12 +6,11 @@ import {
 	ApiContext,
 	UnitOfWork,
 	ExchangePair,
-	BinanceExchangeInfoResponse,
 	ErrorCode,
 } from '../../api-shared-modules/src';
-import { ClientRequest, IncomingMessage } from 'http';
-import * as https from 'https';
 import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
+import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
+import { GetExchangeInfoDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces/get-exchange-info.interfaces';
 
 export class ExchangePairsController {
 
@@ -43,7 +42,7 @@ export class ExchangePairsController {
 			const newPair: Partial<ExchangePair> = pairs.find((p: ExchangePair) => p.symbol === event.pathParameters.symbol);
 			if (!newPair) return ResponseBuilder.notFound(ErrorCode.InvalidId, 'Symbol exchange info not found');
 
-			pair = await this.unitOfWork.ExchangePairs.saveExchangePair({
+			pair = await this.unitOfWork.ExchangePairs.saveExchangePair({ // Can this be just newPair passed in?
 				symbol: newPair.symbol,
 				base: newPair.base,
 				quote: newPair.quote
@@ -59,20 +58,7 @@ export class ExchangePairsController {
 	}
 
 	public requestExchangePairs = async (): Promise<Array<Partial<ExchangePair>>> => {
-		let dataString: string = '';
-
-		const pairsString: string = await new Promise((resolve: any, reject: any): void => {
-			const req: ClientRequest = https.get(`https://api.binance.com/api/v3/exchangeInfo`, (res: IncomingMessage) => {
-				res.on('data', (chunk: any) => dataString += chunk);
-				res.on('end', () => {
-					resolve(dataString);
-				});
-			});
-
-			req.on('error', reject);
-		});
-
-		const info: BinanceExchangeInfoResponse = JSON.parse(pairsString);
+		const info: GetExchangeInfoDto = await BinanceApi.GetExchangeInfo();
 		return info.symbols.map((symbolData: ExchangeInfoSymbol) =>
 			({
 				symbol: symbolData.symbol,
