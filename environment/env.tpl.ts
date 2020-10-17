@@ -9,3 +9,4 @@ export const USER_POOL_ID: string = '{{ COGNITO_USER_POOL_ID }}';
 export const BINANCE_API_KEY: string = '{{ BINANCE_API_KEY }}';
 export const BINANCE_API_SECRET_KEY: string = '{{ BINANCE_API_SECRET_KEY }}';
 export const BINANCE_API_HOST: string = '{{ BINANCE_API_HOST }}';
+export const BINANCE_API_DOMAIN: string = '{{ BINANCE_API_DOMAIN }}';
