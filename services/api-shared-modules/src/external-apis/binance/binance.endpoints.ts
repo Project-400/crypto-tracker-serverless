@@ -41,6 +41,8 @@ export default class BinanceEndpoints {
 
 	public static GetSymbolPrice = (symbol: string): string => `${BINANCE_API_DOMAIN}/api/v3/ticker/price?symbol=${symbol}`;
 
+	public static GetAllSymbolPrices = (): string => `${BINANCE_API_DOMAIN}/api/v3/ticker/price`;
+
 }
 
 export enum BinanceEndpoint {
@@ -49,5 +51,6 @@ export enum BinanceEndpoint {
 	GET_SYMBOL_TRADES,
 	GET_DUST_LOGS,
 	GET_SYMBOL_PRICE,
+	GET_ALL_SYMBOL_PRICE,
 	GET_EXCHANGE_INFO
 }

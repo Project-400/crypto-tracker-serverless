@@ -6,10 +6,12 @@ import {
 	ApiContext,
 	UnitOfWork,
 	PairPrice,
-	PriceBatch, ExchangePair, PriceChangeStats, ErrorCode,
+	PriceBatch,
+	ExchangePair,
+	PriceChangeStats,
+	ErrorCode,
 } from '../../api-shared-modules/src';
-import { ClientRequest, IncomingMessage } from 'http';
-import * as https from 'https';
+import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 
 export class TrendsController {
 
@@ -113,24 +115,7 @@ export class TrendsController {
 	}
 
 	public logNewPriceBatch: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		const dataString: string = await new Promise((resolve: any, reject: any): void => {
-			let ds: string = '';
-
-			const req: ClientRequest = https.get(`https://api.binance.com/api/v3/ticker/price`, {
-				headers: {
-					'X-MBX-APIKEY': '5EEJO4BQMHaVTVMZFHyBTEPBWSYAwt1va0rbuo9hrL1o6p7ls4xDHsSILCu4DANj'
-				}
-			}, (res: IncomingMessage) => {
-				res.on('data', (chunk: any) => ds += chunk);
-				res.on('end', () => {
-					resolve(ds);
-				});
-			});
-
-			req.on('error', reject);
-		});
-
-		const prices: PairPrice[] = JSON.parse(dataString);
+		const prices: PairPrice[] = await BinanceApi.GetAllSymbolPrices();
 
 		const separatedBatches: SeparatedPriceBatches = prices.reduce((sep: SeparatedPriceBatches, pair: PairPrice) => {
 			const symbol: string = pair.symbol.toUpperCase();

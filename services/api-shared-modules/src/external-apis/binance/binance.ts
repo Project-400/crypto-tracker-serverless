@@ -1,7 +1,7 @@
 import BinanceEndpoints, { BinanceEndpoint } from './binance.endpoints';
 import { HttpApi } from '../http-api';
 import { BINANCE_API_KEY } from '../../../../../environment/env';
-import { GetAllCoinsDto, GetDustLogsDto, GetSymbolPriceDto } from './binance.interfaces';
+import { GetAllCoinsDto, GetAllSymbolPricesDto, GetDustLogsDto, GetSymbolPriceDto } from './binance.interfaces';
 import { Trade } from '@crypto-tracker/common-types';
 import { GetExchangeInfoDto } from './binance.interfaces/get-exchange-info.interfaces';
 
@@ -57,6 +57,19 @@ export default class BinanceApi {
 
 	public static async GetSymbolPrice(symbol: string): Promise<GetSymbolPriceDto> {
 		const url: string = BinanceEndpoints.GetSymbolPrice(symbol);
+
+		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+	}
+
+	/*
+	* "Latest price for a symbol or symbols"
+	* https://binance-docs.github.io/apidocs/spot/en/#symbol-price-ticker
+	*
+	* This endpoint will return the current price for a given symbol, eg. LTCBTC
+	* */
+
+	public static async GetAllSymbolPrices(): Promise<GetAllSymbolPricesDto> {
+		const url: string = BinanceEndpoints.GetAllSymbolPrices();
 
 		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
 	}

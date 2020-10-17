@@ -1,4 +1,5 @@
-export interface GetSymbolPriceDto {
-	symbol: string,
-	price: string
-}
+import { PairPrice } from '../../../types';
+
+export interface GetSymbolPriceDto extends PairPrice { }
+
+export interface GetAllSymbolPricesDto extends Array<GetSymbolPriceDto> { }
