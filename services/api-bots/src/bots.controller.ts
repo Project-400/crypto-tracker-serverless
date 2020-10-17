@@ -7,8 +7,7 @@ import {
 	UnitOfWork, ErrorCode,
 } from '../../api-shared-modules/src';
 import { ISymbolTraderData } from '@crypto-tracker/common-types';
-// tslint:disable-next-line:no-require-imports no-var-requires typedef
-const AWS: any = require('aws-sdk');
+import AWS from 'aws-sdk';
 
 export class BotsController {
 
@@ -29,9 +28,6 @@ export class BotsController {
 	}
 
 	public testPublish: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		console.log(event);
-		console.log(context);
-
 		const sns: any = new AWS.SNS();
 
 		console.log('Publishing data to topic');

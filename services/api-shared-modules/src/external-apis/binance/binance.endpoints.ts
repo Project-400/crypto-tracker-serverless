@@ -37,6 +37,8 @@ export default class BinanceEndpoints {
 
 	private static GetSystemStatus = (): string => `${BINANCE_API_DOMAIN}/wapi/v3/systemStatus.html`;
 
+	public static GetExchangeInfo = (): string => `${BINANCE_API_DOMAIN}/api/v3/exchangeInfo`;
+
 	public static GetSymbolPrice = (symbol: string): string => `${BINANCE_API_DOMAIN}/api/v3/ticker/price?symbol=${symbol}`;
 
 }
@@ -45,6 +47,7 @@ export enum BinanceEndpoint {
 	SYSTEM_STATUS,
 	GET_ALL_COINS,
 	GET_SYMBOL_TRADES,
+	GET_DUST_LOGS,
 	GET_SYMBOL_PRICE,
-	GET_DUST_LOGS
+	GET_EXCHANGE_INFO
 }

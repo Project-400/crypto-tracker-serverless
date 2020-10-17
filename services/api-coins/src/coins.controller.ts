@@ -8,10 +8,16 @@ import {
 	ResponseBuilder,
 	UnitOfWork,
 } from '../../api-shared-modules/src';
+import {
+	Coin,
+	DustLog,
+	DustLogRow,
+	GetDustLogsDto,
+	GetSymbolPriceDto
+} from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import _ from 'underscore';
 import { ExchangePairsController } from '../../api-exchange-pairs/src/exchange-pairs.controller';
 import { Trade } from '@crypto-tracker/common-types';
-import { Coin, DustLog, DustLogRow, GetDustLogsDto, GetSymbolPriceDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 
 export class CoinsController {

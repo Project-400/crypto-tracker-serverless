@@ -3,6 +3,7 @@ import { HttpApi } from '../http-api';
 import { BINANCE_API_KEY } from '../../../../../environment/env';
 import { GetAllCoinsDto, GetDustLogsDto, GetSymbolPriceDto } from './binance.interfaces';
 import { Trade } from '@crypto-tracker/common-types';
+import { GetExchangeInfoDto } from './binance.interfaces/get-exchange-info.interfaces';
 
 export default class BinanceApi {
 
@@ -40,6 +41,19 @@ export default class BinanceApi {
 	public static async GetDustLogs(): Promise<GetDustLogsDto> {
 		const data: any = BinanceApi.BinanceData();
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_DUST_LOGS, data);
+
+		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+	}
+
+	/*
+	* Current exchange trading rules and symbol information
+	*
+	* This endpoint will return all of the current Symbols on Binance
+	* This includes each trading pair and their associated rules, eg. Precision, Status, etc.
+	* */
+
+	public static async GetExchangeInfo(): Promise<GetExchangeInfoDto> {
+		const url: string = BinanceEndpoints.GetExchangeInfo();
 
 		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
 	}
