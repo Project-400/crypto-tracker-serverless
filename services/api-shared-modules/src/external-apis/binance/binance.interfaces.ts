@@ -35,3 +35,8 @@ export interface Coin {
 	trading: boolean;
 	networkList: CoinNetwork[];
 }
+
+export interface GetSymbolPriceDto {
+	symbol: string,
+	price: string
+}

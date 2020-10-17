@@ -4,7 +4,7 @@ import { BINANCE_API_DOMAIN, BINANCE_API_SECRET_KEY } from '../../../../../envir
 
 export default class BinanceEndpoints {
 
-	public static FormEndpoint = (endpoint: BinanceEndpoint, data: any): string => {
+	public static SignatureEndpoint = (endpoint: BinanceEndpoint, data?: any): string => {
 		const stringifiedData: string = data && BinanceEndpoints.StringifyData(data);
 		const signature: string = stringifiedData && BinanceEndpoints.FormSignature(stringifiedData);
 
@@ -31,6 +31,8 @@ export default class BinanceEndpoints {
 
 	private static GetSymbolTrades = (data: string, signature: string): string => `${BINANCE_API_DOMAIN}/api/v3/myTrades?${data}&signature=${signature}`;
 
+	public static GetSymbolPrice = (symbol: string): string => `${BINANCE_API_DOMAIN}/api/v3/ticker/price?symbol=${symbol}`;
+
 	private static GetSystemStatus = (): string => `${BINANCE_API_DOMAIN}/wapi/v3/systemStatus.html`;
 
 }
@@ -38,5 +40,6 @@ export default class BinanceEndpoints {
 export enum BinanceEndpoint {
 	SYSTEM_STATUS,
 	GET_ALL_COINS,
-	GET_SYMBOL_TRADES
+	GET_SYMBOL_TRADES,
+	GET_SYMBOL_PRICE
 }
