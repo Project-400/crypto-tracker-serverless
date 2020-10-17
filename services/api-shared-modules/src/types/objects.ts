@@ -110,10 +110,6 @@ export interface ExchangePair {
 	};
 }
 
-export interface BinanceExchangeInfoResponse {
-	symbols: ExchangeInfoSymbol[];
-}
-
 export interface Transaction {
 	request: TransactionRequest;
 	response: TransactionResponse;

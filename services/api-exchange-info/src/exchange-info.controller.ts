@@ -6,11 +6,10 @@ import {
 	ApiContext,
 	UnitOfWork,
 	ErrorCode,
-	BinanceExchangeInfoResponse,
 } from '../../api-shared-modules/src';
-import { ClientRequest, IncomingMessage } from 'http';
-import * as https from 'https';
 import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
+import { GetExchangeInfoDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces/get-exchange-info.interfaces';
+import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 
 export class ExchangeInfoController {
 
@@ -29,8 +28,11 @@ export class ExchangeInfoController {
 	}
 
 	public getSymbolExchangeInfo: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		if (!event.pathParameters || !event.pathParameters.symbol || !event.pathParameters.quote)
-			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+		if (
+			!event.pathParameters ||
+			!event.pathParameters.symbol ||
+			!event.pathParameters.quote
+		) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 
 		let info: ExchangeInfoSymbol;
 
@@ -38,8 +40,6 @@ export class ExchangeInfoController {
 			info = await this.unitOfWork.ExchangeInfo.getExchangeInfo(event.pathParameters.symbol, event.pathParameters.quote);
 		} catch (err) {
 			const allInfo: Array<Partial<ExchangeInfoSymbol>> = await this.requestExchangeInfo();
-
-			console.log(allInfo);
 
 			const newInfo: Partial<ExchangeInfoSymbol> = allInfo.find((s: ExchangeInfoSymbol) => s.symbol === event.pathParameters.symbol);
 			if (!newInfo) return ResponseBuilder.notFound(ErrorCode.InvalidId, 'Symbol exchange info not found');
@@ -56,20 +56,7 @@ export class ExchangeInfoController {
 	}
 
 	public requestExchangeInfo = async (): Promise<ExchangeInfoSymbol[]> => {
-		let dataString: string = '';
-
-		const pairsString: string = await new Promise((resolve: any, reject: any): void => {
-			const req: ClientRequest = https.get(`https://api.binance.com/api/v3/exchangeInfo`, (res: IncomingMessage) => {
-				res.on('data', (chunk: any) => dataString += chunk);
-				res.on('end', () => {
-					resolve(dataString);
-				});
-			});
-
-			req.on('error', reject);
-		});
-
-		const info: BinanceExchangeInfoResponse = JSON.parse(pairsString);
+		const info: GetExchangeInfoDto = await BinanceApi.GetExchangeInfo();
 		return info.symbols;
 	}
 
