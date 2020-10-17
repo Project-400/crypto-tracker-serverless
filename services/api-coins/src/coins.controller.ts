@@ -3,15 +3,16 @@ import {
 	ApiResponse,
 	ApiHandler,
 	ApiEvent,
-	ApiContext, Coin, UnitOfWork, ErrorCode, ExchangePair,
+	ApiContext,
+	UnitOfWork,
+	ErrorCode,
+	ExchangePair,
 } from '../../api-shared-modules/src';
-import { ClientRequest, IncomingMessage } from 'http';
-import * as https from 'https';
-import * as crypto from 'crypto';
-import * as qs from 'qs';
 import _ from 'underscore';
 import { ExchangePairsController } from '../../api-exchange-pairs/src/exchange-pairs.controller';
 import { Trade } from '@crypto-tracker/common-types';
+import { Coin } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
+import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 
 export class CoinsController {
 
@@ -34,40 +35,12 @@ export class CoinsController {
 	}
 
 	public gatherUserCoins: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		let dataString: string = '';
-
-		const coinsString: string = await new Promise((resolve: any, reject: any): void => {
-			const data: string = qs.stringify({
-				timestamp: new Date().getTime(),
-				recvWindow: 10000
-			});
-
-			const signature: string
-				= crypto
-				.createHmac('sha256', 'PXxkSDbB86BKWlNOQYaQ1uujRQHBFoXiDjEUes2mNXAbsI07teWmVei8JPchIIoD')
-				.update(data)
-				.digest('hex');
-
-			const req: ClientRequest = https.get(`https://api.binance.com/sapi/v1/capital/config/getall?${data}&signature=${signature}`, {
-				headers: {
-					'X-MBX-APIKEY': '5EEJO4BQMHaVTVMZFHyBTEPBWSYAwt1va0rbuo9hrL1o6p7ls4xDHsSILCu4DANj'
-				}
-			}, (res: IncomingMessage) => {
-				res.on('data', (chunk: any) => dataString += chunk);
-				res.on('end', () => {
-					resolve(dataString);
-				});
-			});
-
-			req.on('error', reject);
-		});
-
-		const coins: Coin[] = JSON.parse(coinsString);
-
-		await Promise.all(coins.map((coin: Coin) => this.unitOfWork.Coins.saveSingle(coin)));
-
 		try {
-			return ResponseBuilder.ok({ coinsGathered: coins.length });
+			const coins: Coin[] = await BinanceApi.GetAllCoins();
+
+			// await Promise.all(coins.map((coin: Coin) => this.unitOfWork.Coins.saveSingle(coin)));
+
+			return ResponseBuilder.ok({ coinsGathered: coins.length, coins });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
@@ -229,137 +202,25 @@ export class CoinsController {
 	private BTCtoUSDTRounded = (btcPrice: number, btcValue: number): number => Number(this.BTCtoUSDT(btcPrice, btcValue).toFixed(2));
 
 	private getSymbolTrades = async (symbol: string): Promise<Trade[]> => {
-		let dataString: string = '';
-
-		const ordersString: string = await new Promise((resolve: any, reject: any): void => {
-			const data: string = qs.stringify({
-				timestamp: new Date().getTime(),
-				recvWindow: 10000,
-				symbol
-			});
-
-			const signature: string
-				= crypto
-				.createHmac('sha256', 'PXxkSDbB86BKWlNOQYaQ1uujRQHBFoXiDjEUes2mNXAbsI07teWmVei8JPchIIoD')
-				.update(data)
-				.digest('hex');
-
-			const req: ClientRequest = https.get(`https://api.binance.com/api/v3/myTrades?${data}&signature=${signature}`, {
-				headers: {
-					'X-MBX-APIKEY': '5EEJO4BQMHaVTVMZFHyBTEPBWSYAwt1va0rbuo9hrL1o6p7ls4xDHsSILCu4DANj'
-				}
-			}, (res: IncomingMessage) => {
-				res.on('data', (chunk: any) => dataString += chunk);
-				res.on('end', () => {
-					resolve(dataString);
-				});
-			});
-
-			req.on('error', reject);
-		});
-
-		const trades: Trade[] = JSON.parse(ordersString);
+		const trades: Trade[] = await BinanceApi.GetSymbolTrades(symbol);
 
 		return trades;
 	}
 
 	private getSymbolPrice = async (symbol: string): Promise<number> => {
-		let dataString: string = '';
-
-		const priceString: string = await new Promise((resolve: any, reject: any): void => {
-			const req: ClientRequest = https.get(`https://api.binance.com/api/v3/ticker/price?symbol=${symbol}`, {
-				headers: {
-					'X-MBX-APIKEY': '5EEJO4BQMHaVTVMZFHyBTEPBWSYAwt1va0rbuo9hrL1o6p7ls4xDHsSILCu4DANj'
-				}
-			}, (res: IncomingMessage) => {
-				res.on('data', (chunk: any) => dataString += chunk);
-				res.on('end', () => {
-					resolve(dataString);
-				});
-			});
-
-			req.on('error', reject);
-		});
-
-		const data: any = JSON.parse(priceString);
-
-		if (!data.price) return 0;
-
-		return Number(data.price);
+		return BinanceApi.GetSymbolPrice(symbol);
 	}
 
 	private getDustLogs = async (): Promise<any> => {
-		let dataString: string = '';
+		const dustLogsDetails: any = await BinanceApi.GetDustLogs();
 
-		const priceString: string = await new Promise((resolve: any, reject: any): void => {
-			const data: string = qs.stringify({
-				timestamp: new Date().getTime(),
-				recvWindow: 10000
-			});
-
-			const signature: string
-				= crypto
-				.createHmac('sha256', 'PXxkSDbB86BKWlNOQYaQ1uujRQHBFoXiDjEUes2mNXAbsI07teWmVei8JPchIIoD')
-				.update(data)
-				.digest('hex');
-
-			const req: ClientRequest = https.get(`https://api.binance.com/wapi/v3/userAssetDribbletLog.html?${data}&signature=${signature}`, {
-				headers: {
-					'X-MBX-APIKEY': '5EEJO4BQMHaVTVMZFHyBTEPBWSYAwt1va0rbuo9hrL1o6p7ls4xDHsSILCu4DANj'
-				}
-			}, (res: IncomingMessage) => {
-				res.on('data', (chunk: any) => dataString += chunk);
-				res.on('end', () => {
-					resolve(dataString);
-				});
-			});
-
-			req.on('error', reject);
-		});
-
-		const logs: any = [
-			...JSON.parse(priceString).results.rows[0].logs,
-			...JSON.parse(priceString).results.rows[1].logs,
-			...JSON.parse(priceString).results.rows[2].logs,
-			...JSON.parse(priceString).results.rows[3].logs
+		// Temporarily - Only works for 4 sets of logs
+		return [
+			...dustLogsDetails.results.rows[0].logs,
+			...dustLogsDetails.results.rows[1].logs,
+			...dustLogsDetails.results.rows[2].logs,
+			...dustLogsDetails.results.rows[3].logs
 		];
-
-		return logs;
 	}
-
-	// private getAllCoins = async (): Promise<void> => {
-	// 	let dataString: string = '';
-	//
-	// 	const priceString: string = await new Promise((resolve: any, reject: any): void => {
-	// 		const data: string = qs.stringify({
-	// 			timestamp: new Date().getTime(),
-	// 			recvWindow: 10000
-	// 		});
-	//
-	// 		const signature: string
-	// 			= crypto
-	// 			.createHmac('sha256', 'PXxkSDbB86BKWlNOQYaQ1uujRQHBFoXiDjEUes2mNXAbsI07teWmVei8JPchIIoD')
-	// 			.update(data)
-	// 			.digest('hex');
-	//
-	// 		const req: ClientRequest = https.get(`https://api.binance.com/sapi/v1/capital/config/getall?${data}&signature=${signature}`, {
-	// 			headers: {
-	// 				'X-MBX-APIKEY': '5EEJO4BQMHaVTVMZFHyBTEPBWSYAwt1va0rbuo9hrL1o6p7ls4xDHsSILCu4DANj'
-	// 			}
-	// 		}, (res: IncomingMessage) => {
-	// 			res.on('data', (chunk: any) => dataString += chunk);
-	// 			res.on('end', () => {
-	// 				resolve(dataString);
-	// 			});
-	// 		});
-	//
-	// 		req.on('error', reject);
-	// 	});
-	//
-	// 	const d: any = JSON.parse(priceString);
-	//
-	// 	// return Number(data.price);
-	// 	return d;
-	// }
 
 }
