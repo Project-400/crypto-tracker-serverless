@@ -11,7 +11,7 @@ import {
 import _ from 'underscore';
 import { ExchangePairsController } from '../../api-exchange-pairs/src/exchange-pairs.controller';
 import { Trade } from '@crypto-tracker/common-types';
-import { Coin, DustLog, DustLogRow, GetDustLogsDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
+import { Coin, DustLog, DustLogRow, GetDustLogsDto, GetSymbolPriceDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 
 export class CoinsController {
@@ -207,7 +207,13 @@ export class CoinsController {
 		return trades;
 	}
 
-	private getSymbolPrice = async (symbol: string): Promise<number> => BinanceApi.GetSymbolPrice(symbol);
+	private getSymbolPrice = async (symbol: string): Promise<number> => {
+		const priceData: GetSymbolPriceDto = await BinanceApi.GetSymbolPrice(symbol);
+
+		if (!priceData.price || !priceData.symbol) throw Error('Failed to retrieve Symbol Price');
+
+		return Number(priceData.price);
+	}
 
 	private getDustLogs = async (): Promise<DustLog[]> => {
 		const dustLogsDetails: GetDustLogsDto = await BinanceApi.GetDustLogs();

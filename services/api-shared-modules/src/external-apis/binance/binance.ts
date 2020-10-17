@@ -1,7 +1,7 @@
 import BinanceEndpoints, { BinanceEndpoint } from './binance.endpoints';
 import { HttpApi } from '../http-api';
 import { BINANCE_API_KEY } from '../../../../../environment/env';
-import { Coin, GetDustLogsDto, GetSymbolPriceDto } from './binance.interfaces';
+import { GetAllCoinsDto, GetDustLogsDto, GetSymbolPriceDto } from './binance.interfaces';
 import { Trade } from '@crypto-tracker/common-types';
 
 export default class BinanceApi {
@@ -17,7 +17,7 @@ export default class BinanceApi {
 			...params
 		})
 
-	public static async GetAllCoins(): Promise<Coin[]> {
+	public static async GetAllCoins(): Promise<GetAllCoinsDto> {
 		const data: any = BinanceApi.BinanceData();
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_ALL_COINS, data);
 
@@ -31,14 +31,10 @@ export default class BinanceApi {
 		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
 	}
 
-	public static async GetSymbolPrice(symbol: string): Promise<number> {
+	public static async GetSymbolPrice(symbol: string): Promise<GetSymbolPriceDto> {
 		const url: string = BinanceEndpoints.GetSymbolPrice(symbol);
 
-		const priceData: GetSymbolPriceDto = JSON.parse(await HttpApi.get(url, BinanceApi.headers));
-
-		if (!priceData.price || !priceData.symbol) throw Error('Failed to retrieve Symbol Price');
-
-		return Number(priceData.price);
+		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
 	}
 
 	public static async GetDustLogs(): Promise<GetDustLogsDto> {
