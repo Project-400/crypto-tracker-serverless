@@ -4,6 +4,7 @@ import { QueryKey, IPriceChangeStatsRepository } from '../interfaces';
 import { QueryIterator, QueryOptions } from '@aws/dynamodb-data-mapper';
 import { PriceChangeStatsItem } from '../../models/core';
 import { Entity } from '../../types/entities';
+import { EntitySortType } from '../../types/entity-sort-types';
 
 export class PriceChangeStatsRepository extends Repository implements IPriceChangeStatsRepository {
 
@@ -26,7 +27,7 @@ export class PriceChangeStatsRepository extends Repository implements IPriceChan
 	public async getPriceChangeStatsByQuote(quote: string): Promise<PriceChangeStats[]> {
 		const keyCondition: QueryKey = {
 			entity: Entity.PRICE_CHANGE_STATS,
-			sk2: `quote#${quote}`
+			sk2: `${EntitySortType.QUOTE}#${quote}`
 		};
 
 		const queryOptions: QueryOptions = {
@@ -43,7 +44,7 @@ export class PriceChangeStatsRepository extends Repository implements IPriceChan
 	public async getPriceChangeStatsByBase(base: string): Promise<PriceChangeStats[]> {
 		const keyCondition: QueryKey = {
 			entity: Entity.PRICE_CHANGE_STATS,
-			sk3: `base#${base}`
+			sk3: `${EntitySortType.BASE}#${base}`
 		};
 
 		const queryOptions: QueryOptions = {
@@ -62,9 +63,9 @@ export class PriceChangeStatsRepository extends Repository implements IPriceChan
 
 		return this.db.put(Object.assign(new PriceChangeStatsItem(), {
 			pk: `${Entity.PRICE_CHANGE_STATS}#${pcs.symbol}`,
-			sk: `symbol#${pcs.symbol}`,
-			sk2: `quote#${pcs.quote}`,
-			sk3: `base#${pcs.base}`,
+			sk: `${EntitySortType.SYMBOL}#${pcs.symbol}`,
+			sk2: `${EntitySortType.QUOTE}#${pcs.quote}`,
+			sk3: `${EntitySortType.BASE}#${pcs.base}`,
 			entity: Entity.PRICE_CHANGE_STATS,
 			times: {
 				createdAt: date,
@@ -77,7 +78,7 @@ export class PriceChangeStatsRepository extends Repository implements IPriceChan
 	public async update(id: string, changes: Partial<PriceChangeStats>): Promise<PriceChangeStats> {
 		return this.db.update(Object.assign(new PriceChangeStatsItem(), {
 			pk: `${Entity.PRICE_CHANGE_STATS}#${changes.symbol}`,
-			sk: `symbol#${changes.symbol}`,
+			sk: `${EntitySortType.SYMBOL}#${changes.symbol}`,
 			...changes
 		}), {
 			onMissing: 'skip'

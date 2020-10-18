@@ -11,6 +11,7 @@ import {
 	EqualityExpressionPredicate,
 	equals
 } from '@aws/dynamodb-expressions';
+import { EntitySortType } from '../../types/entity-sort-types';
 
 export class SubscriptionRepository extends Repository implements ISubscriptionRepository {
 
@@ -78,7 +79,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 	public async getAllByDeviceConnection(connectionId: string, deviceId: string): Promise<Subscription[]> {
 		const keyCondition: QueryKey = {
 			entity: Entity.SUBSCRIPTION,
-			sk2: `${Entity.DEVICE}#${deviceId}/${Entity.CONNECTION}#${connectionId}`
+			sk2: `${EntitySortType.DEVICE}#${deviceId}/${EntitySortType.CONNECTION}#${connectionId}`
 		};
 
 		const queryOptions: QueryOptions = {
@@ -96,7 +97,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 	public async getAllByConnection(connectionId: string): Promise<Subscription[]> {
 		const keyCondition: QueryKey = {
 			entity: Entity.SUBSCRIPTION,
-			sk2: `/${Entity.CONNECTION}#${connectionId}`
+			sk2: `/${EntitySortType.CONNECTION}#${connectionId}`
 		};
 
 		const queryOptions: QueryOptions = {
@@ -114,7 +115,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 	public async getAllByDevice(deviceId: string): Promise<Subscription[]> {
 		const keyCondition: QueryKey = {
 			entity: Entity.SUBSCRIPTION,
-			sk2: beginsWith(`${Entity.DEVICE}#${deviceId}`)
+			sk2: beginsWith(`${EntitySortType.DEVICE}#${deviceId}`)
 		};
 
 		const queryOptions: QueryOptions = {
@@ -130,7 +131,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 	}
 
 	public async getByType(subscriptionId: string, connectionId: string, userId: string): Promise<Subscription[]> {
-		const predicate: EqualityExpressionPredicate = equals(`${Entity.SUBSCRIPTION}#${subscriptionId}/${Entity.CONNECTION}#${connectionId}`);
+		const predicate: EqualityExpressionPredicate = equals(`${Entity.SUBSCRIPTION}#${subscriptionId}/${EntitySortType.CONNECTION}#${connectionId}`);
 
 		const beginsExpression: ConditionExpression = {
 			...predicate,
@@ -139,7 +140,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 
 		const keyCondition: QueryKey = {
 			entity: Entity.SUBSCRIPTION,
-			sk3: `user#${userId}`
+			sk3: `${Entity.USER}#${userId}`
 		};
 
 		const queryOptions: QueryOptions = {
@@ -158,7 +159,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 	public async getById(subscriptionId: string, itemType: string, itemId: string, connectionId: string): Promise<Subscription> {
 		try {
 			return await this.db.get(Object.assign(new SubscriptionItem(), {
-				pk: `${Entity.SUBSCRIPTION}#${subscriptionId}/${Entity.CONNECTION}#${connectionId}`,
+				pk: `${Entity.SUBSCRIPTION}#${subscriptionId}/${EntitySortType.CONNECTION}#${connectionId}`,
 				sk: `${itemType}#${itemId}`
 			}));
 		} catch (err) {
@@ -170,9 +171,9 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 		itemId: string, connectionId: string, deviceId: string, userId?: string): Promise<Subscription> {
 		return this.db.put(Object.assign(new SubscriptionItem(), {
 			entity: Entity.SUBSCRIPTION,
-			pk: `${Entity.SUBSCRIPTION}#${subscriptionId}/${Entity.CONNECTION}#${connectionId}`,
+			pk: `${Entity.SUBSCRIPTION}#${subscriptionId}/${EntitySortType.CONNECTION}#${connectionId}`,
 			sk: `${itemType}#${itemId}`,
-			sk2: deviceId ? `${Entity.DEVICE}#${deviceId}/${Entity.CONNECTION}#${connectionId}` : `${Entity.CONNECTION}#${connectionId}`,
+			sk2: deviceId ? `${EntitySortType.DEVICE}#${deviceId}/${EntitySortType.CONNECTION}#${connectionId}` : `${EntitySortType.CONNECTION}#${connectionId}`,
 			sk3: userId ? `${Entity.USER}#${userId}` : undefined,
 			connectionId,
 			deviceId,
@@ -188,7 +189,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 	public async update(subscriptionId: string, itemType: string, itemId: string, connectionId: string, changes: Partial<Subscription>):
 		Promise<Subscription> {
 		return this.db.update(Object.assign(new SubscriptionItem(), {
-			pk: `${Entity.SUBSCRIPTION}#${subscriptionId}/${Entity.CONNECTION}#${connectionId}`,
+			pk: `${Entity.SUBSCRIPTION}#${subscriptionId}/${EntitySortType.CONNECTION}#${connectionId}`,
 			sk: `${itemType}#${itemId}`,
 			...changes
 		}), {
@@ -199,7 +200,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 	public async delete(subscriptionId: string, itemType: string, itemId: string, connectionId: string): Promise<Subscription | undefined> {
 		try {
 			const sub: SubscriptionItem = await this.db.delete(Object.assign(new SubscriptionItem(), {
-				pk: `${Entity.SUBSCRIPTION}#${subscriptionId}/${Entity.CONNECTION}#${connectionId}`,
+				pk: `${Entity.SUBSCRIPTION}#${subscriptionId}/${EntitySortType.CONNECTION}#${connectionId}`,
 				sk: `${itemType}#${itemId}`
 			}), {
 				returnValues: 'NONE'

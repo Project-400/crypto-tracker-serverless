@@ -4,13 +4,14 @@ import { PriceBatchItem } from '../../models/core';
 import { IPriceBatchRepository, QueryKey } from '../interfaces';
 import { QueryIterator, QueryOptions } from '@aws/dynamodb-data-mapper';
 import { Entity } from '../../types/entities';
+import { EntitySortType } from '../../types/entity-sort-types';
 
 export class PriceBatchRepository extends Repository implements IPriceBatchRepository {
 
 	public async getPriceBatches(time: string): Promise<PriceBatch[]> {
 		const keyCondition: QueryKey = {
 			entity: Entity.PRICE_BATCH,
-			sk: `createdAt#${time}`
+			sk: `${EntitySortType.CREATED_AT}#${time}`
 		};
 
 		const queryOptions: QueryOptions = {
@@ -33,7 +34,7 @@ export class PriceBatchRepository extends Repository implements IPriceBatchRepos
 
 		return this.db.put(Object.assign(new PriceBatchItem(), {
 			pk: `${Entity.PRICE_BATCH}#${quote}`,
-			sk: `createdAt#${rounded}`,
+			sk: `${EntitySortType.CREATED_AT}#${rounded}`,
 			entity: Entity.PRICE_BATCH,
 			times: {
 				createdAt: date

@@ -4,6 +4,7 @@ import { ITransactionRepository } from '../interfaces';
 import { TransactionItem } from '../../models/core/Transaction';
 import { v4 as uuid } from 'uuid';
 import { Entity } from '../../types/entities';
+import { EntitySortType } from '../../types/entity-sort-types';
 
 export class TransactionRepository extends Repository implements ITransactionRepository {
 
@@ -13,9 +14,9 @@ export class TransactionRepository extends Repository implements ITransactionRep
 
 		return this.db.put(Object.assign(new TransactionItem(), {
 			pk: `${Entity.TRANSACTION}#${transactionId}`,
-			sk: `createdAt#${date}`,
-			sk2: `${transaction.request.side === 'BUY' ? 'buy' : 'sell'}#createdAt#${date}`,
-			sk3: `${transaction.request.side === 'BUY' ? 'buy' : 'sell'}#${transaction.completed ? 'completed' : 'failed'}#createdAt#${date}`,
+			sk: `${EntitySortType.CREATED_AT}#${date}`,
+			sk2: `${transaction.request.side === 'BUY' ? 'buy' : 'sell'}#${EntitySortType.CREATED_AT}#${date}`,
+			sk3: `${transaction.request.side === 'BUY' ? 'buy' : 'sell'}#${transaction.completed ? 'completed' : 'failed'}#${EntitySortType.CREATED_AT}#${date}`,
 			entity: Entity.TRANSACTION,
 			times: {
 				createdAt: date

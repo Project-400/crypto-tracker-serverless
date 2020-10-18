@@ -3,8 +3,6 @@ export enum Entity {
 	COIN = 'coin',
 	TRANSACTION = 'transaction',
 	SUBSCRIPTION = 'subscription',
-	CONNECTION = 'connection',
-	DEVICE = 'device',
 	PRICE_CHANGE_STATS = 'priceChangeStats',
 	PRICE_BATCH = 'priceBatch',
 	EXCHANGE_PAIR = 'exchangePair',
