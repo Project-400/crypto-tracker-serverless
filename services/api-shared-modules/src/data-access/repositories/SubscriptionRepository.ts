@@ -12,6 +12,7 @@ import {
 	equals
 } from '@aws/dynamodb-expressions';
 import { EntitySortType } from '../../types/entity-sort-types';
+import { DBIndex } from '../../types/db-indexes';
 
 export class SubscriptionRepository extends Repository implements ISubscriptionRepository {
 
@@ -21,7 +22,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk-index'
+			indexName: DBIndex.SK
 		};
 
 		const queryIterator: QueryIterator<SubscriptionItem> = this.db.query(SubscriptionItem, keyCondition, queryOptions);
@@ -46,7 +47,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk-index',
+			indexName: DBIndex.SK,
 			filter: equalsExpression
 		};
 
@@ -65,7 +66,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk3-index'
+			indexName: DBIndex.SK3
 		};
 
 		const queryIterator: QueryIterator<SubscriptionItem> = this.db.query(SubscriptionItem, keyCondition, queryOptions);
@@ -83,7 +84,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk2-index'
+			indexName: DBIndex.SK2
 		};
 
 		const queryIterator: QueryIterator<SubscriptionItem> = this.db.query(SubscriptionItem, keyCondition, queryOptions);
@@ -101,7 +102,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk2-index'
+			indexName: DBIndex.SK2
 		};
 
 		const queryIterator: QueryIterator<SubscriptionItem> = this.db.query(SubscriptionItem, keyCondition, queryOptions);
@@ -119,7 +120,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk2-index'
+			indexName: DBIndex.SK2
 		};
 
 		const queryIterator: QueryIterator<SubscriptionItem> = this.db.query(SubscriptionItem, keyCondition, queryOptions);
@@ -144,7 +145,7 @@ export class SubscriptionRepository extends Repository implements ISubscriptionR
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk3-index',
+			indexName: DBIndex.SK3,
 			filter: beginsExpression
 		};
 

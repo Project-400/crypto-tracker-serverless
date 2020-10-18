@@ -4,6 +4,7 @@ import { ICoinRepository, QueryKey } from '../interfaces';
 import { QueryOptions, QueryIterator } from '@aws/dynamodb-data-mapper';
 import { Coin } from '../../external-apis/binance/binance.interfaces';
 import { Entity } from '../../types/entities';
+import { DBIndex } from '../../types/db-indexes';
 
 export class CoinRepository extends Repository implements ICoinRepository {
 
@@ -14,7 +15,7 @@ export class CoinRepository extends Repository implements ICoinRepository {
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk-index'
+			indexName: DBIndex.SK
 		};
 
 		const queryIterator: QueryIterator<CoinItem> = this.db.query(CoinItem, keyCondition, queryOptions);

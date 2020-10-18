@@ -4,6 +4,7 @@ import { Repository } from './Repository';
 import { QueryKey } from '../interfaces';
 import { LastEvaluatedKey, User } from '../../types';
 import { Entity } from '../../types/entities';
+import { DBIndex } from '../../types/db-indexes';
 
 export class UserRepository extends Repository {
 
@@ -19,7 +20,7 @@ export class UserRepository extends Repository {
 			entity: Entity.USER
 		};
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk2-index',
+			indexName: DBIndex.SK2,
 			scanIndexForward: false,
 			startKey: lastEvaluatedKey,
 			// filter: expression,

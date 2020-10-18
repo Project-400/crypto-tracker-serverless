@@ -4,6 +4,7 @@ import { IExchangePairRepository, QueryKey } from '../interfaces';
 import { QueryIterator, QueryOptions } from '@aws/dynamodb-data-mapper';
 import { ExchangePairItem } from '../../models/core';
 import { Entity } from '../../types/entities';
+import { DBIndex } from '../../types/db-indexes';
 
 export class ExchangePairRepository extends Repository implements IExchangePairRepository {
 
@@ -13,7 +14,7 @@ export class ExchangePairRepository extends Repository implements IExchangePairR
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk-index'
+			indexName: DBIndex.SK
 		};
 
 		const queryIterator: QueryIterator<ExchangePairItem> = this.db.query(ExchangePairItem, keyCondition, queryOptions);

@@ -5,6 +5,7 @@ import { QueryIterator, QueryOptions } from '@aws/dynamodb-data-mapper';
 import { PriceChangeStatsItem } from '../../models/core';
 import { Entity } from '../../types/entities';
 import { EntitySortType } from '../../types/entity-sort-types';
+import { DBIndex } from '../../types/db-indexes';
 
 export class PriceChangeStatsRepository extends Repository implements IPriceChangeStatsRepository {
 
@@ -14,7 +15,7 @@ export class PriceChangeStatsRepository extends Repository implements IPriceChan
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk-index'
+			indexName: DBIndex.SK
 		};
 
 		const queryIterator: QueryIterator<PriceChangeStatsItem> = this.db.query(PriceChangeStatsItem, keyCondition, queryOptions);
@@ -31,7 +32,7 @@ export class PriceChangeStatsRepository extends Repository implements IPriceChan
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk2-index'
+			indexName: DBIndex.SK2
 		};
 
 		const queryIterator: QueryIterator<PriceChangeStatsItem> = this.db.query(PriceChangeStatsItem, keyCondition, queryOptions);
@@ -48,7 +49,7 @@ export class PriceChangeStatsRepository extends Repository implements IPriceChan
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk3-index'
+			indexName: DBIndex.SK3
 		};
 
 		const queryIterator: QueryIterator<PriceChangeStatsItem> = this.db.query(PriceChangeStatsItem, keyCondition, queryOptions);

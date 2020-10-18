@@ -5,6 +5,7 @@ import { IPriceBatchRepository, QueryKey } from '../interfaces';
 import { QueryIterator, QueryOptions } from '@aws/dynamodb-data-mapper';
 import { Entity } from '../../types/entities';
 import { EntitySortType } from '../../types/entity-sort-types';
+import { DBIndex } from '../../types/db-indexes';
 
 export class PriceBatchRepository extends Repository implements IPriceBatchRepository {
 
@@ -15,7 +16,7 @@ export class PriceBatchRepository extends Repository implements IPriceBatchRepos
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: 'entity-sk-index'
+			indexName: DBIndex.SK
 		};
 
 		const queryIterator: QueryIterator<PriceBatchItem> = this.db.query(PriceBatchItem, keyCondition, queryOptions);
