@@ -1,5 +1,5 @@
 import { Transaction } from '../..';
 
 export interface ITransactionRepository {
-	save(transaction: Partial<Transaction>): Promise<Transaction>;
+	save(userId: string, transaction: Partial<Transaction>): Promise<Transaction>;
 }

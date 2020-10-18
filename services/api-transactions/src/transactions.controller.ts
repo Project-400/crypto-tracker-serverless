@@ -15,6 +15,7 @@ import { BinanceTransactionSide, BinanceTransactionType } from '../../api-shared
 import {
 	ExchangeCurrencyFullDto
 } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces/exchange-currency.interfaces';
+import Auth, { TokenVerification } from '../../_auth/verify';
 
 export class TransactionsController {
 
@@ -22,6 +23,9 @@ export class TransactionsController {
 
 	public buyCurrency: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
+
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
 
 		const buyInfo: Partial<BuyCurrencyData> = JSON.parse(event.body);
 
@@ -48,7 +52,7 @@ export class TransactionsController {
 
 		let savedTransaction: Transaction;
 
-		savedTransaction = await this.unitOfWork.Transactions.save(transaction);
+		savedTransaction = await this.unitOfWork.Transactions.save(userId, transaction);
 
 		console.log(savedTransaction);
 
@@ -61,6 +65,9 @@ export class TransactionsController {
 
 	public sellCurrency: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
+
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
 
 		const sellInfo: Partial<SellCurrencyData> = JSON.parse(event.body);
 
@@ -91,7 +98,7 @@ export class TransactionsController {
 
 		let savedTransaction: Transaction;
 
-		savedTransaction = await this.unitOfWork.Transactions.save(transaction);
+		savedTransaction = await this.unitOfWork.Transactions.save(userId, transaction);
 
 		console.log(savedTransaction);
 
