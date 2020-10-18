@@ -19,21 +19,25 @@ import _ from 'underscore';
 import { ExchangePairsController } from '../../api-exchange-pairs/src/exchange-pairs.controller';
 import { Trade } from '@crypto-tracker/common-types';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
+import Auth, { TokenVerification } from '../../_auth/verify';
 
 export class CoinsController {
 
 	public constructor(private unitOfWork: UnitOfWork) { }
 
 	public getCoins: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		const coins: Coin[] = await this.unitOfWork.Coins.getAll();
-
-		const coinsWithValue: Coin[] = coins.filter((c: Coin) => c.free > 0).sort((a: Coin, b: Coin) => {
-			if (a.free < b.free) return 1;
-			if (a.free > b.free) return -1;
-			return 0;
-		});
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
 
 		try {
+			const coins: Coin[] = await this.unitOfWork.Coins.getAll(userId);
+
+			const coinsWithValue: Coin[] = coins.filter((c: Coin) => c.free > 0).sort((a: Coin, b: Coin) => {
+				if (a.free < b.free) return 1;
+				if (a.free > b.free) return -1;
+				return 0;
+			});
+
 			return ResponseBuilder.ok({ coins: coinsWithValue });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
@@ -41,10 +45,13 @@ export class CoinsController {
 	}
 
 	public gatherUserCoins: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
+
 		try {
 			const coins: Coin[] = await BinanceApi.GetAllCoins();
 
-			// await Promise.all(coins.map((coin: Coin) => this.unitOfWork.Coins.saveSingle(coin)));
+			await Promise.all(coins.map((coin: Coin) => this.unitOfWork.Coins.saveSingle(userId, coin)));
 
 			return ResponseBuilder.ok({ coinsGathered: coins.length, coins });
 		} catch (err) {

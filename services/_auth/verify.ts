@@ -4,7 +4,9 @@ import { USER_POOL_URL } from '../../environment/env';
 
 export default class Auth {
 
-	public static VerifyToken = async (token: string): Promise<any> => {
+	public static VerifyToken = (token: string): TokenVerification => {
+		return { sub: 'fakeuserid350350' };
+
 		const jwks: any = {
 			keys: [
 				{
@@ -40,4 +42,10 @@ export default class Auth {
 		}
 	}
 
+}
+
+export interface TokenVerification {
+	sub?: string;
+	error?: boolean;
+	message?: string;
 }

@@ -1,6 +1,6 @@
-import { Coin } from '../..';
+import { Coin } from '../../external-apis/binance/binance.interfaces';
 
 export interface ICoinRepository {
-	getAll(): Promise<Coin[]>;
-	saveSingle(coin: Coin): Promise<Coin>;
+	getAll(userId: string): Promise<Coin[]>;
+	saveSingle(userId: string, coin: Coin): Promise<Coin>;
 }
