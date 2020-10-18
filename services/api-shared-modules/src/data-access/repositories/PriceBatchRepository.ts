@@ -1,14 +1,15 @@
 import { PairPrice, PriceBatch } from '../../types';
 import { Repository } from './Repository';
-import { PriceBatchItem } from '../../models/core/PriceBatch';
+import { PriceBatchItem } from '../../models/core';
 import { IPriceBatchRepository, QueryKey } from '../interfaces';
 import { QueryIterator, QueryOptions } from '@aws/dynamodb-data-mapper';
+import { Entity } from '../../types/entities';
 
 export class PriceBatchRepository extends Repository implements IPriceBatchRepository {
 
 	public async getPriceBatches(time: string): Promise<PriceBatch[]> {
 		const keyCondition: QueryKey = {
-			entity: 'priceBatch',
+			entity: Entity.PRICE_BATCH,
 			sk: `createdAt#${time}`
 		};
 
@@ -31,9 +32,9 @@ export class PriceBatchRepository extends Repository implements IPriceBatchRepos
 		const rounded: string = new Date(Math.round(date.getTime() / millis) * millis).toISOString();
 
 		return this.db.put(Object.assign(new PriceBatchItem(), {
-			pk: `priceBatch#${quote}`,
+			pk: `${Entity.PRICE_BATCH}#${quote}`,
 			sk: `createdAt#${rounded}`,
-			entity: 'priceBatch',
+			entity: Entity.PRICE_BATCH,
 			times: {
 				createdAt: date
 			},

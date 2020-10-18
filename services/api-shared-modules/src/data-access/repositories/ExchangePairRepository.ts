@@ -3,12 +3,13 @@ import { Repository } from './Repository';
 import { IExchangePairRepository, QueryKey } from '../interfaces';
 import { QueryIterator, QueryOptions } from '@aws/dynamodb-data-mapper';
 import { ExchangePairItem } from '../../models/core';
+import { Entity } from '../../types/entities';
 
 export class ExchangePairRepository extends Repository implements IExchangePairRepository {
 
 	public async getAllPairs(): Promise<ExchangePair[]> {
 		const keyCondition: QueryKey = {
-			entity: 'exchangePair'
+			entity: Entity.EXCHANGE_PAIR
 		};
 
 		const queryOptions: QueryOptions = {
@@ -24,8 +25,8 @@ export class ExchangePairRepository extends Repository implements IExchangePairR
 
 	public async getExchangePair(symbol: string, quote: string): Promise<ExchangePair> {
 		return this.db.get(Object.assign(new ExchangePairItem(), {
-			pk: `exchangePair#${symbol}`,
-			sk: `exchangePair#${quote}`
+			pk: `${Entity.EXCHANGE_PAIR}#${symbol}`,
+			sk: `${Entity.EXCHANGE_PAIR}#${quote}`
 		}));
 	}
 
@@ -33,9 +34,9 @@ export class ExchangePairRepository extends Repository implements IExchangePairR
 		const date: string = new Date().toISOString();
 
 		return this.db.put(Object.assign(new ExchangePairItem(), {
-			pk: `exchangePair#${pair.symbol}`,
-			sk: `exchangePair#${pair.quote}`,
-			entity: 'exchangePair',
+			pk: `${Entity.EXCHANGE_PAIR}#${pair.symbol}`,
+			sk: `${Entity.EXCHANGE_PAIR}#${pair.quote}`,
+			entity: Entity.EXCHANGE_PAIR,
 			times: {
 				createdAt: date,
 				updatedAt: date

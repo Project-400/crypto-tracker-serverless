@@ -3,6 +3,7 @@ import { QueryOptions, QueryPaginator } from '@aws/dynamodb-data-mapper';
 import { Repository } from './Repository';
 import { QueryKey } from '../interfaces';
 import { LastEvaluatedKey, User } from '../../types';
+import { Entity } from '../../types/entities';
 
 export class UserRepository extends Repository {
 
@@ -15,7 +16,7 @@ export class UserRepository extends Repository {
 		// };
 
 		const keyCondition: QueryKey = {
-			entity: 'user'
+			entity: Entity.USER
 		};
 		const queryOptions: QueryOptions = {
 			indexName: 'entity-sk2-index',
@@ -42,8 +43,8 @@ export class UserRepository extends Repository {
 
 	public async getById(userId: string): Promise<User> {
 		return this.db.get(Object.assign(new UserItem(), {
-			pk: `user#${userId}`,
-			sk: `user#${userId}`
+			pk: `${Entity.USER}#${userId}`,
+			sk: `${Entity.USER}#${userId}`
 		}));
 	}
 
@@ -52,9 +53,9 @@ export class UserRepository extends Repository {
 
 		return this.db.put(Object.assign(new UserItem(), {
 			userId,
-			pk: `user#${userId}`,
-			sk: `user#${userId}`,
-			entity: 'user',
+			pk: `${Entity.USER}#${userId}`,
+			sk: `${Entity.USER}#${userId}`,
+			entity: Entity.USER,
 			confirmed: false,
 			times: {
 				createdAt: date
@@ -69,8 +70,8 @@ export class UserRepository extends Repository {
 		delete changes.sk3;
 
 		return this.db.update(Object.assign(new UserItem(), {
-			pk: `user#${userId}`,
-			sk: `user#${userId}`,
+			pk: `${Entity.USER}#${userId}`,
+			sk: `${Entity.USER}#${userId}`,
 			...changes
 		}), {
 			onMissing: 'skip'
@@ -79,8 +80,8 @@ export class UserRepository extends Repository {
 
 	public async delete(userId: string): Promise<User | undefined> {
 		return this.db.delete(Object.assign(new UserItem(), {
-			pk: `user#${userId}`,
-			sk: `user#${userId}`
+			pk: `${Entity.USER}#${userId}`,
+			sk: `${Entity.USER}#${userId}`
 		}), {
 			returnValues: 'ALL_OLD'
 		});

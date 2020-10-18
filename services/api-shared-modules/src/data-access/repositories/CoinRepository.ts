@@ -3,14 +3,14 @@ import { CoinItem } from '../../models/core/Coin';
 import { ICoinRepository, QueryKey } from '../interfaces';
 import { QueryOptions, QueryIterator } from '@aws/dynamodb-data-mapper';
 import { Coin } from '../../external-apis/binance/binance.interfaces';
-import { COIN, USER } from '../../types';
+import { Entity } from '../../types/entities';
 
 export class CoinRepository extends Repository implements ICoinRepository {
 
 	public async getAll(userId: string): Promise<Coin[]> {
 		const keyCondition: QueryKey = {
-			entity: COIN,
-			sk: `${USER}#${userId}`
+			entity: Entity.COIN,
+			sk: `${Entity.USER}#${userId}`
 		};
 
 		const queryOptions: QueryOptions = {
@@ -28,10 +28,10 @@ export class CoinRepository extends Repository implements ICoinRepository {
 
 	public async saveSingle(userId: string, coin: Coin): Promise<Coin> {
 		return this.db.put(Object.assign(new CoinItem(), {
-			pk: `${COIN}#${coin.coin}`,
-			sk: `${USER}#${userId}`,
-			sk2: `${COIN}#${coin.coin}`,
-			entity: COIN,
+			pk: `${Entity.COIN}#${coin.coin}`,
+			sk: `${Entity.USER}#${userId}`,
+			sk2: `${Entity.COIN}#${coin.coin}`,
+			entity: Entity.COIN,
 			...coin
 		}));
 	}

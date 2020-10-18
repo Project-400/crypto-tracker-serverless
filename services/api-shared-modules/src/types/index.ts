@@ -17,4 +17,3 @@ export * from './db';
 export * from './objects';
 export * from './error-codes';
 export * from './errors';
-export * from './entities';

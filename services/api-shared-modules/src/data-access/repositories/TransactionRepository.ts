@@ -3,6 +3,7 @@ import { Repository } from './Repository';
 import { ITransactionRepository } from '../interfaces';
 import { TransactionItem } from '../../models/core/Transaction';
 import { v4 as uuid } from 'uuid';
+import { Entity } from '../../types/entities';
 
 export class TransactionRepository extends Repository implements ITransactionRepository {
 
@@ -11,11 +12,11 @@ export class TransactionRepository extends Repository implements ITransactionRep
 		const transactionId: string = uuid();
 
 		return this.db.put(Object.assign(new TransactionItem(), {
-			pk: `transaction#${transactionId}`,
+			pk: `${Entity.TRANSACTION}#${transactionId}`,
 			sk: `createdAt#${date}`,
 			sk2: `${transaction.request.side === 'BUY' ? 'buy' : 'sell'}#createdAt#${date}`,
 			sk3: `${transaction.request.side === 'BUY' ? 'buy' : 'sell'}#${transaction.completed ? 'completed' : 'failed'}#createdAt#${date}`,
-			entity: 'transaction',
+			entity: Entity.TRANSACTION,
 			times: {
 				createdAt: date
 			},

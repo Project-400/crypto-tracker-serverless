@@ -3,6 +3,7 @@ import { BotTradeDataItem } from '../../models/core/BotTradeData';
 import { IBotRepository } from '../interfaces';
 import { ISymbolTraderData } from '@crypto-tracker/common-types';
 import { v4 as uuid } from 'uuid';
+import { Entity } from '../../types/entities';
 
 export class BotRepository extends Repository implements IBotRepository {
 
@@ -13,11 +14,11 @@ export class BotRepository extends Repository implements IBotRepository {
 		data.times.savedAt = date;
 
 		return this.db.put(Object.assign(new BotTradeDataItem(), {
-			pk: `botTradeData#${id}`,
-			sk: `botTradeData#${id}`,
+			pk: `${Entity.BOT_TRADE_DATA}#${id}`,
+			sk: `${Entity.BOT_TRADE_DATA}#${id}`,
 			sk2: `createdAt#${date}`,
 			sk3: `symbol#${data.symbol}`,
-			entity: 'botTradeData',
+			entity: Entity.BOT_TRADE_DATA,
 			...data
 		}));
 	}
