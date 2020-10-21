@@ -10,10 +10,16 @@ enum BotStopReason {
 	BOT_ERROR = 'BOT_ERROR'
 }
 
+enum BotType {
+	SHORT_TERM = 'SHORT_TERM',
+	LONG_TERM = 'LONG_TERM'
+}
+
 export interface ITraderBot {
 	botId: string;
 	userId: string;
 	botState: TradingBotState;
+	botType: BotType;
 	symbol?: string;
 	tradeLimit?: number;
 	stopReason?: BotStopReason;
@@ -36,6 +42,9 @@ export class TraderBotItem extends DynamoDbItem implements ITraderBot {
 
 	@attribute()
 	public botState: TradingBotState;
+
+	@attribute()
+	public botType: BotType;
 
 	@attribute()
 	public symbol?: string;
