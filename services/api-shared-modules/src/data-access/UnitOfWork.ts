@@ -1,17 +1,27 @@
 import {
 	UserRepository,
 	SubscriptionRepository,
-	CoinRepository, PriceBatchRepository, ExchangePairRepository, TransactionRepository, ExchangeInfoRepository, BotRepository,
+	CoinRepository,
+	PriceBatchRepository,
+	ExchangePairRepository,
+	TransactionRepository,
+	ExchangeInfoRepository,
+	BotRepository,
+	PriceChangeStatsRepository
 } from './repositories';
 import {
 	IUserRepository,
 	ISubscriptionRepository,
-	ICoinRepository, IPriceBatchRepository, IExchangePairRepository, ITransactionRepository, IExchangeInfoRepository, IBotRepository,
+	ICoinRepository,
+	IPriceBatchRepository,
+	IExchangePairRepository,
+	ITransactionRepository,
+	IExchangeInfoRepository,
+	IBotRepository,
+	IPriceChangeStatsRepository
 } from './interfaces';
 import { DataMapper } from '@aws/dynamodb-data-mapper';
 import { DynamoDB } from 'aws-sdk';
-import { IPriceChangeStatsRepository } from './interfaces/IPriceChangeStatsRepository';
-import { PriceChangeStatsRepository } from './repositories/PriceChangeStatsRepository';
 
 export class UnitOfWork {
 
