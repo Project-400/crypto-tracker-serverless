@@ -4,5 +4,6 @@ export enum EntitySortType {
 	SYMBOL = 'symbol',
 	CREATED_AT = 'createdAt',
 	DEVICE = 'device',
-	CONNECTION = 'connection'
+	CONNECTION = 'connection',
+	BOT_TYPE = 'botType'
 }
