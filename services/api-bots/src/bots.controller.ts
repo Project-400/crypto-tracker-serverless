@@ -30,7 +30,7 @@ export class BotsController {
 			botType: BotType.SHORT_TERM
 		};
 
-		await this.unitOfWork.BotTradeData.createBot(userId, bot);
+		await this.unitOfWork.TraderBot.createBot(userId, bot);
 
 		// TODO: Implement call to bot service
 
@@ -46,7 +46,7 @@ export class BotsController {
 
 		const data: ISymbolTraderData = JSON.parse(event.body).tradeData;
 
-		await this.unitOfWork.BotTradeData.saveTradeBotData(data);
+		await this.unitOfWork.BotTradeData.createTradeBotData(data);
 
 		try {
 			return ResponseBuilder.ok({ saved: true });

@@ -8,7 +8,8 @@ export { IPriceChangeStatsRepository } from './IPriceChangeStatsRepository';
 export { IExchangePairRepository } from './IExchangePairRepository';
 export { ITransactionRepository } from './ITransactionRepository';
 export { IExchangeInfoRepository } from './IExchangeInfoRepository';
-export { IBotRepository } from './IBotRepository';
+export { ITraderBotRepository } from './ITraderBotRepository';
+export { IBotTradeDataRepository } from './IBotTradeDataRepository';
 
 export interface QueryKey {
 	pk?: string;

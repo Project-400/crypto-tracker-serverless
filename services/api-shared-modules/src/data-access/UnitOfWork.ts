@@ -6,7 +6,8 @@ import {
 	ExchangePairRepository,
 	TransactionRepository,
 	ExchangeInfoRepository,
-	BotRepository,
+	TraderBotRepository,
+	BotTradeDataRepository,
 	PriceChangeStatsRepository
 } from './repositories';
 import {
@@ -17,7 +18,8 @@ import {
 	IExchangePairRepository,
 	ITransactionRepository,
 	IExchangeInfoRepository,
-	IBotRepository,
+	ITraderBotRepository,
+	IBotTradeDataRepository,
 	IPriceChangeStatsRepository
 } from './interfaces';
 import { DataMapper } from '@aws/dynamodb-data-mapper';
@@ -33,7 +35,8 @@ export class UnitOfWork {
 	public ExchangePairs: IExchangePairRepository;
 	public ExchangeInfo: IExchangeInfoRepository;
 	public Transactions: ITransactionRepository;
-	public BotTradeData: IBotRepository;
+	public BotTradeData: IBotTradeDataRepository;
+	public TraderBot: ITraderBotRepository;
 
 	public constructor() {
 		const db: DataMapper = new DataMapper({ client: new DynamoDB({ region: 'eu-west-1' }) });
@@ -46,7 +49,8 @@ export class UnitOfWork {
 		this.ExchangePairs = new ExchangePairRepository(db);
 		this.ExchangeInfo = new ExchangeInfoRepository(db);
 		this.Transactions = new TransactionRepository(db);
-		this.BotTradeData = new BotRepository(db);
+		this.BotTradeData = new BotTradeDataRepository(db);
+		this.TraderBot = new TraderBotRepository(db);
 	}
 
 }

@@ -6,4 +6,5 @@ export { PriceChangeStatsRepository } from './PriceChangeStatsRepository';
 export { ExchangePairRepository } from './ExchangePairRepository';
 export { TransactionRepository } from './TransactionRepository';
 export { ExchangeInfoRepository } from './ExchangeInfoRepository';
-export { BotRepository } from './BotRepository';
+export { TraderBotRepository } from './TraderBotRepository';
+export { BotTradeDataRepository } from './BotTradeDataRepository';
