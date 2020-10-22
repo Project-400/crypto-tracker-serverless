@@ -1,6 +1,6 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { Coin, CoinNetwork } from '../../types';
+import { Coin, CoinNetwork } from '../../external-apis/binance/binance.interfaces';
 
 export class CoinItem extends DynamoDbItem implements Coin {
 

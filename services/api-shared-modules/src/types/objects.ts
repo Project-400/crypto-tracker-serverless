@@ -1,5 +1,5 @@
 // Preferably create a custom NPM package and move everything from this file to the package
-import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
+
 import { ExchangeCurrencyFullDto } from '../external-apis/binance/binance.interfaces/exchange-currency.interfaces';
 
 export type UserType = 'User' | 'Admin';
