@@ -1,42 +1,58 @@
-import {
-	ResponseBuilder,
-	ApiResponse,
-	ApiHandler,
-	ApiEvent,
-	ApiContext,
-	UnitOfWork, ErrorCode,
-} from '../../api-shared-modules/src';
+import { ApiContext, ApiEvent, ApiHandler, ApiResponse, ErrorCode, ResponseBuilder, UnitOfWork, } from '../../api-shared-modules/src';
 import { ISymbolTraderData } from '@crypto-tracker/common-types';
 import AWS from 'aws-sdk';
 import Auth, { TokenVerification } from '../../_auth/verify';
-import { BotType, ITraderBot } from '../../api-shared-modules/src/models/core/TraderBot';
+import { BotType, ITraderBot, TradingBotState } from '../../api-shared-modules/src/models/core/TraderBot';
+import { ItemNotFoundException } from '@aws/dynamodb-data-mapper';
 
 export class BotsController {
 
 	public constructor(private unitOfWork: UnitOfWork) { }
 
-	public createBot: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+	public createTraderBot: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
-		if (!event.pathParameters || !event.pathParameters.symbol)
-			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const data: { symbol: string } = JSON.parse(event.body);
+		const symbol: string = data.symbol;
+
+		// TODO: Check symbol exists on Binance
 
 		const auth: TokenVerification = Auth.VerifyToken('');
 		const userId: string = auth.sub;
-		const symbol: string = event.pathParameters.symbol;
 
 		const bot: Partial<ITraderBot> = {
 			userId,
 			symbol,
-			botType: BotType.SHORT_TERM
+			botType: BotType.SHORT_TERM,
+			botState: TradingBotState.WAITING
 		};
 
-		await this.unitOfWork.TraderBot.createBot(userId, bot);
+		try {
+			const result: ITraderBot = await this.unitOfWork.TraderBot.createBot(userId, bot);
 
-		// TODO: Implement call to bot service
+			// TODO: Implement call to bot service
+
+			return ResponseBuilder.ok({ bot: result });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	public getTraderBot: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.queryStringParameters || !event.queryStringParameters.botId || !event.queryStringParameters.createdAt)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
+		const botId: string = event.queryStringParameters.botId;
+		const createdAt: string = event.queryStringParameters.createdAt;
 
 		try {
+			const bot: ITraderBot = await this.unitOfWork.TraderBot.getTraderBot(userId, botId, createdAt);
+
 			return ResponseBuilder.ok({ bot });
 		} catch (err) {
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}

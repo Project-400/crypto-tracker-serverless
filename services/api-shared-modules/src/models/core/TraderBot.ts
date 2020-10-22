@@ -1,6 +1,5 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { TradingBotState } from '@crypto-tracker/common-types';
 
 export enum BotStopReason {
 	USER_STOP = 'USER_STOP',
@@ -13,6 +12,13 @@ export enum BotStopReason {
 export enum BotType {
 	SHORT_TERM = 'SHORT_TERM',
 	LONG_TERM = 'LONG_TERM'
+}
+
+export enum TradingBotState { // Tenmporary until update NPM interface
+	WAITING = 'WAITING',
+	TRADING = 'TRADING',
+	PAUSED = 'PAUSED',
+	FINISHED = 'PAUSED'
 }
 
 export interface ITraderBot {

@@ -45,6 +45,20 @@ plugins:
   - serverless-webpack
 
 functions:
+  getTraderBot:
+    handler: src/handler.getTraderBot
+    events:
+      - http:
+          path: /trader-bot # Pass in botId={botId} and createdAt={createdAt} as query params
+          method: get
+          cors: true
+  createTraderBot:
+    handler: src/handler.createTraderBot
+    events:
+      - http:
+          path: /trader-bot
+          method: post
+          cors: true
   saveTradeBotData:
     handler: src/handler.saveTradeBotData
     events:
