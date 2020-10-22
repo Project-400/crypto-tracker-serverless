@@ -3,11 +3,30 @@ import { ISymbolTraderData } from '@crypto-tracker/common-types';
 import AWS from 'aws-sdk';
 import Auth, { TokenVerification } from '../../_auth/verify';
 import { BotType, ITraderBot, TradingBotState } from '../../api-shared-modules/src/models/core/TraderBot';
-import { ItemNotFoundException } from '@aws/dynamodb-data-mapper';
 
 export class BotsController {
 
 	public constructor(private unitOfWork: UnitOfWork) { }
+
+
+	public getTraderBot: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.queryStringParameters || !event.queryStringParameters.botId || !event.queryStringParameters.createdAt)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
+		const botId: string = event.queryStringParameters.botId;
+		const createdAt: string = event.queryStringParameters.createdAt;
+
+		try {
+			const bot: ITraderBot = await this.unitOfWork.TraderBot.getTraderBot(userId, botId, createdAt);
+
+			return ResponseBuilder.ok({ bot });
+		} catch (err) {
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
 
 	public createTraderBot: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
@@ -38,19 +57,27 @@ export class BotsController {
 		}
 	}
 
-	public getTraderBot: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		if (!event.queryStringParameters || !event.queryStringParameters.botId || !event.queryStringParameters.createdAt)
-			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+	public stopTraderBot: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
+
+		const data: { botId: string, createdAt: string } = JSON.parse(event.body);
+		const botId: string = data.botId;
+		const createdAt: string = data.createdAt;
 
 		const auth: TokenVerification = Auth.VerifyToken('');
 		const userId: string = auth.sub;
-		const botId: string = event.queryStringParameters.botId;
-		const createdAt: string = event.queryStringParameters.createdAt;
 
 		try {
 			const bot: ITraderBot = await this.unitOfWork.TraderBot.getTraderBot(userId, botId, createdAt);
 
-			return ResponseBuilder.ok({ bot });
+			bot.botState = TradingBotState.FINISHING;
+			bot.times.stoppingAt = new Date().toISOString();
+
+			const result: ITraderBot = await this.unitOfWork.TraderBot.updateBot(userId, bot);
+
+			// TODO: Implement call to bot service
+
+			return ResponseBuilder.ok({ bot: result });
 		} catch (err) {
 			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
 			return ResponseBuilder.internalServerError(err, err.message);

@@ -18,7 +18,8 @@ export enum TradingBotState { // Tenmporary until update NPM interface
 	WAITING = 'WAITING',
 	TRADING = 'TRADING',
 	PAUSED = 'PAUSED',
-	FINISHED = 'PAUSED'
+	FINISHING = 'FINISHING',
+	FINISHED = 'FINISHED'
 }
 
 export interface ITraderBot {
@@ -32,9 +33,11 @@ export interface ITraderBot {
 	times: {
 		createdAt: Date | string; // Created in CRUD service
 		startedAt?: Date | string; // Starts operating in Bot service
-		confirmedAt?: Date | string; // Updated in CRUD service after Bot service begins
+		startConfirmedAt?: Date | string; // Updated in CRUD service after Bot service begins
 		updatedAt?: Date | string;
-		stoppedAt?: Date | string;
+		stoppingAt?: Date | string; // Stop call is made to CRUD service
+		stoppedAt?: Date | string; // Time bot stops running
+		stopConfirmedAt?: Date | string; // Updated in CRUD service after bot stops
 	};
 }
 
@@ -65,9 +68,11 @@ export class TraderBotItem extends DynamoDbItem implements ITraderBot {
 	public times: {
 		createdAt: Date | string;
 		startedAt?: Date | string;
-		confirmedAt?: Date | string;
+		startConfirmedAt?: Date | string;
 		updatedAt?: Date | string;
+		stoppingAt?: Date | string;
 		stoppedAt?: Date | string;
+		stopConfirmedAt?: Date | string;
 	};
 
 }
