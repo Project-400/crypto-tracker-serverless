@@ -61,6 +61,8 @@ export class BotsController {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
 
 		const data: { botId: string, createdAt: string } = JSON.parse(event.body);
+		if (!data.botId || !data.createdAt) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
+
 		const botId: string = data.botId;
 		const createdAt: string = data.createdAt;
 
@@ -73,11 +75,17 @@ export class BotsController {
 			bot.botState = TradingBotState.FINISHING;
 			bot.times.stoppingAt = new Date().toISOString();
 
-			const result: ITraderBot = await this.unitOfWork.TraderBot.updateBot(userId, bot);
+			const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.updateBot(userId, bot);
 
+			console.log(finishingResult.botId); // Pass into bot service
 			// TODO: Implement call to bot service
 
-			return ResponseBuilder.ok({ bot: result });
+			bot.botState = TradingBotState.FINISHED;
+			bot.times.startConfirmedAt = new Date().toISOString();
+
+			const finishedBot: ITraderBot = await this.unitOfWork.TraderBot.updateBot(userId, bot);
+
+			return ResponseBuilder.ok({ bot: finishedBot });
 		} catch (err) {
 			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
 			return ResponseBuilder.internalServerError(err, err.message);

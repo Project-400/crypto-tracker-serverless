@@ -59,6 +59,13 @@ functions:
           path: /trader-bot
           method: post
           cors: true
+  stopTraderBot:
+    handler: src/handler.stopTraderBot
+    events:
+      - http:
+          path: /trader-bot/stop
+          method: put
+          cors: true
   saveTradeBotData:
     handler: src/handler.saveTradeBotData
     events:
