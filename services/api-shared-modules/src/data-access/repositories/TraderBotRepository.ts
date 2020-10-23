@@ -33,6 +33,21 @@ export class TraderBotRepository extends Repository implements ITraderBotReposit
 		}));
 	}
 
+	public async updateBot(userId: string, bot: ITraderBot): Promise<ITraderBot> {
+		delete bot.sk2;
+		delete bot.sk3;
+
+		bot.times.updatedAt = new Date().toISOString();
+
+		return this.db.update(Object.assign(new TraderBotItem(), {
+			pk: bot.pk,
+			sk: bot.sk,
+			...bot
+		}), {
+			onMissing: 'skip'
+		});
+	}
+
 	private pk = (botId: string): string => `${Entity.TRADER_BOT}#${botId}`;
 	private sk = (userId: string, createdAt: string): string => `${Entity.USER}#${userId}/${EntitySortType.CREATED_AT}#${createdAt}`;
 	private sk2 = (createdAt: string): string => `${EntitySortType.CREATED_AT}#${createdAt}`;

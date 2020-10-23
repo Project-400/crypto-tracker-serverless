@@ -1,5 +1,6 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
+import { DBItem } from '../../types';
 
 export enum BotStopReason {
 	USER_STOP = 'USER_STOP',
@@ -22,7 +23,7 @@ export enum TradingBotState { // Tenmporary until update NPM interface
 	FINISHED = 'FINISHED'
 }
 
-export interface ITraderBot {
+export interface ITraderBot extends DBItem {
 	botId: string;
 	userId: string;
 	botState: TradingBotState;
