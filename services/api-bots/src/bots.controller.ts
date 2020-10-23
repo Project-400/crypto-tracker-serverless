@@ -8,7 +8,6 @@ export class BotsController {
 
 	public constructor(private unitOfWork: UnitOfWork) { }
 
-
 	public getTraderBot: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.queryStringParameters || !event.queryStringParameters.botId || !event.queryStringParameters.createdAt)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
@@ -19,7 +18,7 @@ export class BotsController {
 		const createdAt: string = event.queryStringParameters.createdAt;
 
 		try {
-			const bot: ITraderBot = await this.unitOfWork.TraderBot.getTraderBot(userId, botId, createdAt);
+			const bot: ITraderBot = await this.unitOfWork.TraderBot.get(userId, botId, createdAt);
 
 			return ResponseBuilder.ok({ bot });
 		} catch (err) {
@@ -47,7 +46,7 @@ export class BotsController {
 		};
 
 		try {
-			const result: ITraderBot = await this.unitOfWork.TraderBot.createBot(userId, bot);
+			const result: ITraderBot = await this.unitOfWork.TraderBot.create(userId, bot);
 
 			// TODO: Implement call to bot service
 
@@ -70,12 +69,12 @@ export class BotsController {
 		const userId: string = auth.sub;
 
 		try {
-			const bot: ITraderBot = await this.unitOfWork.TraderBot.getTraderBot(userId, botId, createdAt);
+			const bot: ITraderBot = await this.unitOfWork.TraderBot.get(userId, botId, createdAt);
 
 			bot.botState = TradingBotState.FINISHING;
 			bot.times.stoppingAt = new Date().toISOString();
 
-			const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.updateBot(userId, bot);
+			const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.update(userId, bot);
 
 			console.log(finishingResult.botId); // Pass into bot service
 			// TODO: Implement call to bot service
@@ -83,7 +82,7 @@ export class BotsController {
 			bot.botState = TradingBotState.FINISHED;
 			bot.times.startConfirmedAt = new Date().toISOString();
 
-			const finishedBot: ITraderBot = await this.unitOfWork.TraderBot.updateBot(userId, bot);
+			const finishedBot: ITraderBot = await this.unitOfWork.TraderBot.update(userId, bot);
 
 			return ResponseBuilder.ok({ bot: finishedBot });
 		} catch (err) {
@@ -105,12 +104,12 @@ export class BotsController {
 		const userId: string = auth.sub;
 
 		try {
-			const bot: ITraderBot = await this.unitOfWork.TraderBot.getTraderBot(userId, botId, createdAt);
+			const bot: ITraderBot = await this.unitOfWork.TraderBot.get(userId, botId, createdAt);
 
 			bot.botState = TradingBotState.PAUSING;
 			bot.times.pausedAt = new Date().toISOString();
 
-			const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.updateBot(userId, bot);
+			const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.update(userId, bot);
 
 			console.log(finishingResult.botId); // Pass into bot service
 			// TODO: Implement call to bot service
@@ -118,7 +117,7 @@ export class BotsController {
 			bot.botState = TradingBotState.PAUSED;
 			bot.times.pauseConfirmedAt = new Date().toISOString();
 
-			const finishedBot: ITraderBot = await this.unitOfWork.TraderBot.updateBot(userId, bot);
+			const finishedBot: ITraderBot = await this.unitOfWork.TraderBot.update(userId, bot);
 
 			return ResponseBuilder.ok({ bot: finishedBot });
 		} catch (err) {

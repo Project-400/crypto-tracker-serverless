@@ -1,20 +1,40 @@
 import { Repository } from './Repository';
-import { ITraderBotRepository } from '../interfaces';
+import { ITraderBotRepository, QueryKey } from '../interfaces';
 import { v4 as uuid } from 'uuid';
 import { Entity } from '../../types/entities';
 import { EntitySortType } from '../../types/entity-sort-types';
 import { ITraderBot, TraderBotItem } from '../../models/core/TraderBot';
+import { QueryIterator, QueryOptions } from '@aws/dynamodb-data-mapper';
+import { DBIndex } from '../../types/db-indexes';
 
 export class TraderBotRepository extends Repository implements ITraderBotRepository {
 
-	public async getTraderBot(userId: string, botId: string, createdAt: string): Promise<ITraderBot> {
+	public async get(userId: string, botId: string, createdAt: string): Promise<ITraderBot> {
 		return this.db.get(Object.assign(new TraderBotItem(), {
 			pk: this.pk(botId),
 			sk: this.sk(userId, createdAt)
 		}));
 	}
 
-	public async createBot(userId: string, bot: Partial<ITraderBot>): Promise<ITraderBot> {
+	public async getAll(userId: string, createdAt: string): Promise<ITraderBot[]> {
+		const keyCondition: QueryKey = {
+			entity: Entity.TRADER_BOT,
+			sk: this.sk(userId, createdAt)
+		};
+
+		const queryOptions: QueryOptions = {
+			indexName: DBIndex.SK
+		};
+
+		const queryIterator: QueryIterator<TraderBotItem> = this.db.query(TraderBotItem, keyCondition, queryOptions);
+		const bots: ITraderBot[] = [];
+
+		for await (const bot of queryIterator) bots.push(bot);
+
+		return bots;
+	}
+
+	public async create(userId: string, bot: Partial<ITraderBot>): Promise<ITraderBot> {
 		const botId: string = uuid();
 		const date: string = new Date().toISOString();
 
@@ -33,7 +53,7 @@ export class TraderBotRepository extends Repository implements ITraderBotReposit
 		}));
 	}
 
-	public async updateBot(userId: string, bot: ITraderBot): Promise<ITraderBot> {
+	public async update(userId: string, bot: ITraderBot): Promise<ITraderBot> {
 		delete bot.sk2;
 		delete bot.sk3;
 
