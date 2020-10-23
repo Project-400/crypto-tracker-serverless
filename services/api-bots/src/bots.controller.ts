@@ -92,6 +92,41 @@ export class BotsController {
 		}
 	}
 
+	public pauseTraderBot: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
+
+		const data: { botId: string, createdAt: string } = JSON.parse(event.body);
+		if (!data.botId || !data.createdAt) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
+
+		const botId: string = data.botId;
+		const createdAt: string = data.createdAt;
+
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
+
+		try {
+			const bot: ITraderBot = await this.unitOfWork.TraderBot.getTraderBot(userId, botId, createdAt);
+
+			bot.botState = TradingBotState.PAUSING;
+			bot.times.pausedAt = new Date().toISOString();
+
+			const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.updateBot(userId, bot);
+
+			console.log(finishingResult.botId); // Pass into bot service
+			// TODO: Implement call to bot service
+
+			bot.botState = TradingBotState.PAUSED;
+			bot.times.pauseConfirmedAt = new Date().toISOString();
+
+			const finishedBot: ITraderBot = await this.unitOfWork.TraderBot.updateBot(userId, bot);
+
+			return ResponseBuilder.ok({ bot: finishedBot });
+		} catch (err) {
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 	public saveTradeBotData: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
 
