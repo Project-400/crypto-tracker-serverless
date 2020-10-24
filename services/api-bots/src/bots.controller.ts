@@ -210,30 +210,37 @@ export class BotsController {
 		// TODO: Check is admin account
 
 		try {
-			const activeBots: ITraderBot[] = await this.unitOfWork.TraderBot.getAllByStates([
-				TradingBotState.WAITING,
-				TradingBotState.TRADING,
-				TradingBotState.PAUSING,
-				TradingBotState.PAUSED
-			]);
+			let activeBots: BotsPageResponse;
+			let count: number = 0;
 
-			await Promise.all(activeBots.map(async (bot: ITraderBot) => {
-				bot.botState = TradingBotState.SHUTTING_DOWN;
-				bot.times.shuttingDownAt = new Date().toISOString();
+			do {
+				activeBots = await this.unitOfWork.TraderBot.getAllByStates([
+					TradingBotState.WAITING,
+					TradingBotState.TRADING,
+					TradingBotState.PAUSING,
+					TradingBotState.PAUSED
+				], activeBots ? activeBots.lastEvaluatedKey : undefined, 10);
 
-				await this.unitOfWork.TraderBot.update(userId, bot);
-			}));
+				await Promise.all(activeBots.bots.map(async (bot: ITraderBot) => {
+					bot.botState = TradingBotState.SHUTTING_DOWN;
+					bot.times.shuttingDownAt = new Date().toISOString();
 
-			// TODO: Implement call to bot service to shutdown all
+					await this.unitOfWork.TraderBot.update(userId, bot);
+				}));
 
-			await Promise.all(activeBots.map(async (bot: ITraderBot) => {
-				bot.botState = TradingBotState.SHUT_DOWN;
-				bot.times.shutdownConfirmedAt = new Date().toISOString();
+				// TODO: Implement call to bot service to shutdown all
 
-				await this.unitOfWork.TraderBot.update(userId, bot);
-			}));
+				await Promise.all(activeBots.bots.map(async (bot: ITraderBot) => {
+					bot.botState = TradingBotState.SHUT_DOWN;
+					bot.times.shutdownConfirmedAt = new Date().toISOString();
 
-			return ResponseBuilder.ok({ count: activeBots.length });
+					await this.unitOfWork.TraderBot.update(userId, bot);
+				}));
+
+				count += activeBots.bots.length;
+			} while (activeBots.lastEvaluatedKey);
+
+			return ResponseBuilder.ok({ count });
 		} catch (err) {
 			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
 			return ResponseBuilder.internalServerError(err, err.message);
