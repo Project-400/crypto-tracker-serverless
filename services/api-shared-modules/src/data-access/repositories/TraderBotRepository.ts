@@ -34,7 +34,32 @@ export class TraderBotRepository extends Repository implements ITraderBotReposit
 		return bots;
 	}
 
-	public async getAllByUser(userId: string, states?: string[]): Promise<ITraderBot[]> {
+	public async getAllByState(states: string[]): Promise<ITraderBot[]> {
+		const predicate: MembershipExpressionPredicate = inList(...states);
+
+		const expression: ConditionExpression = {
+			...predicate,
+			subject: 'botState'
+		};
+
+		const keyCondition: QueryKey = {
+			entity: Entity.TRADER_BOT
+		};
+
+		const queryOptions: QueryOptions = {
+			indexName: DBIndex.SK,
+			filter: expression
+		};
+
+		const queryIterator: QueryIterator<TraderBotItem> = this.db.query(TraderBotItem, keyCondition, queryOptions);
+		const bots: ITraderBot[] = [];
+
+		for await (const bot of queryIterator) bots.push(bot);
+
+		return bots;
+	}
+
+	public async getAllByUserAndStates(userId: string, states: string[]): Promise<ITraderBot[]> {
 		const predicate: MembershipExpressionPredicate = inList(...states);
 
 		const expression: ConditionExpression = {
