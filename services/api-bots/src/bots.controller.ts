@@ -42,7 +42,6 @@ export class BotsController {
 	public getAllTradingBots: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		Auth.VerifyToken(''); // TODO: Check admin account
 		const limit: number = event.queryStringParameters ? Number(event.queryStringParameters.limit) || 10 : 10;
-
 		const lastEvaluatedKey: LastEvaluatedKey = event.headers.lastEvaluatedKey ? JSON.parse(event.headers.lastEvaluatedKey) : undefined;
 
 		try {
@@ -61,14 +60,16 @@ export class BotsController {
 		const auth: TokenVerification = Auth.VerifyToken('');
 		const userId: string = auth.sub;
 		const combinedStates: string = event.queryStringParameters.states;
+		const limit: number = Number(event.queryStringParameters.limit) || 10;
 		const states: string[] = combinedStates.split(',').map((s: string) => s.toUpperCase().trim());
+		const lastEvaluatedKey: LastEvaluatedKey = event.headers.lastEvaluatedKey ? JSON.parse(event.headers.lastEvaluatedKey) : undefined;
 
 		try {
 			states.forEach((s: string) => {
 				if (!(s in TradingBotState)) throw Error('Invalid Bot State');
 			});
 
-			const bots: ITraderBot[] = await this.unitOfWork.TraderBot.getAllByUserAndStates(userId, states);
+			const bots: BotsPageResponse = await this.unitOfWork.TraderBot.getAllByUserAndStates(userId, states, lastEvaluatedKey, limit);
 
 			return ResponseBuilder.ok({ bots });
 		} catch (err) {
@@ -85,7 +86,6 @@ export class BotsController {
 		const combinedStates: string = event.queryStringParameters.states;
 		const limit: number = Number(event.queryStringParameters.limit) || 10;
 		const states: string[] = combinedStates.split(',').map((s: string) => s.toUpperCase().trim());
-
 		const lastEvaluatedKey: LastEvaluatedKey = event.headers.lastEvaluatedKey ? JSON.parse(event.headers.lastEvaluatedKey) : undefined;
 
 		try {
