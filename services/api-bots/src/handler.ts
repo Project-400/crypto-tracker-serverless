@@ -5,6 +5,7 @@ const unitOfWork: UnitOfWork = new UnitOfWork();
 const controller: BotsController = new BotsController(unitOfWork);
 
 export const getTraderBot: ApiHandler = controller.getTraderBot;
+export const getAllTradingBotsByUser: ApiHandler = controller.getAllTradingBotsByUser;
 export const createTraderBot: ApiHandler = controller.createTraderBot;
 export const stopTraderBot: ApiHandler = controller.stopTraderBot;
 export const pauseTraderBot: ApiHandler = controller.pauseTraderBot;

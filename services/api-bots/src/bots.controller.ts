@@ -27,6 +27,29 @@ export class BotsController {
 		}
 	}
 
+	public getAllTradingBotsByUser: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.queryStringParameters || !event.queryStringParameters.states)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
+		const combinedStates: string = event.queryStringParameters.states;
+		const states: string[] = combinedStates.split(',').map((s: string) => s.toUpperCase().trim());
+
+		try {
+			states.forEach((s: string) => {
+				if (!(s in TradingBotState)) throw Error('Invalid Bot State');
+			});
+
+			const bots: ITraderBot[] = await this.unitOfWork.TraderBot.getAllByUser(userId, states);
+
+			return ResponseBuilder.ok({ bots });
+		} catch (err) {
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 	public createTraderBot: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
 
