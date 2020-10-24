@@ -39,6 +39,21 @@ export class BotsController {
 		}
 	}
 
+	public getAllTradingBots: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		Auth.VerifyToken(''); // TODO: Check admin account
+		const limit: number = event.queryStringParameters ? Number(event.queryStringParameters.limit) || 10 : 10;
+
+		const lastEvaluatedKey: LastEvaluatedKey = event.headers.lastEvaluatedKey ? JSON.parse(event.headers.lastEvaluatedKey) : undefined;
+
+		try {
+			const bots: BotsPageResponse = await this.unitOfWork.TraderBot.getAll(lastEvaluatedKey, limit);
+
+			return ResponseBuilder.ok({ bots });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 	public getAllUserTradingBotsByState: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.queryStringParameters || !event.queryStringParameters.states)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
@@ -195,7 +210,7 @@ export class BotsController {
 		// TODO: Check is admin account
 
 		try {
-			const activeBots: ITraderBot[] = await this.unitOfWork.TraderBot.getAllByState([
+			const activeBots: ITraderBot[] = await this.unitOfWork.TraderBot.getAllByStates([
 				TradingBotState.WAITING,
 				TradingBotState.TRADING,
 				TradingBotState.PAUSING,

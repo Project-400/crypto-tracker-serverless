@@ -52,18 +52,25 @@ functions:
           path: /trader-bot # Pass in botId={botId} and createdAt={createdAt} as query params
           method: get
           cors: true
+  getAllTradingBots:
+    handler: src/handler.getAllTradingBots
+    events:
+      - http:
+          path: /trader-bot/all
+          method: get # Pass LastEvaluatedKey via headers
+          cors: true
   getAllUserTradingBotsByState:
     handler: src/handler.getAllUserTradingBotsByState
     events:
       - http:
-          path: /trader-bot/user/all # Pass in a list of bot states, eg. PAUSED,FINISHED
+          path: /trader-bot/user/all-by-state # Pass in a list of bot states, eg. PAUSED,FINISHED
           method: get # Pass LastEvaluatedKey via headers
           cors: true
   getAllTradingBotsByState:
     handler: src/handler.getAllTradingBotsByState
     events:
       - http:
-          path: /trader-bot/all # Pass in a list of bot states, eg. PAUSED,FINISHED
+          path: /trader-bot/all-by-state # Pass in a list of bot states, eg. PAUSED,FINISHED
           method: get # Pass LastEvaluatedKey via headers
           cors: true
   createTraderBot:

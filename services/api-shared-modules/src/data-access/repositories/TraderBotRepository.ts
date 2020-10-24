@@ -23,21 +23,27 @@ export class TraderBotRepository extends Repository implements ITraderBotReposit
 		}));
 	}
 
-	public async getAll(): Promise<ITraderBot[]> {
+	public async getAll(lastEvaluatedKey?: LastEvaluatedKey, limit?: number): Promise<BotsPageResponse> {
 		const keyCondition: QueryKey = {
 			entity: Entity.TRADER_BOT
 		};
 
 		const queryOptions: QueryOptions = {
-			indexName: DBIndex.SK
+			indexName: DBIndex.SK,
+			scanIndexForward: false,
+			startKey: lastEvaluatedKey,
+			limit: limit || 10
 		};
 
-		const queryIterator: QueryIterator<TraderBotItem> = this.db.query(TraderBotItem, keyCondition, queryOptions);
+		const queryPages: QueryPaginator<TraderBotItem> = this.db.query(TraderBotItem, keyCondition, queryOptions).pages();
 		const bots: ITraderBot[] = [];
 
-		for await (const bot of queryIterator) bots.push(bot);
+		for await (const page of queryPages) for (const bot of page) bots.push(bot);
 
-		return bots;
+		return {
+			bots,
+			lastEvaluatedKey: queryPages.lastEvaluatedKey ? queryPages.lastEvaluatedKey : undefined
+		};
 	}
 
 	public async getAllByStates(states: string[], lastEvaluatedKey?: LastEvaluatedKey, limit?: number): Promise<BotsPageResponse> {

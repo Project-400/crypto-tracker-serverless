@@ -4,7 +4,7 @@ import { BotsPageResponse } from '../repositories/TraderBotRepository';
 
 export interface ITraderBotRepository {
 	get(userId: string, botId: string, createdAt: string): Promise<ITraderBot>;
-	getAll(): Promise<ITraderBot[]>;
+	getAll(lastEvaluatedKey?: LastEvaluatedKey, limit?: number): Promise<BotsPageResponse>;
 	getAllByStates(states: string[], lastEvaluatedKey?: LastEvaluatedKey, limit?: number): Promise<BotsPageResponse>;
 	getAllByUserAndStates(userId: string, states: string[]): Promise<ITraderBot[]>;
 	create(userId: string, bot: Partial<ITraderBot>): Promise<ITraderBot>;
