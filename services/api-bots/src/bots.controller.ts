@@ -3,6 +3,8 @@ import { ISymbolTraderData } from '@crypto-tracker/common-types';
 import AWS from 'aws-sdk';
 import Auth, { TokenVerification } from '../../_auth/verify';
 import { BotType, ITraderBot, TradingBotState } from '../../api-shared-modules/src/models/core/TraderBot';
+import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
+import { GetSymbolPriceDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 
 export class BotsController {
 
@@ -56,8 +58,6 @@ export class BotsController {
 		const data: { symbol: string } = JSON.parse(event.body);
 		const symbol: string = data.symbol;
 
-		// TODO: Check symbol exists on Binance
-
 		const auth: TokenVerification = Auth.VerifyToken('');
 		const userId: string = auth.sub;
 
@@ -69,6 +69,9 @@ export class BotsController {
 		};
 
 		try {
+			const priceData: GetSymbolPriceDto = await BinanceApi.GetSymbolPrice(symbol); // Using price endpoint as alternative
+			if (priceData.code !== undefined || priceData.msg === 'Invalid symbol.') throw Error('Cryptocurrency symbol not found');
+
 			const result: ITraderBot = await this.unitOfWork.TraderBot.create(userId, bot);
 
 			// TODO: Implement call to bot service
