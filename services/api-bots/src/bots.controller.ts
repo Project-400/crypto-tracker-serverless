@@ -1,10 +1,20 @@
-import { ApiContext, ApiEvent, ApiHandler, ApiResponse, ErrorCode, ResponseBuilder, UnitOfWork, } from '../../api-shared-modules/src';
+import {
+	ApiContext,
+	ApiEvent,
+	ApiHandler,
+	ApiResponse,
+	ErrorCode,
+	LastEvaluatedKey,
+	ResponseBuilder,
+	UnitOfWork,
+} from '../../api-shared-modules/src';
 import { ISymbolTraderData } from '@crypto-tracker/common-types';
 import AWS from 'aws-sdk';
 import Auth, { TokenVerification } from '../../_auth/verify';
 import { BotType, ITraderBot, TradingBotState } from '../../api-shared-modules/src/models/core/TraderBot';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 import { GetSymbolPriceDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
+import { BotsPageResponse } from '../../api-shared-modules/src/data-access/repositories/TraderBotRepository';
 
 export class BotsController {
 
@@ -43,7 +53,32 @@ export class BotsController {
 				if (!(s in TradingBotState)) throw Error('Invalid Bot State');
 			});
 
-			const bots: ITraderBot[] = await this.unitOfWork.TraderBot.getAllByUser(userId, states);
+			const bots: ITraderBot[] = await this.unitOfWork.TraderBot.getAllByUserAndStates(userId, states);
+
+			return ResponseBuilder.ok({ bots });
+		} catch (err) {
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	public getAllTradingBotsByState: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.queryStringParameters || !event.queryStringParameters.states)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		Auth.VerifyToken(''); // TODO: Check admin account
+		const combinedStates: string = event.queryStringParameters.states;
+		const limit: number = Number(event.queryStringParameters.limit) || 10;
+		const states: string[] = combinedStates.split(',').map((s: string) => s.toUpperCase().trim());
+
+		const lastEvaluatedKey: LastEvaluatedKey = event.headers.lastEvaluatedKey ? JSON.parse(event.headers.lastEvaluatedKey) : undefined;
+
+		try {
+			states.forEach((s: string) => {
+				if (!(s in TradingBotState)) throw Error('Invalid Bot State');
+			});
+
+			const bots: BotsPageResponse = await this.unitOfWork.TraderBot.getAllByStates(states, lastEvaluatedKey, limit);
 
 			return ResponseBuilder.ok({ bots });
 		} catch (err) {
