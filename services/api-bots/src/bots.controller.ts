@@ -169,8 +169,15 @@ export class BotsController {
 				bot.times.shuttingDownAt = new Date().toISOString();
 
 				await this.unitOfWork.TraderBot.update(userId, bot);
+			}));
 
-				// TODO: Implement call to bot service
+			// TODO: Implement call to bot service to shutdown all
+
+			await Promise.all(activeBots.map(async (bot: ITraderBot) => {
+				bot.botState = TradingBotState.SHUT_DOWN;
+				bot.times.shutdownConfirmedAt = new Date().toISOString();
+
+				await this.unitOfWork.TraderBot.update(userId, bot);
 			}));
 
 			return ResponseBuilder.ok({ count: activeBots.length });
