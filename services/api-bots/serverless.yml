@@ -52,11 +52,11 @@ functions:
           path: /trader-bot # Pass in botId={botId} and createdAt={createdAt} as query params
           method: get
           cors: true
-  getAllTradingBotsByUser:
-    handler: src/handler.getAllTradingBotsByUser
+  getAllUserTradingBotsByState:
+    handler: src/handler.getAllUserTradingBotsByState
     events:
       - http:
-          path: /trader-bot/user # Pass in a list of bot states, eg. PAUSED,FINISHED
+          path: /trader-bot/all-by-state # Pass in a list of bot states, eg. PAUSED,FINISHED
           method: get
           cors: true
   createTraderBot:
@@ -78,6 +78,13 @@ functions:
     events:
       - http:
           path: /trader-bot/pause
+          method: put
+          cors: true
+  shutDownAllTraderBots:
+    handler: src/handler.shutDownAllTraderBots
+    events:
+      - http:
+          path: /trader-bot/shutdown-all
           method: put
           cors: true
   saveTradeBotData:
