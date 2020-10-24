@@ -3,10 +3,16 @@ import { ITraderBotRepository, QueryKey } from '../interfaces';
 import { v4 as uuid } from 'uuid';
 import { Entity } from '../../types/entities';
 import { EntitySortType } from '../../types/entity-sort-types';
-import { ITraderBot, TraderBotItem, TradingBotState } from '../../models/core/TraderBot';
-import { QueryIterator, QueryOptions } from '@aws/dynamodb-data-mapper';
+import { ITraderBot, TraderBotItem } from '../../models/core/TraderBot';
+import { QueryIterator, QueryOptions, QueryPaginator } from '@aws/dynamodb-data-mapper';
 import { DBIndex } from '../../types/db-indexes';
 import { beginsWith, inList, MembershipExpressionPredicate, ConditionExpression } from '@aws/dynamodb-expressions';
+import { LastEvaluatedKey } from '../../types';
+
+export interface BotsPageResponse {
+	bots: ITraderBot[];
+	lastEvaluatedKey: LastEvaluatedKey;
+}
 
 export class TraderBotRepository extends Repository implements ITraderBotRepository {
 
@@ -34,7 +40,7 @@ export class TraderBotRepository extends Repository implements ITraderBotReposit
 		return bots;
 	}
 
-	public async getAllByState(states: string[]): Promise<ITraderBot[]> {
+	public async getAllByStates(states: string[], lastEvaluatedKey?: LastEvaluatedKey, limit?: number): Promise<BotsPageResponse> {
 		const predicate: MembershipExpressionPredicate = inList(...states);
 
 		const expression: ConditionExpression = {
@@ -48,15 +54,21 @@ export class TraderBotRepository extends Repository implements ITraderBotReposit
 
 		const queryOptions: QueryOptions = {
 			indexName: DBIndex.SK,
-			filter: expression
+			filter: expression,
+			scanIndexForward: false,
+			startKey: lastEvaluatedKey,
+			limit: limit || 10
 		};
 
-		const queryIterator: QueryIterator<TraderBotItem> = this.db.query(TraderBotItem, keyCondition, queryOptions);
+		const queryPages: QueryPaginator<TraderBotItem> = this.db.query(TraderBotItem, keyCondition, queryOptions).pages();
 		const bots: ITraderBot[] = [];
 
-		for await (const bot of queryIterator) bots.push(bot);
+		for await (const page of queryPages) for (const bot of page) bots.push(bot);
 
-		return bots;
+		return {
+			bots,
+			lastEvaluatedKey: queryPages.lastEvaluatedKey ? queryPages.lastEvaluatedKey : undefined
+		};
 	}
 
 	public async getAllByUserAndStates(userId: string, states: string[]): Promise<ITraderBot[]> {
