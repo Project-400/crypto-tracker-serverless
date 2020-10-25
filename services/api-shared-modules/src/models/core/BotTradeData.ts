@@ -78,9 +78,9 @@ export class TraderBotLogDataItem extends DynamoDbItem implements ITraderBotLogD
 
 	@attribute()
 	public times: {
-		createdAt: Date | string;
-		finishedAt?: Date | string;
-		savedAt?: Date | string;
+		createdAt: string;
+		finishedAt?: string;
+		savedAt?: string;
 	};
 
 	@attribute()

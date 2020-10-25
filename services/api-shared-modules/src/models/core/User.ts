@@ -28,8 +28,8 @@ export class UserItem extends DynamoDbItem implements User {
 	@attribute()
 	public times: {
 		confirmedAt?: string;
-		createdAt: Date | string;
-		lastLogin?: Date | string;
+		createdAt: string;
+		lastLogin?: string;
 	};
 
 	@attribute()

@@ -15,8 +15,8 @@ export class ExchangePairItem extends DynamoDbItem implements ExchangePair {
 
 	@attribute()
 	public times: {
-		createdAt: Date | string;
-		updatedAt: Date | string;
+		createdAt: string;
+		updatedAt: string;
 	};
 
 }

@@ -35,17 +35,17 @@ export interface ITraderBot extends DBItem {
 	tradeLimit?: number;
 	stopReason?: BotStopReason;
 	times: {
-		createdAt: Date | string; // Created in CRUD service
-		startedAt?: Date | string; // Starts operating in Bot service
-		startConfirmedAt?: Date | string; // Updated in CRUD service after Bot service begins
-		pausedAt?: Date | string;
-		pauseConfirmedAt?: Date | string;
-		updatedAt?: Date | string;
-		stoppingAt?: Date | string; // Stop call is made to CRUD service
-		stoppedAt?: Date | string; // Time bot stops running
-		stopConfirmedAt?: Date | string; // Updated in CRUD service after bot stops
-		shuttingDownAt?: Date | string; // Time the bot has been forced to shut down
-		shutdownConfirmedAt?: Date | string; // Updated in CRUD service after bot shuts down
+		createdAt: string; // Created in CRUD service
+		startedAt?: string; // Starts operating in Bot service
+		startConfirmedAt?: string; // Updated in CRUD service after Bot service begins
+		pausedAt?: string;
+		pauseConfirmedAt?: string;
+		updatedAt?: string;
+		stoppingAt?: string; // Stop call is made to CRUD service
+		stoppedAt?: string; // Time bot stops running
+		stopConfirmedAt?: string; // Updated in CRUD service after bot stops
+		shuttingDownAt?: string; // Time the bot has been forced to shut down
+		shutdownConfirmedAt?: string; // Updated in CRUD service after bot shuts down
 	};
 }
 
@@ -74,17 +74,17 @@ export class TraderBotItem extends DynamoDbItem implements ITraderBot {
 
 	@attribute()
 	public times: {
-		createdAt: Date | string;
-		startedAt?: Date | string;
-		startConfirmedAt?: Date | string;
-		pausedAt?: Date | string;
-		pauseConfirmedAt?: Date | string;
-		updatedAt?: Date | string;
-		stoppingAt?: Date | string;
-		stoppedAt?: Date | string;
-		stopConfirmedAt?: Date | string;
-		shuttingDownAt?: Date | string;
-		shutdownConfirmedAt?: Date | string;
+		createdAt: string;
+		startedAt?: string;
+		startConfirmedAt?: string;
+		pausedAt?: string;
+		pauseConfirmedAt?: string;
+		updatedAt?: string;
+		stoppingAt?: string;
+		stoppedAt?: string;
+		stopConfirmedAt?: string;
+		shuttingDownAt?: string;
+		shutdownConfirmedAt?: string;
 	};
 
 }

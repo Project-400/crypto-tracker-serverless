@@ -18,8 +18,8 @@ export class PriceChangeStatsItem extends DynamoDbItem implements PriceChangeSta
 
 	@attribute()
 	public times: {
-		createdAt: Date | string;
-		updatedAt: Date | string;
+		createdAt: string;
+		updatedAt: string;
 	};
 
 	@attribute()

@@ -12,7 +12,7 @@ export class PriceBatchItem extends DynamoDbItem implements PriceBatch {
 
 	@attribute()
 	public times: {
-		createdAt: Date | string;
+		createdAt: string;
 	};
 
 }

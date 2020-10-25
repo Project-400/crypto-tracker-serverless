@@ -28,8 +28,8 @@ export interface User extends DBItem {
 	confirmed: boolean;
 	times: {
 		confirmedAt?: string;
-		createdAt: Date | string;
-		lastLogin?: Date | string;
+		createdAt: string;
+		lastLogin?: string;
 
 	};
 	connections: UserConnection[]; // Websocket connection ids (can be connected to multiple at same time)
@@ -56,7 +56,7 @@ export interface PriceBatch {
 	prices: PairPrice[];
 	quote: string;
 	times: {
-		createdAt: Date | string;
+		createdAt: string;
 	};
 }
 
@@ -96,8 +96,8 @@ export interface PriceChangeStats {
 	};
 	currentPrice: number;
 	times: {
-		createdAt: Date | string;
-		updatedAt: Date | string;
+		createdAt: string;
+		updatedAt: string;
 	};
 }
 
@@ -106,8 +106,8 @@ export interface ExchangePair {
 	base: string;
 	quote: string;
 	times: {
-		createdAt: Date | string;
-		updatedAt: Date | string;
+		createdAt: string;
+		updatedAt: string;
 	};
 }
 
@@ -119,7 +119,7 @@ export interface Transaction {
 	quote: string;
 	completed: boolean;
 	times: {
-		createdAt: Date | string;
+		createdAt: string;
 	};
 }
 

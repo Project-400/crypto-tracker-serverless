@@ -48,8 +48,8 @@ export class ExchangeInfoSymbolItem extends DynamoDbItem implements ExchangeInfo
 
 	@attribute()
 	public times: {
-		createdAt: Date | string;
-		updatedAt: Date | string;
+		createdAt: string;
+		updatedAt: string;
 	};
 
 }

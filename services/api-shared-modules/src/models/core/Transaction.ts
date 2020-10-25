@@ -25,7 +25,7 @@ export class TransactionItem extends DynamoDbItem implements Transaction {
 
 	@attribute()
 	public times: {
-		createdAt: Date | string;
+		createdAt: string;
 	};
 
 }
