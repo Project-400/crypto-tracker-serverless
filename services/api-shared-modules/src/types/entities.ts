@@ -7,6 +7,6 @@ export enum Entity {
 	PRICE_BATCH = 'priceBatch',
 	EXCHANGE_PAIR = 'exchangePair',
 	EXCHANGE_INFO = 'exchangeInfo',
-	BOT_TRADE_DATA = 'botTradeData',
+	TRADER_BOT_LOG_DATA = 'traderBotLogData',
 	TRADER_BOT = 'traderBot'
 }

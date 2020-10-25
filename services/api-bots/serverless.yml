@@ -101,11 +101,18 @@ functions:
           path: /trader-bot/shutdown-all
           method: put
           cors: true
-  saveTradeBotData:
-    handler: src/handler.saveTradeBotData
+  getTraderBotLogData:
+    handler: src/handler.getTraderBotLogData
     events:
       - http:
-          path: /bots/trade/save
+          path: /trader-bot/data
+          method: get
+          cors: true
+  saveTraderBotLogData:
+    handler: src/handler.saveTraderBotLogData
+    events:
+      - http:
+          path: /trader-bot/data
           method: post
           cors: true
 #

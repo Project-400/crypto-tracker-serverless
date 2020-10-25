@@ -8,7 +8,7 @@ import {
 	ResponseBuilder,
 	UnitOfWork,
 } from '../../api-shared-modules/src';
-import { ISymbolTraderData } from '@crypto-tracker/common-types';
+import { ITraderBotLogData } from '@crypto-tracker/common-types';
 import Auth, { TokenVerification } from '../../_auth/verify';
 import { BotType, ITraderBot, TradingBotState } from '../../api-shared-modules/src/models/core/TraderBot';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
@@ -246,10 +246,31 @@ export class BotsController {
 		}
 	}
 
-	public saveTradeBotData: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+	public getTraderBotLogData: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.queryStringParameters || !event.queryStringParameters.botId || !event.queryStringParameters.createdAt)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
+		const botId: string = event.queryStringParameters.botId;
+		const createdAt: string = event.queryStringParameters.createdAt;
+
+		try {
+			const bot: ITraderBot = await this.unitOfWork.BotTradeData.get(userId, botId, createdAt);
+
+			return ResponseBuilder.ok({ bot });
+		} catch (err) {
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	public saveTraderBotLogData: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
 
-		const data: ISymbolTraderData = JSON.parse(event.body).tradeData;
+		const data: ITraderBotLogData = JSON.parse(event.body).tradeData;
+
+		if (!data.botId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Missing Bot ID');
 
 		await this.unitOfWork.BotTradeData.createTradeBotData(data);
 

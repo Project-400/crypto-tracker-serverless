@@ -1,8 +1,11 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { ExchangeInfoSymbol, TransactionFillCommission, PositionState, ISymbolTraderData, SymbolType } from '@crypto-tracker/common-types';
+import { ExchangeInfoSymbol, TransactionFillCommission, PositionState, ITraderBotLogData, SymbolType } from '@crypto-tracker/common-types';
 
-export class BotTradeDataItem extends DynamoDbItem implements ISymbolTraderData {
+export class BotTradeDataItem extends DynamoDbItem implements ITraderBotLogData {
+
+	@attribute()
+	public botId: string;
 
 	@attribute()
 	public symbol: string;
@@ -76,5 +79,8 @@ export class BotTradeDataItem extends DynamoDbItem implements ISymbolTraderData 
 		finishedAt?: Date | string;
 		savedAt?: Date | string;
 	};
+
+	@attribute()
+	public userId: string;
 
 }
