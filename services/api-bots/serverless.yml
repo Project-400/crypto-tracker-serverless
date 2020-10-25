@@ -108,13 +108,6 @@ functions:
           path: /bots/trade/save
           method: post
           cors: true
-  testPublish:
-    handler: src/handler.testPublish
-    events:
-      - http:
-          path: /tets/publish
-          method: get
-          cors: true
 #
 #resources:
 #    - ${file(../resources/cognito-policy.yml)}

@@ -13,4 +13,3 @@ export const stopTraderBot: ApiHandler = controller.stopTraderBot;
 export const pauseTraderBot: ApiHandler = controller.pauseTraderBot;
 export const shutDownAllTraderBots: ApiHandler = controller.shutDownAllTraderBots;
 export const saveTradeBotData: ApiHandler = controller.saveTradeBotData;
-export const testPublish: ApiHandler = controller.testPublish;
