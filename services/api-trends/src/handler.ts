@@ -1,8 +1,10 @@
 import { ApiHandler, UnitOfWork } from '../../api-shared-modules/src';
 import { TrendsController } from './trends.controller';
+import { TrendsService } from './trends.service';
 
 const unitOfWork: UnitOfWork = new UnitOfWork();
-const controller: TrendsController = new TrendsController(unitOfWork);
+const trendsService: TrendsService = new TrendsService(unitOfWork);
+const controller: TrendsController = new TrendsController(trendsService);
 
 export const logNewPriceBatch: ApiHandler = controller.logNewPriceBatch;
 export const savePriceChangeStats: ApiHandler = controller.savePriceChangeStats;
