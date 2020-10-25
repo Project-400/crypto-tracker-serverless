@@ -62,14 +62,6 @@ functions:
           method: put
           cors: true
           authorizer: aws_iam
-  deleteUser:
-    handler: src/handler.deleteUser
-    events:
-      - http:
-          path: /users/{userId}
-          method: delete
-          cors: true
-          authorizer: aws_iam
 
 resources:
     - ${file(../resources/cognito-policy.yml)}

@@ -5,16 +5,15 @@ import {
 	ApiHandler,
 	ApiEvent,
 	ApiContext,
-	UnitOfWork,
-	SharedFunctions,
-	UserItem,
 	LastEvaluatedKey,
 	User
 } from '../../api-shared-modules/src';
+import { UserService } from './user.service';
+import { GetAllUsersResponse } from './user.interfaces';
 
 export class UserController {
 
-	public constructor(private unitOfWork: UnitOfWork) { }
+	public constructor(private userService: UserService) { }
 
 	public getAllUsers: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		let lastEvaluatedKey: LastEvaluatedKey;
@@ -28,8 +27,7 @@ export class UserController {
 			};
 		}
 		try {
-			const result: { users: User[]; lastEvaluatedKey: Partial<UserItem> } = await this.unitOfWork.Users.getAll(lastEvaluatedKey);
-			if (!result) return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Failed to retrieve Users');
+			const result: GetAllUsersResponse = await this.userService.getAllUsers(lastEvaluatedKey);
 
 			return ResponseBuilder.ok({ ...result, count: result.users.length });
 		} catch (err) {
@@ -42,12 +40,11 @@ export class UserController {
 		const userId: string = event.pathParameters.userId;
 
 		try {
-
-			const user: User = await this.unitOfWork.Users.getById(userId);
-			if (!user) return ResponseBuilder.notFound(ErrorCode.InvalidId, 'User not found');
+			const user: User = await this.userService.getUserById(userId);
 
 			return ResponseBuilder.ok({ user });
 		} catch (err) {
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'User not found');
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
@@ -56,28 +53,15 @@ export class UserController {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
 
 		const user: Partial<User> = JSON.parse(event.body) as Partial<User>;
+		const cognitoIdentity: string =
+			event.requestContext &&
+			event.requestContext.identity &&
+			event.requestContext.identity.cognitoAuthenticationProvider;
 
 		try {
-			const userId: string = SharedFunctions.getUserIdFromAuthProvider(event.requestContext.identity.cognitoAuthenticationProvider);
-			const result: User = await this.unitOfWork.Users.update(userId, { ...user });
-			if (!result) return ResponseBuilder.notFound(ErrorCode.InvalidId, 'User not found');
+			const result: User = await this.userService.updateUser(cognitoIdentity, user);
 
 			return ResponseBuilder.ok({ user: result });
-		} catch (err) {
-			return ResponseBuilder.internalServerError(err, err.message);
-		}
-	}
-
-	public deleteUser: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		if (!event.pathParameters || !event.pathParameters.userId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
-
-		const userId: string = event.pathParameters.userId;
-
-		try {
-			const user: User = await this.unitOfWork.Users.delete(userId);
-			if (!user) return ResponseBuilder.notFound(ErrorCode.InvalidId, 'User not found');
-
-			return ResponseBuilder.ok({ user });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
