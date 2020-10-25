@@ -27,7 +27,7 @@ export class CoinRepository extends Repository implements ICoinRepository {
 
 	}
 
-	public async saveSingle(userId: string, coin: Coin): Promise<Coin> {
+	public async create(userId: string, coin: Coin): Promise<Coin> {
 		return this.db.put(Object.assign(new CoinItem(), {
 			pk: `${Entity.COIN}#${coin.coin}`,
 			sk: `${Entity.USER}#${userId}`,
