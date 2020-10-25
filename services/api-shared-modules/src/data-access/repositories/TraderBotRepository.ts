@@ -77,7 +77,8 @@ export class TraderBotRepository extends Repository implements ITraderBotReposit
 		};
 	}
 
-	public async getAllByUserAndStates(userId: string, states: string[], lastEvaluatedKey?: LastEvaluatedKey, limit?: number): Promise<BotsPageResponse> {
+	public async getAllByUserAndStates(userId: string, states: string[], lastEvaluatedKey?: LastEvaluatedKey, limit?: number):
+		Promise<BotsPageResponse> {
 		const predicate: MembershipExpressionPredicate = inList(...states);
 
 		const expression: ConditionExpression = {
@@ -128,7 +129,7 @@ export class TraderBotRepository extends Repository implements ITraderBotReposit
 		}));
 	}
 
-	public async update(userId: string, bot: ITraderBot): Promise<ITraderBot> {
+	public async update(bot: ITraderBot): Promise<ITraderBot> {
 		delete bot.sk2;
 		delete bot.sk3;
 

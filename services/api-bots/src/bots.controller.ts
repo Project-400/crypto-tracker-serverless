@@ -151,13 +151,12 @@ export class BotsController {
 	}
 
 	public shutDownAllTraderBots: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		const auth: TokenVerification = Auth.VerifyToken('');
-		const userId: string = auth.sub;
+		Auth.VerifyToken('');
 
 		// TODO: Check is admin account
 
 		try {
-			const shutdownCount: number = await this.botsService.shutDownAllTraderBots(userId);
+			const shutdownCount: number = await this.botsService.shutDownAllTraderBots();
 
 			return ResponseBuilder.ok({ shutdownCount });
 		} catch (err) {

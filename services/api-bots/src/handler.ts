@@ -4,7 +4,7 @@ import { BotsService } from './bots.service';
 
 const unitOfWork: UnitOfWork = new UnitOfWork();
 const botsService: BotsService = new BotsService(unitOfWork);
-const controller: BotsController = new BotsController(unitOfWork, botsService);
+const controller: BotsController = new BotsController(botsService);
 
 export const getTraderBot: ApiHandler = controller.getTraderBot;
 export const getAllTradingBots: ApiHandler = controller.getAllTradingBots;

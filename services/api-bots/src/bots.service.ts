@@ -53,7 +53,7 @@ export class BotsService {
 		bot.botState = TradingBotState.FINISHING;
 		bot.times.stoppingAt = new Date().toISOString();
 
-		const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.update(userId, bot);
+		const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.update(bot);
 
 		console.log(finishingResult.botId); // Pass into bot service
 		// TODO: Implement call to bot service
@@ -61,7 +61,7 @@ export class BotsService {
 		bot.botState = TradingBotState.FINISHED;
 		bot.times.startConfirmedAt = new Date().toISOString();
 
-		return this.unitOfWork.TraderBot.update(userId, bot);
+		return this.unitOfWork.TraderBot.update(bot);
 	}
 
 	public pauseTraderBot = async (userId: string, botId: string, createdAt: string): Promise<ITraderBot> => {
@@ -70,7 +70,7 @@ export class BotsService {
 		bot.botState = TradingBotState.PAUSING;
 		bot.times.pausedAt = new Date().toISOString();
 
-		const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.update(userId, bot);
+		const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.update(bot);
 
 		console.log(finishingResult.botId); // Pass into bot service
 		// TODO: Implement call to bot service
@@ -78,10 +78,10 @@ export class BotsService {
 		bot.botState = TradingBotState.PAUSED;
 		bot.times.pauseConfirmedAt = new Date().toISOString();
 
-		return this.unitOfWork.TraderBot.update(userId, bot);
+		return this.unitOfWork.TraderBot.update(bot);
 	}
 
-	public shutDownAllTraderBots = async (userId: string): Promise<number> => {
+	public shutDownAllTraderBots = async (): Promise<number> => {
 		let activeBots: BotsPageResponse;
 		let count: number = 0;
 
@@ -97,7 +97,7 @@ export class BotsService {
 				bot.botState = TradingBotState.SHUTTING_DOWN;
 				bot.times.shuttingDownAt = new Date().toISOString();
 
-				await this.unitOfWork.TraderBot.update(userId, bot);
+				await this.unitOfWork.TraderBot.update(bot);
 			}));
 
 			// TODO: Implement call to bot service to shutdown all
@@ -106,7 +106,7 @@ export class BotsService {
 				bot.botState = TradingBotState.SHUT_DOWN;
 				bot.times.shutdownConfirmedAt = new Date().toISOString();
 
-				await this.unitOfWork.TraderBot.update(userId, bot);
+				await this.unitOfWork.TraderBot.update(bot);
 			}));
 
 			count += activeBots.bots.length;

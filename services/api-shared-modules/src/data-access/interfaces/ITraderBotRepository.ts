@@ -8,5 +8,5 @@ export interface ITraderBotRepository {
 	getAllByStates(states: string[], lastEvaluatedKey?: LastEvaluatedKey, limit?: number): Promise<BotsPageResponse>;
 	getAllByUserAndStates(userId: string, states: string[], lastEvaluatedKey?: LastEvaluatedKey, limit?: number): Promise<BotsPageResponse>;
 	create(userId: string, bot: Partial<ITraderBot>): Promise<ITraderBot>;
-	update(userId: string, bot: ITraderBot): Promise<ITraderBot>;
+	update(bot: ITraderBot): Promise<ITraderBot>;
 }
