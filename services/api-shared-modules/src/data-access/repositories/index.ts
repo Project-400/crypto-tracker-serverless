@@ -7,4 +7,4 @@ export { ExchangePairRepository } from './ExchangePairRepository';
 export { TransactionRepository } from './TransactionRepository';
 export { ExchangeInfoRepository } from './ExchangeInfoRepository';
 export { TraderBotRepository } from './TraderBotRepository';
-export { BotTradeDataRepository } from './BotTradeDataRepository';
+export { TraderBotLogDataRepository } from './TraderBotLogDataRepository';

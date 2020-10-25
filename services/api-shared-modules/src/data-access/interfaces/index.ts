@@ -9,7 +9,7 @@ export { IExchangePairRepository } from './IExchangePairRepository';
 export { ITransactionRepository } from './ITransactionRepository';
 export { IExchangeInfoRepository } from './IExchangeInfoRepository';
 export { ITraderBotRepository } from './ITraderBotRepository';
-export { IBotTradeDataRepository } from './IBotTradeDataRepository';
+export { ITraderBotLogDataRepository } from './ITraderBotLogDataRepository';
 
 export interface QueryKey {
 	pk?: string;

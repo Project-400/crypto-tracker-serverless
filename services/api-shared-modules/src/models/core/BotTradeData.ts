@@ -2,10 +2,13 @@ import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
 import { ExchangeInfoSymbol, TransactionFillCommission, PositionState, ITraderBotLogData, SymbolType } from '@crypto-tracker/common-types';
 
-export class BotTradeDataItem extends DynamoDbItem implements ITraderBotLogData {
+export class TraderBotLogDataItem extends DynamoDbItem implements ITraderBotLogData {
 
 	@attribute()
-	public botId: string;
+	public bot: {
+		botId: string;
+		createdAt: string;
+	};
 
 	@attribute()
 	public symbol: string;

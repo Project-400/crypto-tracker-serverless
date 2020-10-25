@@ -247,20 +247,19 @@ export class BotsController {
 	}
 
 	public getTraderBotLogData: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		if (!event.queryStringParameters || !event.queryStringParameters.botId || !event.queryStringParameters.createdAt)
+		if (!event.queryStringParameters || !event.queryStringParameters.botId)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 
 		const auth: TokenVerification = Auth.VerifyToken('');
 		const userId: string = auth.sub;
 		const botId: string = event.queryStringParameters.botId;
-		const createdAt: string = event.queryStringParameters.createdAt;
 
 		try {
-			const bot: ITraderBot = await this.unitOfWork.BotTradeData.get(userId, botId, createdAt);
+			const data: ITraderBotLogData = await this.unitOfWork.TraderBotLogData.get(userId, botId);
 
-			return ResponseBuilder.ok({ bot });
+			return ResponseBuilder.ok({ data });
 		} catch (err) {
-			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot Log Data not found');
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
@@ -268,14 +267,14 @@ export class BotsController {
 	public saveTraderBotLogData: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
 
-		const data: ITraderBotLogData = JSON.parse(event.body).tradeData;
+		const data: ITraderBotLogData = JSON.parse(event.body);
 
-		if (!data.botId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Missing Bot ID');
+		if (!data.bot || !data.bot.botId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Missing Bot Details');
 
-		await this.unitOfWork.BotTradeData.createTradeBotData(data);
+		const result: ITraderBotLogData = await this.unitOfWork.TraderBotLogData.create(data);
 
 		try {
-			return ResponseBuilder.ok({ saved: true });
+			return ResponseBuilder.ok({ result });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
