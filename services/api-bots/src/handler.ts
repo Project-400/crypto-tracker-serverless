@@ -1,8 +1,10 @@
 import { ApiHandler, UnitOfWork } from '../../api-shared-modules/src';
 import { BotsController } from './bots.controller';
+import { BotsService } from './bots.service';
 
 const unitOfWork: UnitOfWork = new UnitOfWork();
-const controller: BotsController = new BotsController(unitOfWork);
+const botsService: BotsService = new BotsService(unitOfWork);
+const controller: BotsController = new BotsController(unitOfWork, botsService);
 
 export const getTraderBot: ApiHandler = controller.getTraderBot;
 export const getAllTradingBots: ApiHandler = controller.getAllTradingBots;

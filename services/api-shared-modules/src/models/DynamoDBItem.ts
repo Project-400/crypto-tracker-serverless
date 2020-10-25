@@ -1,6 +1,6 @@
 import { attribute, hashKey, rangeKey, table } from '@aws/dynamodb-data-mapper-annotations';
 
-export interface DynamoDbItem {
+export interface DbItem {
 	pk: string;
 	sk: string;
 	sk2: string;
@@ -10,7 +10,7 @@ export interface DynamoDbItem {
 
 // TODO: Implement a mechanism to change this automatically based on environment
 @table('dev-CryptoTracker-GENERAL')
-export class DynamoDbItem implements DynamoDbItem {
+export class DynamoDbItem implements DbItem {
 	@hashKey()
 	public pk!: string;
 
