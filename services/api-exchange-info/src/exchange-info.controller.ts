@@ -4,24 +4,20 @@ import {
 	ApiHandler,
 	ApiEvent,
 	ApiContext,
-	UnitOfWork,
-	ErrorCode,
+	ErrorCode
 } from '../../api-shared-modules/src';
 import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
-import { GetExchangeInfoDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces/get-exchange-info.interfaces';
-import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
+import { ExchangeInfoService } from './exchange-info.service';
 
 export class ExchangeInfoController {
 
-	public constructor(private unitOfWork: UnitOfWork) { }
+	public constructor(private exchangeInfoService: ExchangeInfoService) { }
 
 	public gatherAllExchangeInfo: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		const info: ExchangeInfoSymbol[] = await this.requestExchangeInfo();
-
-		await Promise.all(info.map((i: ExchangeInfoSymbol) => this.unitOfWork.ExchangeInfo.saveExchangeInfo(i)));
-
 		try {
-			return ResponseBuilder.ok({ info });
+			const count: number = await this.exchangeInfoService.gatherAllExchangeInfo();
+
+			return ResponseBuilder.ok({ count });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
@@ -34,30 +30,17 @@ export class ExchangeInfoController {
 			!event.pathParameters.quote
 		) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 
-		let info: ExchangeInfoSymbol;
+		const symbol: string = event.pathParameters.symbol;
+		const quote: string = event.pathParameters.quote;
 
 		try {
-			info = await this.unitOfWork.ExchangeInfo.getExchangeInfo(event.pathParameters.symbol, event.pathParameters.quote);
-		} catch (err) {
-			const allInfo: Array<Partial<ExchangeInfoSymbol>> = await this.requestExchangeInfo();
+			const info: ExchangeInfoSymbol = await this.exchangeInfoService.getSymbolExchangeInfo(symbol, quote);
 
-			const newInfo: Partial<ExchangeInfoSymbol> = allInfo.find((s: ExchangeInfoSymbol) => s.symbol === event.pathParameters.symbol);
-			if (!newInfo) return ResponseBuilder.notFound(ErrorCode.InvalidId, 'Symbol exchange info not found');
-
-			info = await this.unitOfWork.ExchangeInfo.saveExchangeInfo(newInfo);
-		}
-
-		try {
 			return ResponseBuilder.ok({ info });
 		} catch (err) {
 			console.log(err);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
-	}
-
-	public requestExchangeInfo = async (): Promise<ExchangeInfoSymbol[]> => {
-		const info: GetExchangeInfoDto = await BinanceApi.GetExchangeInfo();
-		return info.symbols;
 	}
 
 }
