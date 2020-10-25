@@ -7,10 +7,10 @@ import {
 	GetSymbolPriceDto
 } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
-import { ExchangePairsController } from '../../api-exchange-pairs/src/exchange-pairs.controller';
 import { ExchangePair } from '../../api-shared-modules/src/types';
 import { Trade } from '@crypto-tracker/common-types';
 import _ from 'underscore';
+import { ExchangePairsService } from '../../api-exchange-pairs/src/exchange-pairs.service';
 
 export class CoinsService {
 
@@ -35,7 +35,7 @@ export class CoinsService {
 	}
 
 	public getInvestmentChange = async (coin: string): Promise<any> => {
-		const exchangePairs: ExchangePairsController = new ExchangePairsController(this.unitOfWork);
+		const exchangePairs: ExchangePairsService = new ExchangePairsService(this.unitOfWork);
 		const pairs: Array<Partial<ExchangePair>> = await exchangePairs.requestExchangePairs();
 		const coinPairs: Array<Partial<ExchangePair>> = pairs.filter((p: ExchangePair) => p.base === coin);
 
