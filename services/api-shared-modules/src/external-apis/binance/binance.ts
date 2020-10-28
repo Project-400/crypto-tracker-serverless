@@ -1,6 +1,6 @@
 import BinanceEndpoints, { BinanceEndpoint } from './binance.endpoints';
 import { HttpApi } from '../http-api';
-import { BINANCE_API_KEY } from '../../../../../environment/env';
+import { BINANCE_API_HOST, BINANCE_API_KEY } from '../../../../../environment/env';
 import { GetAllCoinsDto, GetAllSymbolPricesDto, GetDustLogsDto, GetSymbolPriceDto } from './binance.interfaces';
 import { Trade } from '@crypto-tracker/common-types';
 import { GetExchangeInfoDto } from './binance.interfaces/get-exchange-info.interfaces';
@@ -118,7 +118,7 @@ export default class BinanceApi {
 		const data: any = BinanceApi.BinanceData(buyData);
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.BUY_CURRENCY, data);
 
-		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+		return JSON.parse(await HttpApi.post(url, BINANCE_API_HOST, true, BinanceApi.headers));
 	}
 
 	/*
@@ -132,7 +132,7 @@ export default class BinanceApi {
 		const data: any = BinanceApi.BinanceData(buyData);
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.SELL_CURRENCY, data);
 
-		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+		return JSON.parse(await HttpApi.post(url, BINANCE_API_HOST, true, BinanceApi.headers));
 	}
 
 }
