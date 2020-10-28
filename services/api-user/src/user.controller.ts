@@ -17,15 +17,8 @@ export class UserController {
 
 	public getAllUsers: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		let lastEvaluatedKey: LastEvaluatedKey;
-		if (event.body) {
-			const { pk, sk, sk2, entity}: LastEvaluatedKey = JSON.parse(event.body) as LastEvaluatedKey;
-			lastEvaluatedKey = {
-				pk,
-				sk,
-				sk2,
-				entity
-			};
-		}
+		if (event.body) lastEvaluatedKey = JSON.parse(event.body) as LastEvaluatedKey;
+
 		try {
 			const result: GetAllUsersResponse = await this.userService.getAllUsers(lastEvaluatedKey);
 

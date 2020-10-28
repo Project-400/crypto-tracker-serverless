@@ -1,18 +1,42 @@
 import { BOT_SERVICE_API_DOMAIN } from '../../../../../environment/env';
+import * as qs from 'qs';
 
 export default class BotServiceEndpoints {
 
-	public static DeployBot = (): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot`;
+	public static RequestEndpoint = (endpoint: BotServiceEndpoint, data?: any): string => {
+		const stringifiedData: string = data && BotServiceEndpoints.StringifyData(data);
 
-	public static StopBot = (): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot/stop`;
+		switch (endpoint) {
+			case BotServiceEndpoint.DEPLOY_BOT:
+				return BotServiceEndpoints.DeployBot(stringifiedData);
+			case BotServiceEndpoint.STOP_BOT:
+				return BotServiceEndpoints.StopBot(stringifiedData);
+			case BotServiceEndpoint.GET_BOT:
+				return BotServiceEndpoints.GetBot(stringifiedData);
+			case BotServiceEndpoint.GET_ALL_BOTS:
+				return BotServiceEndpoints.GetAllBots();
+			case BotServiceEndpoint.SHUTDOWN_ALL_BOTS:
+				return BotServiceEndpoints.ShutdownAllBots();
+			case BotServiceEndpoint.HEALTH_CHECK:
+				return BotServiceEndpoints.HealthCheck();
+			default:
+				return BotServiceEndpoints.HealthCheck();
+		}
+	}
 
-	public static GetBot = (botId: string): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot?botId=${botId}`;
+	private static StringifyData = (data: any): string => qs.stringify(data);
 
-	public static GetAllBots = (): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot/all`;
+	private static DeployBot = (data: string): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot?${data}`;
 
-	public static ShutdownAllBots = (): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot/shutdown-all`;
+	private static StopBot = (data: string): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot/stop?${data}`;
 
-	public static HealthCheck = (): string => `${BOT_SERVICE_API_DOMAIN}/health`;
+	private static GetBot = (botId: string): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot?botId=${botId}`;
+
+	private static GetAllBots = (): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot/all`;
+
+	private static ShutdownAllBots = (): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot/shutdown-all`;
+
+	private static HealthCheck = (): string => `${BOT_SERVICE_API_DOMAIN}/health`;
 
 }
 
@@ -21,5 +45,6 @@ export enum BotServiceEndpoint {
 	STOP_BOT,
 	GET_BOT,
 	GET_ALL_BOTS,
-	SHUTDOWN_ALL_BOTS
+	SHUTDOWN_ALL_BOTS,
+	HEALTH_CHECK
 }

@@ -11,3 +11,6 @@ export const BINANCE_API_KEY: string = '{{ BINANCE_API_KEY }}';
 export const BINANCE_API_SECRET_KEY: string = '{{ BINANCE_API_SECRET_KEY }}';
 export const BINANCE_API_HOST: string = '{{ BINANCE_API_HOST }}';
 export const BINANCE_API_DOMAIN: string = '{{ BINANCE_API_DOMAIN }}';
+
+export const BOT_SERVICE_API_HOST: string = '{{ BOT_SERVICE_API_HOST }}';
+export const BOT_SERVICE_API_DOMAIN: string = '{{ BOT_SERVICE_API_DOMAIN }}';
