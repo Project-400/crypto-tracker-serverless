@@ -1,5 +1,6 @@
 import { ClientRequest, IncomingMessage } from 'http';
 import * as https from 'https';
+import * as http from 'http';
 
 export class HttpApi {
 
@@ -16,41 +17,81 @@ export class HttpApi {
 		});
 	}
 
-	public static async post(url: string, host: string, secureHttp: boolean, headers?: { [key: string]: string }): Promise<string> {
+	public static async post(
+		path: string,
+		host: string,
+		port: number,
+		postData: { [key: string]: string },
+		headers?: { [key: string]: string }
+	): Promise<any> {
 		return new Promise((resolve: any, reject: any): void => {
-			let dataString: string = '';
-
-			const req: ClientRequest = https.get({ // https.request not working - Using https.get with POST method (It works?)
+			const postOptions: any = {
 				host,
-				port: secureHttp ? 443 : 80,
-				path: url,
-				method: 'POST',
-				headers
-			}, (res: IncomingMessage) => {
-				res.on('data', (chunk: any) => dataString += chunk);
-				res.on('end', () => resolve(dataString));
+				path,
+				port,
+				headers,
+				method: 'POST'
+			};
+
+			const req: ClientRequest = http.request(postOptions, (res: IncomingMessage) => {
+				if (res.statusCode < 200 || res.statusCode >= 300) return reject(new Error('statusCode=' + res.statusCode));
+
+				let body: any[] = [];
+
+				res.on('data', (chunk: any) => body.push(chunk));
+
+				res.on('end', () => {
+					try {
+						body = JSON.parse(Buffer.concat(body).toString());
+					} catch (e) {
+						reject(e);
+					}
+					resolve(body);
+				});
 			});
 
-			req.on('error', reject);
+			req.on('error', (e: Error): void => reject(e.message));
+			req.write(JSON.stringify(postData));
+			req.end();
 		});
 	}
 
-	public static async put(url: string, host: string, secureHttp: boolean, headers?: { [key: string]: string }): Promise<string> {
+	public static async put(
+		path: string,
+		host: string,
+		port: number,
+		postData: { [key: string]: string },
+		headers?: { [key: string]: string }
+	): Promise<string> {
 		return new Promise((resolve: any, reject: any): void => {
-			let dataString: string = '';
-
-			const req: ClientRequest = https.get({ // https.request not working - Using https.get with POST method (It works?)
+			const postOptions: any = {
 				host,
-				port: secureHttp ? 443 : 80,
-				path: url,
-				method: 'PUT',
-				headers
-			}, (res: IncomingMessage) => {
-				res.on('data', (chunk: any) => dataString += chunk);
-				res.on('end', () => resolve(dataString));
+				path,
+				port,
+				headers,
+				method: 'POST'
+			};
+
+			const req: ClientRequest = http.request(postOptions, (res: IncomingMessage) => {
+				if (res.statusCode < 200 || res.statusCode >= 300) return reject(new Error('statusCode=' + res.statusCode));
+
+				let body: any[] = [];
+
+				res.on('data', (chunk: any) => body.push(chunk));
+
+				res.on('end', () => {
+					try {
+						body = JSON.parse(Buffer.concat(body).toString());
+					} catch (e) {
+						reject(e);
+					}
+					resolve(body);
+				});
 			});
 
-			req.on('error', reject);
+			req.on('error', (e: Error): void => reject(e.message));
+			req.write(JSON.stringify(postData));
+			req.end();
 		});
 	}
 
