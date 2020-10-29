@@ -1,7 +1,4 @@
-import { ClientRequest, IncomingMessage } from 'http';
-import * as https from 'https';
-// tslint:disable-next-line:no-duplicate-imports
-import * as http from 'http';
+import http from 'http';
 
 export class HttpApi {
 
@@ -9,7 +6,7 @@ export class HttpApi {
 		return new Promise((resolve: any, reject: any): void => {
 			let dataString: string = '';
 
-			const req: ClientRequest = https.get(url, { headers }, (res: IncomingMessage) => {
+			const req: http.ClientRequest = http.get(url, { headers }, (res: http.IncomingMessage) => {
 				res.on('data', (chunk: any) => dataString += chunk);
 				res.on('end', () => resolve(dataString));
 			});
@@ -34,7 +31,7 @@ export class HttpApi {
 				method: 'POST'
 			};
 
-			const req: ClientRequest = http.request(postOptions, (res: IncomingMessage) => {
+			const req: http.ClientRequest = http.request(postOptions, (res: http.IncomingMessage) => {
 				if (res.statusCode < 200 || res.statusCode >= 300) return reject(new Error('statusCode=' + res.statusCode));
 
 				let body: any[] = [];
@@ -73,7 +70,7 @@ export class HttpApi {
 				method: 'PUT'
 			};
 
-			const req: ClientRequest = http.request(putOptions, (res: IncomingMessage) => {
+			const req: http.ClientRequest = http.request(putOptions, (res: http.IncomingMessage) => {
 				if (res.statusCode < 200 || res.statusCode >= 300) return reject(new Error('statusCode=' + res.statusCode));
 
 				let body: any[] = [];

@@ -1,4 +1,4 @@
-import { BOT_SERVICE_API_VERSION } from '../../../../../environment/env';
+import { BOT_SERVICE_API_VERSION, BOT_SERVICE_API_DOMAIN } from '../../../../../environment/env';
 import * as qs from 'qs';
 
 export default class BotServiceEndpoints {
@@ -40,7 +40,7 @@ export default class BotServiceEndpoints {
 
 	private static ShutdownAllBots = (): string => `${BOT_SERVICE_API_VERSION}/trader-bot/shutdown-all`;
 
-	private static HealthCheck = (): string => `${BOT_SERVICE_API_VERSION}/health`;
+	private static HealthCheck = (): string => `${BOT_SERVICE_API_DOMAIN}/health`;
 
 }
 

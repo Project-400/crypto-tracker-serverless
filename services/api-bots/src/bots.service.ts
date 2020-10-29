@@ -117,6 +117,12 @@ export class BotsService {
 				TradingBotState.PAUSED
 			], activeBots ? activeBots.lastEvaluatedKey : undefined, 10);
 
+			try {
+				await BotServiceApi.HealthCheck();
+			} catch (e) {
+				throw Error('Bot service health check failed');
+			}
+
 			await Promise.all(activeBots.bots.map(async (bot: ITraderBot) => {
 				bot.botState = TradingBotState.SHUTTING_DOWN;
 				bot.times.shuttingDownAt = new Date().toISOString();
