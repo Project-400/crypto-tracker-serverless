@@ -65,10 +65,16 @@ export class BotsService {
 		bot.botState = TradingBotState.FINISHING;
 		bot.times.stoppingAt = new Date().toISOString();
 
-		const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.update(bot);
+		const stoppingResult: ITraderBot = await this.unitOfWork.TraderBot.update(bot);
 
-		console.log(finishingResult.botId); // Pass into bot service
-		// TODO: Implement call to bot service
+		let stopOperation: any;
+		try {
+			stopOperation = await BotServiceApi.StopTraderBot(stoppingResult.botId);
+		} catch (e) {
+			throw Error('Failed to stop trader bot - Server not responsive');
+		}
+
+		if (!stopOperation || !stopOperation.success || !stopOperation.bot) throw Error('Failed to stop trader bot - Data missing');
 
 		bot.botState = TradingBotState.FINISHED;
 		bot.times.startConfirmedAt = new Date().toISOString();
@@ -82,10 +88,16 @@ export class BotsService {
 		bot.botState = TradingBotState.PAUSING;
 		bot.times.pausedAt = new Date().toISOString();
 
-		const finishingResult: ITraderBot = await this.unitOfWork.TraderBot.update(bot);
+		const pausingResult: ITraderBot = await this.unitOfWork.TraderBot.update(bot);
 
-		console.log(finishingResult.botId); // Pass into bot service
-		// TODO: Implement call to bot service
+		let pauseOperation: any;
+		try {
+			pauseOperation = await BotServiceApi.PauseTraderBot(pausingResult.botId);
+		} catch (e) {
+			throw Error('Failed to pause trader bot - Server not responsive');
+		}
+
+		if (!pauseOperation || !pauseOperation.success || !pauseOperation.bot) throw Error('Failed to pause trader bot - Data missing');
 
 		bot.botState = TradingBotState.PAUSED;
 		bot.times.pauseConfirmedAt = new Date().toISOString();
@@ -112,7 +124,14 @@ export class BotsService {
 				await this.unitOfWork.TraderBot.update(bot);
 			}));
 
-			// TODO: Implement call to bot service to shutdown all
+			let shutdownOperation: any;
+			try {
+				shutdownOperation = await BotServiceApi.ShutdownAllTraderBots();
+			} catch (e) {
+				throw Error('Failed to shutdown all trader bots - Server not responsive');
+			}
+
+			if (!shutdownOperation || !shutdownOperation.success || shutdownOperation.count === undefined) throw Error('Failed to shutdown all trader bots - Data missing');
 
 			await Promise.all(activeBots.bots.map(async (bot: ITraderBot) => {
 				bot.botState = TradingBotState.SHUT_DOWN;

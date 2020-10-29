@@ -22,8 +22,8 @@ export class HttpApi {
 		path: string,
 		host: string,
 		port: number,
-		postData: { [key: string]: string },
-		headers?: { [key: string]: string }
+		headers?: { [key: string]: string },
+		postData?: { [key: string]: string }
 	): Promise<any> {
 		return new Promise((resolve: any, reject: any): void => {
 			const postOptions: any = {
@@ -52,7 +52,7 @@ export class HttpApi {
 			});
 
 			req.on('error', (e: Error): void => reject(e.message));
-			req.write(JSON.stringify(postData));
+			if (postData) req.write(JSON.stringify(postData));
 			req.end();
 		});
 	}
@@ -61,8 +61,8 @@ export class HttpApi {
 		path: string,
 		host: string,
 		port: number,
-		putData: { [key: string]: string },
-		headers?: { [key: string]: string }
+		headers?: { [key: string]: string },
+		putData?: { [key: string]: string }
 	): Promise<any> {
 		return new Promise((resolve: any, reject: any): void => {
 			const putOptions: any = {
@@ -91,7 +91,7 @@ export class HttpApi {
 			});
 
 			req.on('error', (e: Error): void => reject(e.message));
-			req.write(JSON.stringify(putData));
+			if (putData) req.write(JSON.stringify(putData));
 			req.end();
 		});
 	}

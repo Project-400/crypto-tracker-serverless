@@ -8,9 +8,11 @@ export default class BotServiceEndpoints {
 
 		switch (endpoint) {
 			case BotServiceEndpoint.DEPLOY_BOT:
-				return BotServiceEndpoints.DeployBot(stringifiedData);
+				return BotServiceEndpoints.DeployBot();
 			case BotServiceEndpoint.STOP_BOT:
-				return BotServiceEndpoints.StopBot(stringifiedData);
+				return BotServiceEndpoints.StopBot();
+			case BotServiceEndpoint.PAUSE_BOT:
+				return BotServiceEndpoints.PauseBot();
 			case BotServiceEndpoint.GET_BOT:
 				return BotServiceEndpoints.GetBot(stringifiedData);
 			case BotServiceEndpoint.GET_ALL_BOTS:
@@ -26,9 +28,11 @@ export default class BotServiceEndpoints {
 
 	private static StringifyData = (data: any): string => qs.stringify(data);
 
-	private static DeployBot = (data: string): string => `${BOT_SERVICE_API_VERSION}/trader-bot`;
+	private static DeployBot = (): string => `${BOT_SERVICE_API_VERSION}/trader-bot`;
 
-	private static StopBot = (data: string): string => `${BOT_SERVICE_API_VERSION}/trader-bot/stop`;
+	private static StopBot = (): string => `${BOT_SERVICE_API_VERSION}/trader-bot/stop`;
+
+	private static PauseBot = (): string => `${BOT_SERVICE_API_VERSION}/trader-bot/pause`;
 
 	private static GetBot = (botId: string): string => `${BOT_SERVICE_API_VERSION}/trader-bot?botId=${botId}`;
 
@@ -43,6 +47,7 @@ export default class BotServiceEndpoints {
 export enum BotServiceEndpoint {
 	DEPLOY_BOT,
 	STOP_BOT,
+	PAUSE_BOT,
 	GET_BOT,
 	GET_ALL_BOTS,
 	SHUTDOWN_ALL_BOTS,
