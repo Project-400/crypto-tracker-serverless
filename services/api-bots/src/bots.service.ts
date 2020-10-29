@@ -44,7 +44,19 @@ export class BotsService {
 
 		const bot: ITraderBot = await this.unitOfWork.TraderBot.create(userId, botDetails);
 
-		return BotServiceApi.DeployTraderBot(bot.botId);
+		let deployment: any;
+		try {
+			deployment = await BotServiceApi.DeployTraderBot(bot.botId);
+		} catch (e) {
+			throw Error('Failed to deploy trader bot - Server not responsive');
+		}
+
+		if (!deployment || !deployment.success || !deployment.bot) throw Error('Failed to deploy trader bot - Data missing');
+
+		bot.times.startConfirmedAt = new Date().toISOString();
+		bot.botState = TradingBotState.TRADING;
+
+		return this.unitOfWork.TraderBot.update(bot);
 	}
 
 	public stopTraderBot = async (userId: string, botId: string, createdAt: string): Promise<ITraderBot> => {
