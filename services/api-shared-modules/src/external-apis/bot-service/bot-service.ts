@@ -4,16 +4,20 @@ import { BOT_SERVICE_API_HOST } from '../../../../../environment/env';
 
 export default class BotServiceApi {
 
-	public static async DeployTraderBot(botId: string): Promise<void> {
-		const url: string = BotServiceEndpoints.RequestEndpoint(BotServiceEndpoint.DEPLOY_BOT, { botId });
+	private static headers: any = {
+		'Content-Type': 'application/json'
+	};
 
-		return JSON.parse(await HttpApi.post(url, BOT_SERVICE_API_HOST, false));
+	public static async DeployTraderBot(botId: string): Promise<any> {
+		const url: string = BotServiceEndpoints.RequestEndpoint(BotServiceEndpoint.DEPLOY_BOT);
+
+		return HttpApi.post(url, BOT_SERVICE_API_HOST, 3000, { botId }, BotServiceApi.headers);
 	}
 
-	public static async StopTraderBot(botId: string): Promise<void> {
-		const url: string = BotServiceEndpoints.RequestEndpoint(BotServiceEndpoint.STOP_BOT, { botId });
+	public static async StopTraderBot(botId: string): Promise<any> {
+		const url: string = BotServiceEndpoints.RequestEndpoint(BotServiceEndpoint.STOP_BOT);
 
-		return JSON.parse(await HttpApi.put(url, BOT_SERVICE_API_HOST, false));
+		return HttpApi.put(url, BOT_SERVICE_API_HOST, 3000, { botId }, BotServiceApi.headers);
 	}
 
 	public static async GetTraderBot(botId: string): Promise<void> {
@@ -31,7 +35,8 @@ export default class BotServiceApi {
 	public static async ShutdownAllTraderBots(): Promise<void> {
 		const url: string = BotServiceEndpoints.RequestEndpoint(BotServiceEndpoint.SHUTDOWN_ALL_BOTS);
 
-		return JSON.parse(await HttpApi.put(url, BOT_SERVICE_API_HOST, false));
+		// return JSON.parse(await HttpApi.put(url, BOT_SERVICE_API_HOST, false));
+		return JSON.parse(await HttpApi.get(url));
 	}
 
 	public static async HealthCheck(): Promise<void> {

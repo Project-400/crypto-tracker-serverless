@@ -13,4 +13,5 @@ export const BINANCE_API_HOST: string = '{{ BINANCE_API_HOST }}';
 export const BINANCE_API_DOMAIN: string = '{{ BINANCE_API_DOMAIN }}';
 
 export const BOT_SERVICE_API_HOST: string = '{{ BOT_SERVICE_API_HOST }}';
+export const BOT_SERVICE_API_VERSION: string = '{{ BOT_SERVICE_API_VERSION }}';
 export const BOT_SERVICE_API_DOMAIN: string = '{{ BOT_SERVICE_API_DOMAIN }}';

@@ -1,5 +1,6 @@
 import { ClientRequest, IncomingMessage } from 'http';
 import * as https from 'https';
+// tslint:disable-next-line:no-duplicate-imports
 import * as http from 'http';
 
 export class HttpApi {
@@ -60,19 +61,19 @@ export class HttpApi {
 		path: string,
 		host: string,
 		port: number,
-		postData: { [key: string]: string },
+		putData: { [key: string]: string },
 		headers?: { [key: string]: string }
-	): Promise<string> {
+	): Promise<any> {
 		return new Promise((resolve: any, reject: any): void => {
-			const postOptions: any = {
+			const putOptions: any = {
 				host,
 				path,
 				port,
 				headers,
-				method: 'POST'
+				method: 'PUT'
 			};
 
-			const req: ClientRequest = http.request(postOptions, (res: IncomingMessage) => {
+			const req: ClientRequest = http.request(putOptions, (res: IncomingMessage) => {
 				if (res.statusCode < 200 || res.statusCode >= 300) return reject(new Error('statusCode=' + res.statusCode));
 
 				let body: any[] = [];
@@ -90,7 +91,7 @@ export class HttpApi {
 			});
 
 			req.on('error', (e: Error): void => reject(e.message));
-			req.write(JSON.stringify(postData));
+			req.write(JSON.stringify(putData));
 			req.end();
 		});
 	}

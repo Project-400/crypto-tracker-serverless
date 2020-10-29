@@ -2,9 +2,10 @@ import { UnitOfWork } from '../../api-shared-modules/src/data-access';
 import { BotType, ITraderBot, TradingBotState } from '../../api-shared-modules/src/models/core/TraderBot';
 import { BotsPageResponse } from '../../api-shared-modules/src/data-access/repositories/TraderBotRepository';
 import { LastEvaluatedKey } from '../../api-shared-modules/src/types';
+import { ITraderBotLogData } from '@crypto-tracker/common-types';
+import BotServiceApi from '../../api-shared-modules/src/external-apis/bot-service/bot-service';
 import { GetSymbolPriceDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
-import { ITraderBotLogData } from '@crypto-tracker/common-types';
 
 export class BotsService {
 
@@ -31,7 +32,7 @@ export class BotsService {
 	}
 
 	public createTraderBot = async (userId: string, symbol: string): Promise<ITraderBot> => {
-		const bot: Partial<ITraderBot> = {
+		const botDetails: Partial<ITraderBot> = {
 			userId,
 			symbol,
 			botType: BotType.SHORT_TERM,
@@ -41,10 +42,9 @@ export class BotsService {
 		const priceData: GetSymbolPriceDto = await BinanceApi.GetSymbolPrice(symbol); // Using price endpoint as alternative
 		if (priceData.code !== undefined || priceData.msg === 'Invalid symbol.') throw Error('Cryptocurrency symbol not found');
 
-		// TODO: Implement call to bot service
-		// Possibly let this endpoint return & notify bot startup via Websocket
+		const bot: ITraderBot = await this.unitOfWork.TraderBot.create(userId, botDetails);
 
-		return this.unitOfWork.TraderBot.create(userId, bot);
+		return BotServiceApi.DeployTraderBot(bot.botId);
 	}
 
 	public stopTraderBot = async (userId: string, botId: string, createdAt: string): Promise<ITraderBot> => {

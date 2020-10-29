@@ -1,4 +1,4 @@
-import { BOT_SERVICE_API_DOMAIN } from '../../../../../environment/env';
+import { BOT_SERVICE_API_VERSION } from '../../../../../environment/env';
 import * as qs from 'qs';
 
 export default class BotServiceEndpoints {
@@ -26,17 +26,17 @@ export default class BotServiceEndpoints {
 
 	private static StringifyData = (data: any): string => qs.stringify(data);
 
-	private static DeployBot = (data: string): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot?${data}`;
+	private static DeployBot = (data: string): string => `${BOT_SERVICE_API_VERSION}/trader-bot`;
 
-	private static StopBot = (data: string): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot/stop?${data}`;
+	private static StopBot = (data: string): string => `${BOT_SERVICE_API_VERSION}/trader-bot/stop`;
 
-	private static GetBot = (botId: string): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot?botId=${botId}`;
+	private static GetBot = (botId: string): string => `${BOT_SERVICE_API_VERSION}/trader-bot?botId=${botId}`;
 
-	private static GetAllBots = (): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot/all`;
+	private static GetAllBots = (): string => `${BOT_SERVICE_API_VERSION}/trader-bot/all`;
 
-	private static ShutdownAllBots = (): string => `${BOT_SERVICE_API_DOMAIN}/trader-bot/shutdown-all`;
+	private static ShutdownAllBots = (): string => `${BOT_SERVICE_API_VERSION}/trader-bot/shutdown-all`;
 
-	private static HealthCheck = (): string => `${BOT_SERVICE_API_DOMAIN}/health`;
+	private static HealthCheck = (): string => `${BOT_SERVICE_API_VERSION}/health`;
 
 }
 
