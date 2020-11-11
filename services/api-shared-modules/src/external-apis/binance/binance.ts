@@ -32,7 +32,7 @@ export default class BinanceApi {
 		const data: any = BinanceApi.BinanceData();
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_ALL_COINS, data);
 
-		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
 	}
 
 	/*
@@ -47,7 +47,7 @@ export default class BinanceApi {
 		const data: any = BinanceApi.BinanceData({ symbol });
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_SYMBOL_TRADES, data);
 
-		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
 	}
 
 	/*
@@ -60,7 +60,7 @@ export default class BinanceApi {
 	public static async GetSymbolPrice(symbol: string): Promise<GetSymbolPriceDto> {
 		const url: string = BinanceEndpoints.GetSymbolPrice(symbol);
 
-		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
 	}
 
 	/*
@@ -73,7 +73,7 @@ export default class BinanceApi {
 	public static async GetAllSymbolPrices(): Promise<GetAllSymbolPricesDto> {
 		const url: string = BinanceEndpoints.GetAllSymbolPrices();
 
-		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
 	}
 
 	/*
@@ -90,7 +90,7 @@ export default class BinanceApi {
 		const data: any = BinanceApi.BinanceData();
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_DUST_LOGS, data);
 
-		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
 	}
 
 	/*
@@ -104,7 +104,7 @@ export default class BinanceApi {
 	public static async GetExchangeInfo(): Promise<GetExchangeInfoDto> {
 		const url: string = BinanceEndpoints.GetExchangeInfo();
 
-		return JSON.parse(await HttpApi.get(url, BinanceApi.headers));
+		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
 	}
 
 	/*
@@ -118,7 +118,7 @@ export default class BinanceApi {
 		const data: any = BinanceApi.BinanceData(buyData);
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.BUY_CURRENCY, data);
 
-		return JSON.parse(await HttpApi.post(url, BINANCE_API_HOST, true, BinanceApi.headers));
+		return JSON.parse(await HttpApi.post(url, BINANCE_API_HOST, 443, BinanceApi.headers));
 	}
 
 	/*
@@ -132,7 +132,7 @@ export default class BinanceApi {
 		const data: any = BinanceApi.BinanceData(buyData);
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.SELL_CURRENCY, data);
 
-		return JSON.parse(await HttpApi.post(url, BINANCE_API_HOST, true, BinanceApi.headers));
+		return JSON.parse(await HttpApi.post(url, BINANCE_API_HOST, 443, BinanceApi.headers));
 	}
 
 }

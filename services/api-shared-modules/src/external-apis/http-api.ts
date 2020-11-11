@@ -1,15 +1,21 @@
 import http from 'http';
+import https from 'https';
 
 export class HttpApi {
 
-	public static async get(url: string, headers?: { [key: string]: string }): Promise<string> {
+	public static async get(url: string, secureHttp: boolean, headers?: { [key: string]: string }): Promise<string> {
 		return new Promise((resolve: any, reject: any): void => {
 			let dataString: string = '';
 
-			const req: http.ClientRequest = http.get(url, { headers }, (res: http.IncomingMessage) => {
-				res.on('data', (chunk: any) => dataString += chunk);
-				res.on('end', () => resolve(dataString));
-			});
+			const req: http.ClientRequest = secureHttp ?
+				https.get(url, { headers }, (res: http.IncomingMessage) => {
+					res.on('data', (chunk: any) => dataString += chunk);
+					res.on('end', () => resolve(dataString));
+				}) :
+				http.get(url, { headers }, (res: http.IncomingMessage) => {
+					res.on('data', (chunk: any) => dataString += chunk);
+					res.on('end', () => resolve(dataString));
+				});
 
 			req.on('error', reject);
 		});

@@ -29,13 +29,13 @@ export default class BotServiceApi {
 	public static async GetTraderBot(botId: string): Promise<void> {
 		const url: string = BotServiceEndpoints.RequestEndpoint(BotServiceEndpoint.STOP_BOT, { botId });
 
-		return JSON.parse(await HttpApi.get(url));
+		return JSON.parse(await HttpApi.get(url, false));
 	}
 
 	public static async GetAllTraderBots(): Promise<void> {
 		const url: string = BotServiceEndpoints.RequestEndpoint(BotServiceEndpoint.GET_ALL_BOTS);
 
-		return JSON.parse(await HttpApi.get(url));
+		return JSON.parse(await HttpApi.get(url, false));
 	}
 
 	public static async ShutdownAllTraderBots(): Promise<any> {
@@ -47,7 +47,7 @@ export default class BotServiceApi {
 	public static async HealthCheck(): Promise<void> {
 		const url: string = BotServiceEndpoints.RequestEndpoint(BotServiceEndpoint.HEALTH_CHECK);
 
-		return JSON.parse(await HttpApi.get(url));
+		return JSON.parse(await HttpApi.get(url, false));
 	}
 
 }
