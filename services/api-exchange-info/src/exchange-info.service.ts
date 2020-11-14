@@ -17,11 +17,11 @@ export class ExchangeInfoService {
 		return info.length;
 	}
 
-	public getSymbolExchangeInfo = async (symbol: string, quote: string): Promise<ExchangeInfoSymbol> => {
+	public getSymbolExchangeInfo = async (symbol: string): Promise<ExchangeInfoSymbol> => {
 		let info: ExchangeInfoSymbol;
 
 		try {
-			info = await this.unitOfWork.ExchangeInfo.getExchangeInfo(symbol, quote); // Attempt to get details from DB
+			info = await this.unitOfWork.ExchangeInfo.getExchangeInfo(symbol); // Attempt to get details from DB
 		} catch (err) { // Doesn't exist in the DB - Make request to Binance
 			const allInfo: Array<Partial<ExchangeInfoSymbol>> = await this.requestExchangeInfo();
 

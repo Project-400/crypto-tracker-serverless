@@ -19,26 +19,23 @@ export class ExchangeInfoController {
 
 			return ResponseBuilder.ok({ count });
 		} catch (err) {
+			console.error(`Error trying to gathering all exchange info: ${err}`);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
 
 	public getSymbolExchangeInfo: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-		if (
-			!event.pathParameters ||
-			!event.pathParameters.symbol ||
-			!event.pathParameters.quote
-		) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+		if (!event.pathParameters || !event.pathParameters.symbol)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 
 		const symbol: string = event.pathParameters.symbol;
-		const quote: string = event.pathParameters.quote;
 
 		try {
-			const info: ExchangeInfoSymbol = await this.exchangeInfoService.getSymbolExchangeInfo(symbol, quote);
+			const info: ExchangeInfoSymbol = await this.exchangeInfoService.getSymbolExchangeInfo(symbol);
 
 			return ResponseBuilder.ok({ info });
 		} catch (err) {
-			console.log(err);
+			console.error(`Error getting symbol exchange info: ${err}`);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}

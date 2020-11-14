@@ -18,6 +18,8 @@ export class TransactionsController {
 	public buyCurrency: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
 
+		// TODO: Only take in symbol - get base and quote from DB
+
 		const auth: TokenVerification = Auth.VerifyToken('');
 		const userId: string = auth.sub;
 

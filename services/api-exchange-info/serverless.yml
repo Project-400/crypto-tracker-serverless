@@ -49,7 +49,7 @@ functions:
     handler: src/handler.getSymbolExchangeInfo
     events:
       - http:
-          path: /exchange-info/single/{symbol}/{quote}
+          path: /exchange-info/single/{symbol}
           method: get
           cors: true
 #          authorizer: aws_iam
