@@ -8,6 +8,7 @@ import {
 } from '../../api-shared-modules/src';
 import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
 import { ExchangeInfoService } from './exchange-info.service';
+import { GatherAllExchangeInfoCounts } from './exchange-info.interfaces';
 
 export class ExchangeInfoController {
 
@@ -15,9 +16,9 @@ export class ExchangeInfoController {
 
 	public gatherAllExchangeInfo: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		try {
-			const count: number = await this.exchangeInfoService.gatherAllExchangeInfo();
+			const counts: GatherAllExchangeInfoCounts = await this.exchangeInfoService.gatherAllExchangeInfo();
 
-			return ResponseBuilder.ok({ count });
+			return ResponseBuilder.ok({ ...counts });
 		} catch (err) {
 			console.error(`Error trying to gathering all exchange info: ${err}`);
 			return ResponseBuilder.internalServerError(err, err.message);

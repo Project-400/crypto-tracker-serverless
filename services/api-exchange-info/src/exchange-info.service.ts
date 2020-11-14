@@ -3,19 +3,36 @@ import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
 import { GetExchangeInfoDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces/get-exchange-info.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 import DateTimeFunctions from '../../api-shared-modules/src/utils/datetime';
+import { GatherAllExchangeInfoCounts } from './exchange-info.interfaces';
 
 export class ExchangeInfoService {
 
 	public constructor(private unitOfWork: UnitOfWork) { }
 
-	public gatherAllExchangeInfo = async (): Promise<number> => {
+	public gatherAllExchangeInfo = async (): Promise<GatherAllExchangeInfoCounts> => {
 		const info: ExchangeInfoSymbol[] = await this.requestExchangeInfo();
+		let newCount: number = 0;
+		let updatedCount: number = 0;
+		console.log(`Sorting ${info.length} Infos`);
 
-		// TODO: Check currently saved Exchange Info objects in DB and only save new ones (possibly update old ones)
+		await Promise.all(info.map(async (i: ExchangeInfoSymbol) => {
+			try {
+				console.log(`Sorting ${i.symbol}`);
+				const existingInfo: ExchangeInfoSymbol = await this.unitOfWork.ExchangeInfo.get(i.symbol);
 
-		await Promise.all(info.map((i: ExchangeInfoSymbol) => this.unitOfWork.ExchangeInfo.create(i)));
+				await this.unitOfWork.ExchangeInfo.update({ ...existingInfo, ...i });
+				updatedCount += 1;
+			} catch (err) {
+				if (err.name === 'ItemNotFoundException') {
+					await this.unitOfWork.ExchangeInfo.create(i);
+					newCount += 1;
+				} else {
+					console.error(`An error occurred when retrieving Exchange Info from DB`);
+				}
+			}
+		}));
 
-		return info.length;
+		return { total: info.length, newCount, updatedCount };
 	}
 
 	public getSymbolExchangeInfo = async (symbol: string): Promise<ExchangeInfoSymbol> => {
