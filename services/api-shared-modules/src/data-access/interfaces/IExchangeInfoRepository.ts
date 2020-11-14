@@ -1,6 +1,7 @@
 import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
 
 export interface IExchangeInfoRepository {
-	saveExchangeInfo(pair: Partial<ExchangeInfoSymbol>): Promise<ExchangeInfoSymbol>;
-	getExchangeInfo(symbol: string): Promise<ExchangeInfoSymbol>;
+	get(symbol: string): Promise<ExchangeInfoSymbol>;
+	create(pair: Partial<ExchangeInfoSymbol>): Promise<ExchangeInfoSymbol>;
+	update(pair: ExchangeInfoSymbol): Promise<ExchangeInfoSymbol>;
 }
