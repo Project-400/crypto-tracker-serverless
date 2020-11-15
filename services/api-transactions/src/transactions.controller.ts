@@ -37,6 +37,7 @@ export class TransactionsController {
 
 			return ResponseBuilder.ok({ transaction: savedTransaction });
 		} catch (err) {
+			console.error(`Failed to buy currency: ${err.message}`);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
@@ -61,6 +62,7 @@ export class TransactionsController {
 
 			return ResponseBuilder.ok({ transaction: savedTransaction });
 		} catch (err) {
+			console.error(`Failed to sell currency: ${err.message}`);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}

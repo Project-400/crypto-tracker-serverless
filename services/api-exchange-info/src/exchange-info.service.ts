@@ -9,15 +9,13 @@ export class ExchangeInfoService {
 
 	public constructor(private unitOfWork: UnitOfWork) { }
 
-	public gatherAllExchangeInfo = async (): Promise<GatherAllExchangeInfoCounts> => {
+	public gatherAllExchangeInfo = async (): Promise<GatherAllExchangeInfoCounts> => {				// Run by admin or cron job only
 		const info: ExchangeInfoSymbol[] = await this.requestExchangeInfo();
 		let newCount: number = 0;
 		let updatedCount: number = 0;
-		console.log(`Sorting ${info.length} Infos`);
 
 		await Promise.all(info.map(async (i: ExchangeInfoSymbol) => {
 			try {
-				console.log(`Sorting ${i.symbol}`);
 				const existingInfo: ExchangeInfoSymbol = await this.unitOfWork.ExchangeInfo.get(i.symbol);
 
 				await this.unitOfWork.ExchangeInfo.update({ ...existingInfo, ...i });

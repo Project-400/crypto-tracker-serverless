@@ -19,7 +19,12 @@ export class TransactionsService {
 			type: BinanceTransactionType.MARKET
 		};
 
-		const response: ExchangeCurrencyFullDto = await BinanceApi.BuyCurrency(request);
+		let response: ExchangeCurrencyFullDto;
+		try {
+			response = await BinanceApi.BuyCurrency(request, buyInfo.isTest);
+		} catch (err) {
+			throw Error(`Unable to buy Currency via Binance. ${err}`);
+		}
 
 		const transaction: Partial<Transaction> = {
 			request,
@@ -45,7 +50,12 @@ export class TransactionsService {
 			type: BinanceTransactionType.MARKET
 		};
 
-		const response: ExchangeCurrencyFullDto = await BinanceApi.SellCurrency(request);
+		let response: ExchangeCurrencyFullDto;
+		try {
+			response = await BinanceApi.SellCurrency(request, sellInfo.isTest);
+		} catch (err) {
+			throw Error(`Unable to sell Currency via Binance. ${err}`);
+		}
 
 		const transaction: Partial<Transaction> = {
 			request,

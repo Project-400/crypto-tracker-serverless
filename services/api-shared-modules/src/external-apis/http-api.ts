@@ -37,8 +37,9 @@ export class HttpApi {
 				method: 'POST'
 			};
 
-			const req: http.ClientRequest = http.request(postOptions, (res: http.IncomingMessage) => {
-				if (res.statusCode < 200 || res.statusCode >= 300) return reject(new Error('statusCode=' + res.statusCode));
+			const req: http.ClientRequest = https.request(postOptions, (res: http.IncomingMessage) => {
+				if (res.statusCode < 200 || res.statusCode >= 300)
+					return reject(new Error(`Error making POST request using Options: ${JSON.stringify(postOptions)} - StatusCode=${res.statusCode}`));
 
 				let body: any[] = [];
 
@@ -76,8 +77,9 @@ export class HttpApi {
 				method: 'PUT'
 			};
 
-			const req: http.ClientRequest = http.request(putOptions, (res: http.IncomingMessage) => {
-				if (res.statusCode < 200 || res.statusCode >= 300) return reject(new Error('statusCode=' + res.statusCode));
+			const req: http.ClientRequest = https.request(putOptions, (res: http.IncomingMessage) => {
+				if (res.statusCode < 200 || res.statusCode >= 300)
+					return reject(new Error(`Error making PUT request using Options: ${JSON.stringify(putOptions)} - StatusCode=${res.statusCode}`));
 
 				let body: any[] = [];
 

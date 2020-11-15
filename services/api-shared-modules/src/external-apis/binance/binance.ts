@@ -118,6 +118,7 @@ export default class BinanceApi {
 		const data: any = BinanceApi.BinanceData(buyData);
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.BUY_CURRENCY, data, isTest);
 
+		console.log(url);
 		return HttpApi.post(url, BINANCE_API_HOST, 443, BinanceApi.headers);
 	}
 
@@ -128,9 +129,9 @@ export default class BinanceApi {
 	* This endpoint is used to place an order (sell currency / token).
 	* */
 
-	public static async SellCurrency(buyData: TransactionRequest): Promise<ExchangeCurrencyFullDto> {
+	public static async SellCurrency(buyData: TransactionRequest, isTest: boolean): Promise<ExchangeCurrencyFullDto> {
 		const data: any = BinanceApi.BinanceData(buyData);
-		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.SELL_CURRENCY, data);
+		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.SELL_CURRENCY, data, isTest);
 
 		return HttpApi.post(url, BINANCE_API_HOST, 443, BinanceApi.headers);
 	}
