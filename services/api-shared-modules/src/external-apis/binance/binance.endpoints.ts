@@ -4,7 +4,7 @@ import { BINANCE_API_DOMAIN, BINANCE_API_SECRET_KEY } from '../../../../../envir
 
 export default class BinanceEndpoints {
 
-	public static SignatureEndpoint = (endpoint: BinanceEndpoint, data?: any): string => {
+	public static SignatureEndpoint = (endpoint: BinanceEndpoint, data?: any, isTest: boolean = true): string => {
 		const stringifiedData: string = data && BinanceEndpoints.StringifyData(data);
 		const signature: string = stringifiedData && BinanceEndpoints.FormSignature(stringifiedData);
 
@@ -18,9 +18,9 @@ export default class BinanceEndpoints {
 			case BinanceEndpoint.GET_DUST_LOGS:
 				return BinanceEndpoints.GetDustLogs(stringifiedData, signature);
 			case BinanceEndpoint.BUY_CURRENCY:
-				return BinanceEndpoints.BuyCurrency(stringifiedData, signature, true);
+				return BinanceEndpoints.BuyCurrency(stringifiedData, signature, isTest);
 			case BinanceEndpoint.SELL_CURRENCY:
-				return BinanceEndpoints.SellCurrency(stringifiedData, signature, true);
+				return BinanceEndpoints.SellCurrency(stringifiedData, signature, isTest);
 			default:
 				return BinanceEndpoints.GetSystemStatus();
 		}
