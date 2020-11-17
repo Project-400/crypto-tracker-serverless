@@ -3,9 +3,7 @@ import { Transaction, TransactionRequest } from '../../api-shared-modules/src/ty
 import { BinanceTransactionSide, BinanceTransactionType } from '../../api-shared-modules/src/external-apis/binance/binance.enums';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 import { BuyCurrencyData, SellCurrencyData } from './transactions.interfaces';
-import {
-	ExchangeCurrencyFullDto
-} from '../../api-shared-modules/src/external-apis/binance/binance.interfaces/exchange-currency.interfaces';
+import { ExchangeCurrencyTransactionFull } from '@crypto-tracker/common-types';
 
 export class TransactionsService {
 
@@ -19,7 +17,7 @@ export class TransactionsService {
 			type: BinanceTransactionType.MARKET
 		};
 
-		let response: ExchangeCurrencyFullDto;
+		let response: ExchangeCurrencyTransactionFull;
 		try {
 			response = await BinanceApi.BuyCurrency(request, buyInfo.isTest);
 		} catch (err) {
@@ -50,7 +48,7 @@ export class TransactionsService {
 			type: BinanceTransactionType.MARKET
 		};
 
-		let response: ExchangeCurrencyFullDto;
+		let response: ExchangeCurrencyTransactionFull;
 		try {
 			response = await BinanceApi.SellCurrency(request, sellInfo.isTest);
 		} catch (err) {

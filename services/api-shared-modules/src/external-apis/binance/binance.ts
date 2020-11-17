@@ -2,10 +2,9 @@ import BinanceEndpoints, { BinanceEndpoint } from './binance.endpoints';
 import { HttpApi } from '../http-api';
 import { BINANCE_API_HOST, BINANCE_API_KEY } from '../../../../../environment/env';
 import { GetAllCoinsDto, GetAllSymbolPricesDto, GetDustLogsDto, GetSymbolPriceDto } from './binance.interfaces';
-import { Trade } from '@crypto-tracker/common-types';
+import { ExchangeCurrencyTransactionFull, Trade } from '@crypto-tracker/common-types';
 import { GetExchangeInfoDto } from './binance.interfaces/get-exchange-info.interfaces';
 import { TransactionRequest } from '../../types';
-import { ExchangeCurrencyFullDto } from './binance.interfaces/exchange-currency.interfaces';
 
 export default class BinanceApi {
 
@@ -114,7 +113,7 @@ export default class BinanceApi {
 	* This endpoint is used to place an order (buy currency / token).
 	* */
 
-	public static async BuyCurrency(buyData: TransactionRequest, isTest: boolean): Promise<ExchangeCurrencyFullDto> {
+	public static async BuyCurrency(buyData: TransactionRequest, isTest: boolean): Promise<ExchangeCurrencyTransactionFull> {
 		const data: any = BinanceApi.BinanceData(buyData);
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.BUY_CURRENCY, data, isTest);
 
@@ -129,7 +128,7 @@ export default class BinanceApi {
 	* This endpoint is used to place an order (sell currency / token).
 	* */
 
-	public static async SellCurrency(buyData: TransactionRequest, isTest: boolean): Promise<ExchangeCurrencyFullDto> {
+	public static async SellCurrency(buyData: TransactionRequest, isTest: boolean): Promise<ExchangeCurrencyTransactionFull> {
 		const data: any = BinanceApi.BinanceData(buyData);
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.SELL_CURRENCY, data, isTest);
 

@@ -1,6 +1,6 @@
 // Preferably create a custom NPM package and move everything from this file to the package
 
-import { ExchangeCurrencyFullDto } from '../external-apis/binance/binance.interfaces/exchange-currency.interfaces';
+import { ExchangeCurrencyTransactionFull } from '@crypto-tracker/common-types';
 
 export type UserType = 'User' | 'Admin';
 
@@ -113,7 +113,7 @@ export interface ExchangePair {
 
 export interface Transaction {
 	request: TransactionRequest;
-	response: ExchangeCurrencyFullDto;
+	response: ExchangeCurrencyTransactionFull;
 	symbol: string;
 	base: string;
 	quote: string;
