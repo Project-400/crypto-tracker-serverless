@@ -1,7 +1,7 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
 import { Transaction, TransactionRequest } from '../../types';
-import { ExchangeCurrencyFullDto } from '../../external-apis/binance/binance.interfaces/exchange-currency.interfaces';
+import { ExchangeCurrencyTransactionFull } from '@crypto-tracker/common-types';
 
 export class TransactionItem extends DynamoDbItem implements Transaction {
 
@@ -9,7 +9,7 @@ export class TransactionItem extends DynamoDbItem implements Transaction {
 	public request: TransactionRequest;
 
 	@attribute()
-	public response: ExchangeCurrencyFullDto;
+	public response: ExchangeCurrencyTransactionFull;
 
 	@attribute()
 	public symbol: string;
