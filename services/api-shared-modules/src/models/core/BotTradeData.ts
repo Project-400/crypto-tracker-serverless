@@ -1,6 +1,6 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { ExchangeInfoSymbol, TransactionFillCommission, PositionState, ITraderBotLogData, SymbolType } from '@crypto-tracker/common-types';
+import { ExchangeInfoSymbol, TransactionFill, PositionState, ITraderBotLogData, SymbolType } from '@crypto-tracker/common-types';
 
 export class TraderBotLogDataItem extends DynamoDbItem implements ITraderBotLogData {
 
@@ -53,7 +53,7 @@ export class TraderBotLogDataItem extends DynamoDbItem implements ITraderBotLogD
 	public percentageDroppedFromHigh: number;
 
 	@attribute()
-	public commissions: TransactionFillCommission[];
+	public commissions: TransactionFill[];
 
 	@attribute()
 	public state: PositionState;
