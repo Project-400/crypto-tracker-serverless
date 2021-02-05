@@ -7,7 +7,7 @@ import {
 	LastEvaluatedKey,
 	ResponseBuilder
 } from '../../api-shared-modules/src';
-import { ITraderBotLogData } from '@crypto-tracker/common-types';
+import { IBotTradeData } from '@crypto-tracker/common-types';
 import Auth, { TokenVerification } from '../../_auth/verify';
 import { ITraderBot } from '../../api-shared-modules/src/models/core/TraderBot';
 import { BotsPageResponse } from '../../api-shared-modules/src/data-access/repositories/TraderBotRepository';
@@ -174,7 +174,7 @@ export class BotsController {
 		const botId: string = event.queryStringParameters.botId;
 
 		try {
-			const data: ITraderBotLogData = await this.botsService.getTraderBotLogData(userId, botId);
+			const data: IBotTradeData = await this.botsService.getTraderBotLogData(userId, botId);
 
 			return ResponseBuilder.ok({ data });
 		} catch (err) {
@@ -186,11 +186,11 @@ export class BotsController {
 	public saveTraderBotLogData: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.body) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request body');
 
-		const data: ITraderBotLogData = JSON.parse(event.body);
-		if (!data.bot || !data.bot.botId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Missing Bot Details');
+		const data: IBotTradeData = JSON.parse(event.body);
+		if (!data.botId) return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Missing Bot ID');
 
 		try {
-			const result: ITraderBotLogData = await this.botsService.saveTraderBotLogData(data);
+			const result: IBotTradeData = await this.botsService.saveTraderBotLogData(data);
 
 			return ResponseBuilder.ok({ result });
 		} catch (err) {

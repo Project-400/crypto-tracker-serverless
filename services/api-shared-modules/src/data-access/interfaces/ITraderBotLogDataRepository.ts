@@ -1,6 +1,6 @@
-import { ITraderBotLogData } from '@crypto-tracker/common-types';
+import { IBotTradeData } from '@crypto-tracker/common-types';
 
 export interface ITraderBotLogDataRepository {
-	get(userId: string, botId: string): Promise<ITraderBotLogData>;
-	create(data: ITraderBotLogData): Promise<ITraderBotLogData>;
+	get(userId: string, botId: string): Promise<IBotTradeData>;
+	create(data: IBotTradeData): Promise<IBotTradeData>;
 }

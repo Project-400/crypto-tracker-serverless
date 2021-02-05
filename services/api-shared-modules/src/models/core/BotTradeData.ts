@@ -1,14 +1,16 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { ExchangeInfoSymbol, TransactionFill, PositionState, ITraderBotLogData, SymbolType } from '@crypto-tracker/common-types';
+import {
+	ExchangeInfoSymbol,
+	PositionState,
+	SymbolType,
+	IBotTradeData, CommissionTotals, TransactionFill
+} from '@crypto-tracker/common-types';
 
-export class TraderBotLogDataItem extends DynamoDbItem implements ITraderBotLogData {
+export class TraderBotLogDataItem extends DynamoDbItem implements IBotTradeData {
 
 	@attribute()
-	public bot: {
-		botId: string;
-		createdAt: string;
-	};
+	public botId: string;
 
 	@attribute()
 	public symbol: string;
@@ -18,6 +20,19 @@ export class TraderBotLogDataItem extends DynamoDbItem implements ITraderBotLogD
 
 	@attribute()
 	public quote: string;
+
+	@attribute()
+	public startedTrading: boolean;
+
+	@attribute()
+	public finishedTrading: boolean;
+
+	@attribute()
+	public buyDataSet: boolean;
+
+	@attribute()
+	public sellDataSet: boolean;
+
 
 	@attribute()
 	public lowercaseSymbol: string;
@@ -53,7 +68,13 @@ export class TraderBotLogDataItem extends DynamoDbItem implements ITraderBotLogD
 	public percentageDroppedFromHigh: number;
 
 	@attribute()
-	public commissions: TransactionFill[];
+	public buyFills: TransactionFill[];
+
+	@attribute()
+	public sellFills: TransactionFill[];
+
+	@attribute()
+	public commissions: CommissionTotals;
 
 	@attribute()
 	public state: PositionState;
@@ -85,5 +106,47 @@ export class TraderBotLogDataItem extends DynamoDbItem implements ITraderBotLogD
 
 	@attribute()
 	public userId: string;
+
+	@attribute()
+	public averageBuyPrice: number;
+
+	@attribute()
+	public averageSellPrice: number;
+
+	@attribute()
+	public baseAssetPrecision: number;
+
+	@attribute()
+	public highestBuyPrice: number;
+
+	@attribute()
+	public highestPriceReachedDuringTrade: number;
+
+	@attribute()
+	public highestSellPrice: number;
+
+	@attribute()
+	public lowestBuyPrice: number;
+
+	@attribute()
+	public lowestPriceReachedDuringTrade: number;
+
+	@attribute()
+	public lowestSellPrice: number;
+
+	@attribute()
+	public preTradePriceChangeCount: number;
+
+	@attribute()
+	public priceChangeCount: number;
+
+	@attribute()
+	public priceChangeInterval: number;
+
+	@attribute()
+	public quoteAssetPrecision: number;
+
+	@attribute()
+	public startTime: number;
 
 }

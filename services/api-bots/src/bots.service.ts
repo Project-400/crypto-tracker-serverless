@@ -2,7 +2,7 @@ import { UnitOfWork } from '../../api-shared-modules/src/data-access';
 import { BotType, ITraderBot, TradingBotState } from '../../api-shared-modules/src/models/core/TraderBot';
 import { BotsPageResponse } from '../../api-shared-modules/src/data-access/repositories/TraderBotRepository';
 import { LastEvaluatedKey } from '../../api-shared-modules/src/types';
-import { ITraderBotLogData } from '@crypto-tracker/common-types';
+import { IBotTradeData } from '@crypto-tracker/common-types';
 import BotServiceApi from '../../api-shared-modules/src/external-apis/bot-service/bot-service';
 import { GetSymbolPriceDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
@@ -152,10 +152,10 @@ export class BotsService {
 		return count;
 	}
 
-	public getTraderBotLogData = async (userId: string, botId: string): Promise<ITraderBotLogData> =>
+	public getTraderBotLogData = async (userId: string, botId: string): Promise<IBotTradeData> =>
 		this.unitOfWork.TraderBotLogData.get(userId, botId)
 
-	public saveTraderBotLogData = async (botLogData: ITraderBotLogData): Promise<ITraderBotLogData> =>
+	public saveTraderBotLogData = async (botLogData: IBotTradeData): Promise<IBotTradeData> =>
 		this.unitOfWork.TraderBotLogData.create(botLogData)
 
 	private validateBotStates = (states: string[]): void => {
