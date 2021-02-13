@@ -7,5 +7,6 @@ const coinsService: CoinsService = new CoinsService(unitOfWork);
 const controller: CoinsController = new CoinsController(coinsService);
 
 export const getCoins: ApiHandler = controller.getCoins;
+export const getSpecifiedCoins: ApiHandler = controller.getSpecifiedCoins;
 export const gatherUserCoins: ApiHandler = controller.gatherUserCoins;
 export const getInvestmentChange: ApiHandler = controller.getInvestmentChange;

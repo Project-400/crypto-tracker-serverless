@@ -16,8 +16,18 @@ export class CoinsService {
 
 	public constructor(private unitOfWork: UnitOfWork) { }
 
-	public getCoins = async (userId: string): Promise<Coin[]> => {
-		const coins: Coin[] = await this.unitOfWork.Coins.getAll(userId);
+	public getAllCoins = async (userId: string): Promise<Coin[]> => {
+		const coins: Coin[] = await this.unitOfWork.Coins.getAllCoins(userId);
+
+		return coins.filter((c: Coin) => c.free > 0).sort((a: Coin, b: Coin) => {
+			if (a.free < b.free) return 1;
+			if (a.free > b.free) return -1;
+			return 0;
+		});
+	}
+
+	public getSpecifiedCoins = async (userId: string, coinNames: string[]): Promise<Coin[]> => {
+		const coins: Coin[] = await this.unitOfWork.Coins.getSpecifiedCoins(userId, coinNames);
 
 		return coins.filter((c: Coin) => c.free > 0).sort((a: Coin, b: Coin) => {
 			if (a.free < b.free) return 1;

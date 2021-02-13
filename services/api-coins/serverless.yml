@@ -44,6 +44,13 @@ functions:
           path: /coins
           method: get
           cors: true
+  getSpecifiedCoins:
+    handler: src/handler.getSpecifiedCoins
+    events:
+      - http:
+          path: /coins/list/{coins}
+          method: get
+          cors: true
   gatherUserCoins:
     handler: src/handler.gatherUserCoins
     events:
