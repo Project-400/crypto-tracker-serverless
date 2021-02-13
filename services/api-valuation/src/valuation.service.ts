@@ -19,24 +19,28 @@ export interface CoinCount {
 
 export class ValuationService {
 
-	public constructor(private unitOfWork: UnitOfWork, private exchangeInfoService: ExchangeInfoService) { }
+	public constructor(
+		private unitOfWork: UnitOfWork,
+		private exchangeInfoService: ExchangeInfoService
+	) { }
 
 	public getValuation = async (coinCounts: CoinCount[]): Promise<CoinCount[]> => {
 		const symbolPricesDto: GetAllSymbolPricesDto = await BinanceApi.GetAllSymbolPrices();
-		const nonTradingPairs: ExchangeInfoSymbol[] = await this.exchangeInfoService.getNonTradingPairs();
+		const nonTradingPairs: string[] = await this.exchangeInfoService.getNonTradingPairs();
 		// const exchangeInfoDto: GetExchangeInfoDto = await BinanceApi.GetExchangeInfo();
 
 		const prices: { [symbol: string]: string } = { };
 
-		symbolPricesDto.map((symbolPriceDto: GetSymbolPriceDto) => {
-			if (symbolPriceDto.symbol === 'DOGEBNB') console.log(symbolPriceDto);
+		symbolPricesDto.filter((symbolPriceDto: GetSymbolPriceDto) =>
+			nonTradingPairs.indexOf(symbolPriceDto.symbol) <= -1
+		).map((symbolPriceDto: GetSymbolPriceDto) => {
 			prices[symbolPriceDto.symbol] = symbolPriceDto.price;
 		});
 
-		nonTradingPairs.map((exchangeInfoSymbol: ExchangeInfoSymbol) => {
-			if (exchangeInfoSymbol.symbol === 'DOGEBNB') console.log(exchangeInfoSymbol);
-			if (exchangeInfoSymbol.symbol === 'DOGEBTC') console.log(exchangeInfoSymbol);
-		});
+		// nonTradingPairs.map((notTradingSymbol: string) => {
+		// 	if (notTradingSymbol === 'DOGEBNB') console.log(notTradingSymbol);
+		// 	// if (exchangeInfoSymbol.symbol === 'DOGEBTC') console.log(exchangeInfoSymbol);
+		// });
 
 		const BTCUSDT_Price: string = prices.BTCUSDT;
 		const BNBBUSD_Price: string = prices.BNBBUSD;
@@ -58,7 +62,7 @@ export class ValuationService {
 				busdTotalValue: `${coinCount.coinCount * Number(busdPrice)}`,
 				btcToUsdTotalValue: this.btcToUsd(`${coinCount.coinCount * Number(btcPrice)}`, BTCUSDT_Price),
 				bnbToUsdTotalValue: this.bnbToUsd(`${coinCount.coinCount * Number(bnbPrice)}`, BNBBUSD_Price),
-				nonTradingPairs
+				// nonTradingPairs
 			};
 		};
 	}
