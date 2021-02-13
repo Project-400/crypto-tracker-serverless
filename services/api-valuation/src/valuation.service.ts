@@ -2,7 +2,6 @@ import { UnitOfWork } from '../../api-shared-modules/src/data-access';
 import { GetAllSymbolPricesDto, GetSymbolPriceDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 import { ExchangeInfoService } from '../../api-exchange-info/src/exchange-info.service';
-import { CoinsService } from '../../api-coins/src/coins.service';
 
 export interface CoinCount {
 	coin: string;

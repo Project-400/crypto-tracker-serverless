@@ -41,7 +41,7 @@ functions:
     handler: src/handler.getValuation
     events:
       - http:
-          path: /valuation
+          path: /valuation/{coins}
           method: get
           cors: true
 #          authorizer: aws_iam

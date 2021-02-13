@@ -2,7 +2,7 @@ import {
 	ApiContext,
 	ApiEvent,
 	ApiHandler,
-	ApiResponse,
+	ApiResponse, ErrorCode,
 	ResponseBuilder
 } from '../../api-shared-modules/src';
 import Auth, { TokenVerification } from '../../_auth/verify';
@@ -18,23 +18,22 @@ export class ValuationController {
 	) { }
 
 	public getValuation: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.pathParameters || !event.pathParameters.coins)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
 		const auth: TokenVerification = Auth.VerifyToken('');
 		const userId: string = auth.sub;
 
-		try {
-			const values: CoinCount[] = await this.valuationService.getValuation([
-				{ coin: 'ALPHA', coinCount: 299.7 },
-				{ coin: 'ZRX', coinCount: 30 },
-				{ coin: 'SUSHI', coinCount: 31.705263 },
-				{ coin: 'SPARTA', coinCount: 160 },
-				{ coin: 'DOGE', coinCount: 2500 },
-				{ coin: 'BAKE', coinCount: 325 },
-				{ coin: 'YOYO', coinCount: 1000 },
-				{ coin: 'USDT', coinCount: 10 },
-				{ coin: 'BUSD', coinCount: 20 },
-				{ coin: 'TUSD', coinCount: 30 },
-			]);
+		const coinNames: string[] = event.pathParameters.coins.split(',');
 
+		try {
+			const coinCounts: CoinCount[] = (await this.coinsService.getSpecifiedCoins(userId, coinNames))
+				.map((c: Coin) => ({
+					coin: c.coin,
+					coinCount: c.free
+				}));
+
+			const values: CoinCount[] = await this.valuationService.getValuation(coinCounts);
 			const totalValue: string = this.valuationService.calculateValueTotal(values);
 
 			return ResponseBuilder.ok({ values, totalValue });
@@ -48,7 +47,7 @@ export class ValuationController {
 		const userId: string = auth.sub;
 
 		try {
-			const coinCounts: CoinCount[] = (await this.coinsService.getCoins(userId))
+			const coinCounts: CoinCount[] = (await this.coinsService.getAllCoins(userId))
 				.map((c: Coin) => ({
 					coin: c.coin,
 					coinCount: c.free
