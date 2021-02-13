@@ -6,14 +6,15 @@ import { ExchangeInfoService } from '../../api-exchange-info/src/exchange-info.s
 export interface CoinCount {
 	coin: string;
 	coinCount: number;
-	usdValue: string;
-	individualValues: {
+	usdValue?: string;
+	isNonMainstream?: boolean; // If the coin does not have a BTC, ETH, USDT, BUSD or BNB trading pair
+	individualValues?: {
 		usdtValue?: string;
 		busdValue?: string;
 		btcValue?: string;
 		bnbValue?: string;
 	};
-	totalValues: {
+	totalValues?: {
 		usdtTotalValue?: string;
 		busdTotalValue?: string;
 		btcToUsdTotalValue?: string;
@@ -36,6 +37,7 @@ export class ValuationService {
 
 	public getValuation = async (coinCounts: CoinCount[]): Promise<CoinCount[]> => {
 		const prices: PairPriceList = await this.getSymbolPrices();
+		const nonMainstreamPairs: string[] = await this.exchangeInfoService.getNonMainstreamPairs();
 		const BTCUSDT_Price: string = prices.BTCUSDT;
 		const BNBBUSD_Price: string = prices.BNBBUSD;
 
@@ -67,6 +69,8 @@ export class ValuationService {
 				cc.totalValues.bnbToUsdTotalValue = this.bnbToUsd(`${coinCount.coinCount * Number(bnbPrice)}`, BNBBUSD_Price);
 			}
 
+			cc.isNonMainstream = nonMainstreamPairs.indexOf(coinCount.coin) > -1;
+
 			return this.setUsdValue(cc);
 		});
 	}
@@ -84,7 +88,9 @@ export class ValuationService {
 
 		return prices;
 	}
+
 	private btcToUsd = (btcValue: string, btcUsdtPrice: string): string => `${Number(btcUsdtPrice) * Number(btcValue)}`;
+
 	private bnbToUsd = (bnbValue: string, bnbUsdtPrice: string): string => `${Number(bnbUsdtPrice) * Number(bnbValue)}`;
 
 	private setUsdValue = (coinCount: CoinCount): CoinCount => {

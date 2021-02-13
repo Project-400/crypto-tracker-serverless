@@ -4,7 +4,6 @@ import { GetExchangeInfoDto } from '../../api-shared-modules/src/external-apis/b
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 import DateTimeFunctions from '../../api-shared-modules/src/utils/datetime';
 import { GatherAllExchangeInfoCounts } from './exchange-info.interfaces';
-import { DustLog, DustLogRow } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 
 export class ExchangeInfoService {
 
