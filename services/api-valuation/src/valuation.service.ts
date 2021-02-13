@@ -112,6 +112,17 @@ export class ValuationService {
 			coinCount.totalValues.btcToUsdTotalValue ||
 			coinCount.totalValues.bnbToUsdTotalValue;
 
+		if (coinCount.coin === 'USDT') { // Non mainstream with no mainstream pairs
+			coinCount.individualValues.usdtValue = coinCount.coinCount.toString();
+			coinCount.totalValues.usdtTotalValue = coinCount.coinCount.toString();
+			coinCount.usdValue = coinCount.coinCount.toString();
+		}
+		if (coinCount.coin === 'BUSD') { // Rounding is usually off
+			coinCount.individualValues.busdValue = coinCount.coinCount.toString();
+			coinCount.totalValues.busdTotalValue = coinCount.coinCount.toString();
+			coinCount.usdValue = coinCount.coinCount.toString();
+		}
+
 		return coinCount;
 	}
 }

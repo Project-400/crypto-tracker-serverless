@@ -25,7 +25,9 @@ export class ValuationController {
 				{ coin: 'DOGE', coinCount: 2500 },
 				{ coin: 'BAKE', coinCount: 325 },
 				{ coin: 'YOYO', coinCount: 1000 },
-				{ coin: 'USTD', coinCount: 10 }
+				{ coin: 'USDT', coinCount: 10 },
+				{ coin: 'BUSD', coinCount: 20 },
+				{ coin: 'TUSD', coinCount: 30 },
 			]);
 			return ResponseBuilder.ok({ values });
 		} catch (err) {
