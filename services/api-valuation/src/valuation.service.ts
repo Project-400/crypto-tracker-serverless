@@ -87,8 +87,10 @@ export class ValuationService {
 	}
 
 	public calculateValueTotal = (coinCounts: CoinCount[]): string => {
-		const totalValue: number = coinCounts.reduce((total: number, coinCount: CoinCount) =>
-			total + Number(coinCount.usdValue), 0);
+		const totalValue: number = coinCounts.reduce((total: number, coinCount: CoinCount) => {
+			if (coinCount.usdValue) return total + Number(coinCount.usdValue);
+			return total;
+		}, 0);
 
 		return totalValue.toFixed(2);
 	}
