@@ -7,10 +7,15 @@ import {
 } from '../../api-shared-modules/src';
 import Auth, { TokenVerification } from '../../_auth/verify';
 import { CoinCount, ValuationService } from './valuation.service';
+import { CoinsService } from '../../api-coins/src/coins.service';
+import { Coin } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 
 export class ValuationController {
 
-	public constructor(private valuationService: ValuationService) { }
+	public constructor(
+		private valuationService: ValuationService,
+		private coinsService: CoinsService
+	) { }
 
 	public getValuation: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		const auth: TokenVerification = Auth.VerifyToken('');
@@ -29,7 +34,30 @@ export class ValuationController {
 				{ coin: 'BUSD', coinCount: 20 },
 				{ coin: 'TUSD', coinCount: 30 },
 			]);
-			return ResponseBuilder.ok({ values });
+
+			const totalValue: string = this.valuationService.calculateValueTotal(values);
+
+			return ResponseBuilder.ok({ values, totalValue });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	public getValuationForAllCoins: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
+
+		try {
+			const coinCounts: CoinCount[] = (await this.coinsService.getCoins(userId))
+				.map((c: Coin) => ({
+					coin: c.coin,
+					coinCount: c.free
+				}));
+
+			const values: CoinCount[] = await this.valuationService.getValuation(coinCounts);
+			const totalValue: string = this.valuationService.calculateValueTotal(values);
+
+			return ResponseBuilder.ok({ values, totalValue });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}

@@ -2,6 +2,7 @@ import { UnitOfWork } from '../../api-shared-modules/src/data-access';
 import { GetAllSymbolPricesDto, GetSymbolPriceDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 import { ExchangeInfoService } from '../../api-exchange-info/src/exchange-info.service';
+import { CoinsService } from '../../api-coins/src/coins.service';
 
 export interface CoinCount {
 	coin: string;
@@ -85,6 +86,13 @@ export class ValuationService {
 		});
 	}
 
+	public calculateValueTotal = (coinCounts: CoinCount[]): string => {
+		const totalValue: number = coinCounts.reduce((total: number, coinCount: CoinCount) =>
+			total + Number(coinCount.usdValue), 0);
+
+		return totalValue.toFixed(2);
+	}
+
 	private getSymbolPrices = async (): Promise<PairPriceList> => {
 		const symbolPricesDto: GetAllSymbolPricesDto = await BinanceApi.GetAllSymbolPrices();
 		const nonTradingPairs: string[] = await this.exchangeInfoService.getNonTradingPairs();
@@ -110,6 +118,7 @@ export class ValuationService {
 			coinCount.totalValues.busdTotalValue ||
 			coinCount.totalValues.usdtTotalValue ||
 			coinCount.totalValues.btcToUsdTotalValue ||
+			coinCount.totalValues.ethToUsdTotalValue ||
 			coinCount.totalValues.bnbToUsdTotalValue;
 
 		if (coinCount.coin === 'USDT') { // Non mainstream with no mainstream pairs
