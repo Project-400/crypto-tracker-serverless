@@ -12,14 +12,17 @@ export interface CoinCount {
 		usdtValue?: string;
 		busdValue?: string;
 		btcValue?: string;
+		ethValue?: string;
 		bnbValue?: string;
 	};
 	totalValues?: {
 		usdtTotalValue?: string;
 		busdTotalValue?: string;
 		btcToUsdTotalValue?: string;
+		ethToUsdTotalValue?: string;
 		bnbToUsdTotalValue?: string;
 		btcTotalValue?: string;
+		ethTotalValue?: string;
 		bnbTotalValue?: string;
 	};
 }
@@ -39,12 +42,14 @@ export class ValuationService {
 		const prices: PairPriceList = await this.getSymbolPrices();
 		const nonMainstreamPairs: string[] = await this.exchangeInfoService.getNonMainstreamPairs();
 		const BTCUSDT_Price: string = prices.BTCUSDT;
-		const BNBBUSD_Price: string = prices.BNBBUSD;
+		const ETHUSDT_Price: string = prices.ETHUSDT;
+		const BNBBUSD_Price: string = prices.BNBUSDT;
 
 		return coinCounts.map((coinCount: CoinCount): CoinCount => {
 			const usdtPrice: string = prices[`${coinCount.coin}USDT`];
 			const busdPrice: string = prices[`${coinCount.coin}BUSD`];
 			const btcPrice: string = prices[`${coinCount.coin}BTC`];
+			const ethPrice: string = prices[`${coinCount.coin}ETH`];
 			const bnbPrice: string = prices[`${coinCount.coin}BNB`];
 
 			const cc: CoinCount = {
@@ -53,6 +58,7 @@ export class ValuationService {
 					usdtValue: usdtPrice,
 					busdValue: busdPrice,
 					btcValue: btcPrice,
+					ethValue: ethPrice,
 					bnbValue: bnbPrice
 				},
 				totalValues: { }
@@ -63,6 +69,10 @@ export class ValuationService {
 			if (btcPrice) {
 				cc.totalValues.btcTotalValue = `${coinCount.coinCount * Number(btcPrice)}`;
 				cc.totalValues.btcToUsdTotalValue = this.btcToUsd(`${coinCount.coinCount * Number(btcPrice)}`, BTCUSDT_Price);
+			}
+			if (ethPrice) {
+				cc.totalValues.ethTotalValue = `${coinCount.coinCount * Number(ethPrice)}`;
+				cc.totalValues.ethToUsdTotalValue = this.ethToUsd(`${coinCount.coinCount * Number(ethPrice)}`, ETHUSDT_Price);
 			}
 			if (bnbPrice) {
 				cc.totalValues.bnbTotalValue = `${coinCount.coinCount * Number(bnbPrice)}`;
@@ -90,6 +100,8 @@ export class ValuationService {
 	}
 
 	private btcToUsd = (btcValue: string, btcUsdtPrice: string): string => `${Number(btcUsdtPrice) * Number(btcValue)}`;
+
+	private ethToUsd = (ethValue: string, ethUsdtPrice: string): string => `${Number(ethUsdtPrice) * Number(ethValue)}`;
 
 	private bnbToUsd = (bnbValue: string, bnbUsdtPrice: string): string => `${Number(bnbUsdtPrice) * Number(bnbValue)}`;
 

@@ -19,6 +19,7 @@ export class ValuationController {
 		try {
 			const values: CoinCount[] = await this.valuationService.getValuation([
 				{ coin: 'ALPHA', coinCount: 299.7 },
+				{ coin: 'ZRX', coinCount: 30 },
 				{ coin: 'SUSHI', coinCount: 31.705263 },
 				{ coin: 'SPARTA', coinCount: 160 },
 				{ coin: 'DOGE', coinCount: 2500 },
