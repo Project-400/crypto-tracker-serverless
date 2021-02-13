@@ -6,7 +6,7 @@ import {
 	ResponseBuilder
 } from '../../api-shared-modules/src';
 import Auth, { TokenVerification } from '../../_auth/verify';
-import { ValuationService } from './valuation.service';
+import { CoinCount, ValuationService } from './valuation.service';
 
 export class ValuationController {
 
@@ -17,7 +17,15 @@ export class ValuationController {
 		const userId: string = auth.sub;
 
 		try {
-			return ResponseBuilder.ok({ });
+			const values: CoinCount[] = await this.valuationService.getValuation([
+				{ coin: 'ALPHA', coinCount: 299.7 },
+				{ coin: 'SUSHI', coinCount: 31.705263 },
+				{ coin: 'SPARTA', coinCount: 160 },
+				{ coin: 'DOGE', coinCount: 2500 },
+				{ coin: 'BAKE', coinCount: 325 },
+				{ coin: 'YOYO', coinCount: 1000 },
+			]);
+			return ResponseBuilder.ok({ values });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
