@@ -4,6 +4,7 @@ import { GetExchangeInfoDto } from '../../api-shared-modules/src/external-apis/b
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 import DateTimeFunctions from '../../api-shared-modules/src/utils/datetime';
 import { GatherAllExchangeInfoCounts } from './exchange-info.interfaces';
+import { DustLog, DustLogRow } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 
 export class ExchangeInfoService {
 
@@ -56,15 +57,38 @@ export class ExchangeInfoService {
 	}
 
 	public getNonTradingSymbolData = async (): Promise<ExchangeInfoSymbol[]> => { // Invalid pairs (exchange info) that are not trading
-		const exchangeInfoDto: GetExchangeInfoDto = await BinanceApi.GetExchangeInfo();
+		const symbols: ExchangeInfoSymbol[] = await this.requestExchangeInfo();
 
-		return exchangeInfoDto.symbols.filter((s: ExchangeInfoSymbol) => s.status !== 'TRADING');
+		return symbols.filter((s: ExchangeInfoSymbol) => s.status !== 'TRADING');
 	}
 
 	public getNonTradingPairs = async (): Promise<string[]> => { // Invalid symbol names that are not trading
 		const exchangeInfoDto: ExchangeInfoSymbol[] = await this.getNonTradingSymbolData();
 
 		return exchangeInfoDto.map((s: ExchangeInfoSymbol) => s.symbol);
+	}
+
+	// Symbol pairs that do not trade in BTC, ETH, USDT, BUSD or BNB
+	public getNonMainstreamPairs = async (): Promise<string[]> => {
+		const exchangeInfoSymbols: ExchangeInfoSymbol[] = await this.requestExchangeInfo();
+
+		const groupedAssets: { [s: string]: string[] } =
+			exchangeInfoSymbols.reduce((assets: { [s: string]: string[] }, symbol: ExchangeInfoSymbol) => {
+			if (assets[symbol.baseAsset]) assets[symbol.baseAsset].push(symbol.symbol);
+			else assets[symbol.baseAsset] = [symbol.symbol];
+			return assets;
+		}, { });
+
+		return Object.keys(groupedAssets).filter((coin: string) => {
+			const symbols: string[] = groupedAssets[coin];
+			return (
+				symbols.indexOf(`${coin}BTC`) <= -1 &&
+				symbols.indexOf(`${coin}ETH`) <= -1 &&
+				symbols.indexOf(`${coin}USDT`) <= -1 &&
+				symbols.indexOf(`${coin}BUSD`) <= -1 &&
+				symbols.indexOf(`${coin}BNB`) <= -1
+			);
+		});
 	}
 
 	private saveSingleExchangeInfo = async (symbol: string): Promise<ExchangeInfoSymbol> => {

@@ -41,4 +41,15 @@ export class ExchangeInfoController {
 		}
 	}
 
+	public getNonMainstreamPairs: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		try {
+			const nonMainStreamPairs: string[] = await this.exchangeInfoService.getNonMainstreamPairs();
+
+			return ResponseBuilder.ok({ nonMainStreamPairs });
+		} catch (err) {
+			console.error(`Error getting non mainstream pairs: ${err}`);
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 }

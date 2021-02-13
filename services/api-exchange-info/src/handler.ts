@@ -8,3 +8,4 @@ const controller: ExchangeInfoController = new ExchangeInfoController(exchangeIn
 
 export const gatherAllExchangeInfo: ApiHandler = controller.gatherAllExchangeInfo;
 export const getSymbolExchangeInfo: ApiHandler = controller.getSymbolExchangeInfo;
+export const getNonMainstreamPairs: ApiHandler = controller.getNonMainstreamPairs;
