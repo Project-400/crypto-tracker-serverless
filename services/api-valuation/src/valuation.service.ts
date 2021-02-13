@@ -1,20 +1,30 @@
 import { UnitOfWork } from '../../api-shared-modules/src/data-access';
 import { GetAllSymbolPricesDto, GetSymbolPriceDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
-import { GetExchangeInfoDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces/get-exchange-info.interfaces';
-import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
 import { ExchangeInfoService } from '../../api-exchange-info/src/exchange-info.service';
 
 export interface CoinCount {
 	coin: string;
 	coinCount: number;
-	btcCoinValue?: string;
-	usdCoinValue?: string;
-	btcTotalValue?: string;
-	usdtTotalValue?: string;
-	busdTotalValue?: string;
-	btcToUsdTotalValue?: string;
-	bnbToUsdTotalValue?: string;
+	usdValue: string;
+	individualValues: {
+		usdtValue?: string;
+		busdValue?: string;
+		btcValue?: string;
+		bnbValue?: string;
+	};
+	totalValues: {
+		usdtTotalValue?: string;
+		busdTotalValue?: string;
+		btcToUsdTotalValue?: string;
+		bnbToUsdTotalValue?: string;
+		btcTotalValue?: string;
+		bnbTotalValue?: string;
+	};
+}
+
+export interface PairPriceList {
+	[symbol: string]: string;
 }
 
 export class ValuationService {
@@ -25,23 +35,7 @@ export class ValuationService {
 	) { }
 
 	public getValuation = async (coinCounts: CoinCount[]): Promise<CoinCount[]> => {
-		const symbolPricesDto: GetAllSymbolPricesDto = await BinanceApi.GetAllSymbolPrices();
-		const nonTradingPairs: string[] = await this.exchangeInfoService.getNonTradingPairs();
-		// const exchangeInfoDto: GetExchangeInfoDto = await BinanceApi.GetExchangeInfo();
-
-		const prices: { [symbol: string]: string } = { };
-
-		symbolPricesDto.filter((symbolPriceDto: GetSymbolPriceDto) =>
-			nonTradingPairs.indexOf(symbolPriceDto.symbol) <= -1
-		).map((symbolPriceDto: GetSymbolPriceDto) => {
-			prices[symbolPriceDto.symbol] = symbolPriceDto.price;
-		});
-
-		// nonTradingPairs.map((notTradingSymbol: string) => {
-		// 	if (notTradingSymbol === 'DOGEBNB') console.log(notTradingSymbol);
-		// 	// if (exchangeInfoSymbol.symbol === 'DOGEBTC') console.log(exchangeInfoSymbol);
-		// });
-
+		const prices: PairPriceList = await this.getSymbolPrices();
 		const BTCUSDT_Price: string = prices.BTCUSDT;
 		const BNBBUSD_Price: string = prices.BNBBUSD;
 
@@ -51,23 +45,55 @@ export class ValuationService {
 			const btcPrice: string = prices[`${coinCount.coin}BTC`];
 			const bnbPrice: string = prices[`${coinCount.coin}BNB`];
 
-			return {
+			const cc: CoinCount = {
 				...coinCount,
-				usdtPrice,
-				busdPrice,
-				btcPrice,
-				bnbPrice,
-				// usdCoinValue: Number(prices[coinCount.symbol]),
-				usdtTotalValue: `${coinCount.coinCount * Number(usdtPrice)}`,
-				busdTotalValue: `${coinCount.coinCount * Number(busdPrice)}`,
-				btcToUsdTotalValue: this.btcToUsd(`${coinCount.coinCount * Number(btcPrice)}`, BTCUSDT_Price),
-				bnbToUsdTotalValue: this.bnbToUsd(`${coinCount.coinCount * Number(bnbPrice)}`, BNBBUSD_Price),
-				// nonTradingPairs
+				individualValues: {
+					usdtValue: usdtPrice,
+					busdValue: busdPrice,
+					btcValue: btcPrice,
+					bnbValue: bnbPrice
+				},
+				totalValues: { }
 			};
-		};
+
+			if (usdtPrice) cc.totalValues.usdtTotalValue = `${coinCount.coinCount * Number(usdtPrice)}`;
+			if (busdPrice) cc.totalValues.busdTotalValue = `${coinCount.coinCount * Number(busdPrice)}`;
+			if (btcPrice) {
+				cc.totalValues.btcTotalValue = `${coinCount.coinCount * Number(btcPrice)}`;
+				cc.totalValues.btcToUsdTotalValue = this.btcToUsd(`${coinCount.coinCount * Number(btcPrice)}`, BTCUSDT_Price);
+			}
+			if (bnbPrice) {
+				cc.totalValues.bnbTotalValue = `${coinCount.coinCount * Number(bnbPrice)}`;
+				cc.totalValues.bnbToUsdTotalValue = this.bnbToUsd(`${coinCount.coinCount * Number(bnbPrice)}`, BNBBUSD_Price);
+			}
+
+			return this.setUsdValue(cc);
+		});
 	}
 
+	private getSymbolPrices = async (): Promise<PairPriceList> => {
+		const symbolPricesDto: GetAllSymbolPricesDto = await BinanceApi.GetAllSymbolPrices();
+		const nonTradingPairs: string[] = await this.exchangeInfoService.getNonTradingPairs();
+		const prices: { [symbol: string]: string } = { };
+
+		symbolPricesDto.filter((symbolPriceDto: GetSymbolPriceDto) =>
+			nonTradingPairs.indexOf(symbolPriceDto.symbol) <= -1 // Remove non-trading pairs
+		).map((symbolPriceDto: GetSymbolPriceDto) => {
+			prices[symbolPriceDto.symbol] = symbolPriceDto.price;
+		});
+
+		return prices;
+	}
 	private btcToUsd = (btcValue: string, btcUsdtPrice: string): string => `${Number(btcUsdtPrice) * Number(btcValue)}`;
 	private bnbToUsd = (bnbValue: string, bnbUsdtPrice: string): string => `${Number(bnbUsdtPrice) * Number(bnbValue)}`;
 
+	private setUsdValue = (coinCount: CoinCount): CoinCount => {
+		coinCount.usdValue =
+			coinCount.totalValues.busdTotalValue ||
+			coinCount.totalValues.usdtTotalValue ||
+			coinCount.totalValues.btcToUsdTotalValue ||
+			coinCount.totalValues.bnbToUsdTotalValue;
+
+		return coinCount;
+	}
 }
