@@ -49,7 +49,7 @@ export interface Subscription extends DBItem {
 
 export interface PairPrice {
 	symbol: string;
-	price: number;
+	price: string; // number
 }
 
 export interface PriceBatch {

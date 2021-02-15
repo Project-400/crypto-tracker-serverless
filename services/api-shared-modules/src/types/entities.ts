@@ -8,5 +8,6 @@ export enum Entity {
 	EXCHANGE_PAIR = 'exchangePair',
 	EXCHANGE_INFO = 'exchangeInfo',
 	TRADER_BOT_LOG_DATA = 'traderBotLogData',
-	TRADER_BOT = 'traderBot'
+	TRADER_BOT = 'traderBot',
+	WALLET_VALUATION = 'walletValuation'
 }
