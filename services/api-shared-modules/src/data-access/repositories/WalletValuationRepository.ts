@@ -7,7 +7,7 @@ export class WalletValuationRepository extends Repository implements IWalletValu
 
 	public async create(userId: string, value: string): Promise<WalletValuation> {
 		const walletValuationId: string = uuid();
-		const millis: number = 1000 * 60 * 5;
+		const millis: number = 1000 * 60;
 		const date: Date = new Date();
 		const dateISO: string = date.toISOString();
 		const roundedTime: string = new Date(Math.ceil(date.getTime() / millis) * millis).toISOString();
@@ -29,8 +29,18 @@ export class WalletValuationRepository extends Repository implements IWalletValu
 		}));
 	}
 
-	public async update(userId: string, value: string): Promise<void> {
-		return Promise.resolve(undefined);
+	public async update(walletValuationId: string, userId: string, value: string, changes: Partial<WalletValuation>):
+		Promise<WalletValuation> {
+		delete changes.sk2;
+		delete changes.sk3;
+
+		return this.db.update(Object.assign(new WalletValuationItem(), {
+			pk: `${Entity.WALLET_VALUATION}#${walletValuationId}`,
+			sk: `${Entity.USER}#${userId}/`,
+			...changes
+		}), {
+			onMissing: 'skip'
+		});
 	}
 
 }

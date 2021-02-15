@@ -24,6 +24,8 @@ import {
 } from './interfaces';
 import { DataMapper } from '@aws/dynamodb-data-mapper';
 import { DynamoDB } from 'aws-sdk';
+import { IWalletValuationRepository } from './interfaces/IWalletValuationRepository';
+import { WalletValuationRepository } from './repositories/WalletValuationRepository';
 
 export class UnitOfWork {
 
@@ -37,6 +39,7 @@ export class UnitOfWork {
 	public Transactions: ITransactionRepository;
 	public TraderBotLogData: ITraderBotLogDataRepository;
 	public TraderBot: ITraderBotRepository;
+	public WalletValuation: IWalletValuationRepository;
 
 	public constructor() {
 		const db: DataMapper = new DataMapper({ client: new DynamoDB({ region: 'eu-west-1' }) });
@@ -51,6 +54,7 @@ export class UnitOfWork {
 		this.Transactions = new TransactionRepository(db);
 		this.TraderBotLogData = new TraderBotLogDataRepository(db);
 		this.TraderBot = new TraderBotRepository(db);
+		this.WalletValuation = new WalletValuationRepository(db);
 	}
 
 }
