@@ -35,6 +35,7 @@ provider:
 plugins:
   - serverless-offline
   - serverless-webpack
+  - serverless-offline-scheduler
 
 functions:
   getValuation:
@@ -48,6 +49,7 @@ functions:
   getValuationForAllCoins:
     handler: src/handler.getValuationForAllCoins
     events:
+      - schedule: rate(1 minute)
       - http:
           path: /valuation/all
           method: get

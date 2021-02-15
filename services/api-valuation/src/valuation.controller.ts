@@ -9,12 +9,14 @@ import Auth, { TokenVerification } from '../../_auth/verify';
 import { CoinCount, ValuationService } from './valuation.service';
 import { CoinsService } from '../../api-coins/src/coins.service';
 import { Coin } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
+import { WalletValuationService } from './wallet-valuation.service';
 
 export class ValuationController {
 
 	public constructor(
 		private valuationService: ValuationService,
-		private coinsService: CoinsService
+		private coinsService: CoinsService,
+		private walletValuationService: WalletValuationService
 	) { }
 
 	public getValuation: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
@@ -55,6 +57,10 @@ export class ValuationController {
 
 			const values: CoinCount[] = await this.valuationService.getValuation(coinCounts);
 			const totalValue: string = this.valuationService.calculateValueTotal(values);
+
+			await this.walletValuationService.logWalletValuation(userId, totalValue);
+
+			console.log(`CURRENT WALLET TOTAL: ${totalValue} at ${new Date().toISOString()}`);
 
 			return ResponseBuilder.ok({ values, totalValue });
 		} catch (err) {

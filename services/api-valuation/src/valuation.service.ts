@@ -1,4 +1,3 @@
-import { UnitOfWork } from '../../api-shared-modules/src/data-access';
 import { GetAllSymbolPricesDto, GetSymbolPriceDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 import { ExchangeInfoService } from '../../api-exchange-info/src/exchange-info.service';
@@ -34,7 +33,7 @@ export interface PairPriceList {
 export class ValuationService {
 
 	public constructor(
-		private unitOfWork: UnitOfWork,
+		// private unitOfWork: UnitOfWork,
 		private exchangeInfoService: ExchangeInfoService
 	) { }
 
