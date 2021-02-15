@@ -49,9 +49,17 @@ functions:
   getValuationForAllCoins:
     handler: src/handler.getValuationForAllCoins
     events:
-      - schedule: rate(1 minute)
       - http:
           path: /valuation/all
+          method: get
+          cors: true
+#          authorizer: aws_iam
+  logWalletValue:
+    handler: src/handler.logWalletValue
+    events:
+      - schedule: rate(1 minute)
+      - http:
+          path: /valuation/log
           method: get
           cors: true
 #          authorizer: aws_iam

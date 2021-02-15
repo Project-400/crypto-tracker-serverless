@@ -49,23 +49,42 @@ export class ValuationController {
 		const userId: string = auth.sub;
 
 		try {
-			const coinCounts: CoinCount[] = (await this.coinsService.getAllCoins(userId))
-				.map((c: Coin) => ({
-					coin: c.coin,
-					coinCount: c.free
-				}));
-
-			const values: CoinCount[] = await this.valuationService.getValuation(coinCounts);
-			const totalValue: string = this.valuationService.calculateValueTotal(values);
-
-			await this.walletValuationService.logWalletValuation(userId, totalValue);
-
-			console.log(`CURRENT WALLET TOTAL: ${totalValue} at ${new Date().toISOString()}`);
+			const { values, totalValue }: { values: CoinCount[]; totalValue: string } = await this.getValuationForAllWalletCoins(userId);
 
 			return ResponseBuilder.ok({ values, totalValue });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
+	}
+
+	public logWalletValue: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
+
+		try {
+			const { totalValue }: { totalValue: string } = await this.getValuationForAllWalletCoins(userId);
+
+			await this.walletValuationService.logWalletValuation(userId, totalValue);
+
+			console.log(`CURRENT WALLET TOTAL: ${totalValue} at ${new Date().toISOString()}`);
+
+			return ResponseBuilder.ok({ });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	private getValuationForAllWalletCoins = async (userId: string): Promise<{ values: CoinCount[]; totalValue: string }> => {
+		const coinCounts: CoinCount[] = (await this.coinsService.getAllCoins(userId))
+			.map((c: Coin) => ({
+				coin: c.coin,
+				coinCount: c.free
+			}));
+
+		const values: CoinCount[] = await this.valuationService.getValuation(coinCounts);
+		const totalValue: string = this.valuationService.calculateValueTotal(values);
+
+		return { values, totalValue };
 	}
 
 }

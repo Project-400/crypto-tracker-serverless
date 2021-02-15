@@ -7,7 +7,7 @@ export class WalletValuationService {
 
 	public logWalletValuation = async (userId: string, totalValue: string): Promise<void> => {
 		const minuteMillis: number = 1000 * 60;
-		const hourMillis: number = 1000 * 60 * 5;
+		const hourMillis: number = 1000 * 60 * 60;
 		const date: Date = new Date();
 		const roundedMinute: string = new Date(Math.floor(date.getTime() / minuteMillis) * minuteMillis).toISOString();
 		const roundedHour: string = new Date(Math.floor(date.getTime() / hourMillis) * hourMillis).toISOString();
