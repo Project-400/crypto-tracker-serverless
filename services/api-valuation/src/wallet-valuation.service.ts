@@ -1,29 +1,72 @@
 import { UnitOfWork } from '../../api-shared-modules/src/data-access';
-import { WalletValuation, WalletValue } from '@crypto-tracker/common-types';
+import { VALUE_LOG_INTERVAL, WalletValue } from '@crypto-tracker/common-types';
 
 export class WalletValuationService {
 
 	public constructor(private unitOfWork: UnitOfWork) { }
 
-	public logWalletValuation = async (userId: string, totalValue: string): Promise<void> => {
+	// public getWalletValuationLogs = async (userId: string, interval: VALUE_LOG_INTERVAL, count: number): Promise<WalletValuation[]> => {
+	// 	if (interval === VALUE_LOG_INTERVAL.MINUTE) {
+	// 		const millis: number = 1000 * 60;
+	//
+	// 	}
+	// 	const logs: WalletValuation[] = await this.unitOfWork.WalletValuation.getRange(userId, '', ''); // Attempt to get details from DB
+	//
+	// 	return logs;
+	// }
+
+	public performValueLogging = async (userId: string, totalValue: string): Promise<void> => {
 		const minuteMillis: number = 1000 * 60;
-		const hourMillis: number = 1000 * 60 * 60;
 		const date: Date = new Date();
 		const roundedMinute: string = new Date(Math.floor(date.getTime() / minuteMillis) * minuteMillis).toISOString();
-		const roundedHour: string = new Date(Math.floor(date.getTime() / hourMillis) * hourMillis).toISOString();
-		const walletValue: WalletValue = {
+
+		await this.logMinuteWalletValuation(userId, totalValue, roundedMinute);
+	}
+
+	public logMinuteWalletValuation = async (userId: string, totalValue: string, roundedMinute: string): Promise<void> => {
+
+		await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
+	}
+
+	public logHourWalletValuation = async (userId: string, totalValue: string): Promise<void> => {
+		const minuteMillis: number = 1000 * 60;
+		const date: Date = new Date();
+		const roundedMinute: string = new Date(Math.floor(date.getTime() / minuteMillis) * minuteMillis).toISOString();
+
+		await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
+	}
+
+	public logWalletValuation = async (userId: string, totalValue: string, time: string, interval: VALUE_LOG_INTERVAL): Promise<void> => {
+		const walletValue: Partial<WalletValue> = {
 			value: totalValue,
-			time: roundedMinute
+			time,
+			interval
 		};
 
-		const walletValuation: WalletValuation = await this.unitOfWork.WalletValuation.get(userId, roundedHour);
+		const walletValuation: WalletValue = await this.unitOfWork.WalletValuation.get(userId, interval, time);
 
-		if (walletValuation) {
-			walletValuation.values.push(walletValue);
-			await this.unitOfWork.WalletValuation.update(roundedHour, userId, walletValuation);
-		} else {
-			await this.unitOfWork.WalletValuation.create(userId, roundedHour, roundedMinute, walletValue);
-		}
+		if (!walletValuation) await this.unitOfWork.WalletValuation.create(userId, walletValue);
 	}
+
+	// public logWalletValuation = async (userId: string, totalValue: string): Promise<void> => {
+	// 	const minuteMillis: number = 1000 * 60;
+	// 	const hourMillis: number = 1000 * 60 * 60;
+	// 	const date: Date = new Date();
+	// 	const roundedMinute: string = new Date(Math.floor(date.getTime() / minuteMillis) * minuteMillis).toISOString();
+	// 	const roundedHour: string = new Date(Math.floor(date.getTime() / hourMillis) * hourMillis).toISOString();
+	// 	const walletValue: WalletValue = {
+	// 		value: totalValue,
+	// 		time: roundedMinute
+	// 	};
+	//
+	// 	const walletValuation: WalletValuation = await this.unitOfWork.WalletValuation.get(userId, roundedHour);
+	//
+	// 	if (walletValuation) {
+	// 		walletValuation.values.push(walletValue);
+	// 		await this.unitOfWork.WalletValuation.update(roundedHour, userId, walletValuation);
+	// 	} else {
+	// 		await this.unitOfWork.WalletValuation.create(userId, roundedHour, roundedMinute, walletValue);
+	// 	}
+	// }
 
 }

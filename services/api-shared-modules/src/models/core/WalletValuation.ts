@@ -1,24 +1,22 @@
 import { DynamoDbItem } from '../DynamoDBItem';
 import { attribute } from '@aws/dynamodb-data-mapper-annotations';
-import { WalletValuation, WalletValue } from '@crypto-tracker/common-types';
+import { WalletValue } from '@crypto-tracker/common-types';
+import { VALUE_LOG_INTERVAL } from '@crypto-tracker/common-types/lib/enums';
 
-export class WalletValuationItem extends DynamoDbItem implements WalletValuation {
-
-	@attribute()
-	public walletValuationId: string;
+export class WalletValuationItem extends DynamoDbItem implements WalletValue {
 
 	@attribute()
-	public userId: string;
+	public value: string;
 
 	@attribute()
-	public values: WalletValue[];
+	public time: string;
+
+	@attribute()
+	public interval: VALUE_LOG_INTERVAL;
 
 	@attribute()
 	public times: {
 		createdAt: string;
-		updatedAt?: string;
-		valueStartingAt: string;
-		valueEndingAt?: string;
 	};
 
 }

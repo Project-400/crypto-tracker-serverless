@@ -1,10 +1,4 @@
-import {
-	ApiContext,
-	ApiEvent,
-	ApiHandler,
-	ApiResponse, ErrorCode,
-	ResponseBuilder
-} from '../../api-shared-modules/src';
+import { ApiContext, ApiEvent, ApiHandler, ApiResponse, ErrorCode, ResponseBuilder } from '../../api-shared-modules/src';
 import Auth, { TokenVerification } from '../../_auth/verify';
 import { CoinCount, ValuationService } from './valuation.service';
 import { CoinsService } from '../../api-coins/src/coins.service';
@@ -57,6 +51,19 @@ export class ValuationController {
 		}
 	}
 
+	// public getWalletValuationLogs: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+	// 	const auth: TokenVerification = Auth.VerifyToken('');
+	// 	const userId: string = auth.sub;
+	//
+	// 	try {
+	// 		const logs: WalletValuation[] = await this.walletValuationService.getWalletValuationLogs(userId, VALUE_LOG_INTERVAL.MINUTE, 10);
+	//
+	// 		return ResponseBuilder.ok({ logs });
+	// 	} catch (err) {
+	// 		return ResponseBuilder.internalServerError(err, err.message);
+	// 	}
+	// }
+
 	public logWalletValue: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		const auth: TokenVerification = Auth.VerifyToken('');
 		const userId: string = auth.sub;
@@ -64,7 +71,7 @@ export class ValuationController {
 		try {
 			const { totalValue }: { totalValue: string } = await this.getValuationForAllWalletCoins(userId);
 
-			await this.walletValuationService.logWalletValuation(userId, totalValue);
+			await this.walletValuationService.logMinuteWalletValuation(userId, totalValue);
 
 			console.log(`CURRENT WALLET TOTAL: ${totalValue} at ${new Date().toISOString()}`);
 

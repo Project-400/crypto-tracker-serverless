@@ -56,6 +56,7 @@ functions:
 #          authorizer: aws_iam
   logWalletValue:
     handler: src/handler.logWalletValue
+    timeout: 10
     events:
       - schedule: rate(1 minute)
       - http:

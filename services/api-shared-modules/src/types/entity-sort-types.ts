@@ -6,5 +6,6 @@ export enum EntitySortType {
 	TIME = 'time',
 	DEVICE = 'device',
 	CONNECTION = 'connection',
-	BOT_TYPE = 'botType'
+	BOT_TYPE = 'botType',
+	INTERVAL = 'interval'
 }
