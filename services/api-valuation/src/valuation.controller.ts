@@ -71,7 +71,7 @@ export class ValuationController {
 		try {
 			const { totalValue }: { totalValue: string } = await this.getValuationForAllWalletCoins(userId);
 
-			await this.walletValuationService.logMinuteWalletValuation(userId, totalValue);
+			await this.walletValuationService.performValueLogging(userId, totalValue);
 
 			console.log(`CURRENT WALLET TOTAL: ${totalValue} at ${new Date().toISOString()}`);
 

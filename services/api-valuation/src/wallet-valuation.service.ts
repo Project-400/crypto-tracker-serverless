@@ -21,19 +21,26 @@ export class WalletValuationService {
 		const roundedMinute: string = new Date(Math.floor(date.getTime() / minuteMillis) * minuteMillis).toISOString();
 
 		await this.logMinuteWalletValuation(userId, totalValue, roundedMinute);
+
+		if (roundedMinute.endsWith(':00:00.000Z')) { // TODO: log hour kline data
+			await this.logHourWalletValuation(userId, totalValue, roundedMinute);
+		}
+
+		if (roundedMinute.endsWith('T00:00:00.000Z')) { // TODO: log day kline data
+			await this.logDayWalletValuation(userId, totalValue, roundedMinute);
+		}
 	}
 
 	public logMinuteWalletValuation = async (userId: string, totalValue: string, roundedMinute: string): Promise<void> => {
-
 		await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
 	}
 
-	public logHourWalletValuation = async (userId: string, totalValue: string): Promise<void> => {
-		const minuteMillis: number = 1000 * 60;
-		const date: Date = new Date();
-		const roundedMinute: string = new Date(Math.floor(date.getTime() / minuteMillis) * minuteMillis).toISOString();
+	public logHourWalletValuation = async (userId: string, totalValue: string, roundedHour: string): Promise<void> => {
+		await this.logWalletValuation(userId, totalValue, roundedHour, VALUE_LOG_INTERVAL.HOUR);
+	}
 
-		await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
+	public logDayWalletValuation = async (userId: string, totalValue: string, roundedDay: string): Promise<void> => {
+		await this.logWalletValuation(userId, totalValue, roundedDay, VALUE_LOG_INTERVAL.DAY);
 	}
 
 	public logWalletValuation = async (userId: string, totalValue: string, time: string, interval: VALUE_LOG_INTERVAL): Promise<void> => {
