@@ -22,11 +22,11 @@ export class WalletValuationService {
 
 		await this.logMinuteWalletValuation(userId, totalValue, roundedMinute);
 
-		if (roundedMinute.endsWith(':00:00.000Z')) { // TODO: log hour kline data
+		if (roundedMinute.endsWith(':00:00.000Z')) {
 			await this.logHourWalletValuation(userId, totalValue, roundedMinute);
 		}
 
-		if (roundedMinute.endsWith('T00:00:00.000Z')) { // TODO: log day kline data
+		if (roundedMinute.endsWith('T00:00:00.000Z')) {
 			await this.logDayWalletValuation(userId, totalValue, roundedMinute);
 		}
 	}
@@ -49,6 +49,14 @@ export class WalletValuationService {
 			time,
 			interval
 		};
+
+		if (interval === VALUE_LOG_INTERVAL.HOUR || interval === VALUE_LOG_INTERVAL.DAY) {
+			walletValue.klineValues = {
+				open: totalValue,
+				lowest: totalValue,
+				highest: totalValue
+			};
+		}
 
 		const walletValuation: WalletValue = await this.unitOfWork.WalletValuation.get(userId, interval, time);
 
