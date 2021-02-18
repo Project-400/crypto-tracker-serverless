@@ -18,19 +18,27 @@ export class KlineValuesRepository extends Repository implements IKlineValuesRep
 		}
 	}
 
-	public async create(userId: string, klineValues: Partial<KlineValues>): Promise<KlineValues> {
+	public async create(userId: string, time: string, initValue: string, interval: VALUE_LOG_INTERVAL): Promise<KlineValues> {
 		const date: string = new Date().toISOString();
 
 		return this.db.put(Object.assign(new KlineValuesItem(), {
-			pk: `${Entity.KLINE_VALUES}#${klineValues.time}`,
-			sk: `${Entity.USER}#${userId}/${EntitySortType.INTERVAL}#${klineValues.interval}/${EntitySortType.TIME}#${klineValues.time}`,
-			sk2: `${Entity.KLINE_VALUES}#${klineValues.time}`,
+			pk: `${Entity.KLINE_VALUES}#${time}`,
+			sk: `${Entity.USER}#${userId}/${EntitySortType.INTERVAL}#${interval}/${EntitySortType.TIME}#${time}`,
+			sk2: `${Entity.KLINE_VALUES}#${time}`,
 			entity: Entity.KLINE_VALUES,
+			time,
+			open: interval,
+			lowest: interval,
+			highest: interval,
+			change: '0',
+			changePercentage: 0,
+			interval,
 			isClosed: false,
+			updateCount: 1,
 			times: {
-				createdAt: date
-			},
-			...klineValues
+				createdAt: date,
+				valueStartingAt: time
+			}
 		}));
 	}
 
