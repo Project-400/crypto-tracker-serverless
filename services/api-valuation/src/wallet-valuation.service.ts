@@ -1,5 +1,5 @@
 import { UnitOfWork } from '../../api-shared-modules/src/data-access';
-import { VALUE_LOG_INTERVAL, WalletValue } from '@crypto-tracker/common-types';
+import { KlineValues, VALUE_LOG_INTERVAL, WalletValue } from '@crypto-tracker/common-types';
 
 export class WalletValuationService {
 
@@ -23,11 +23,17 @@ export class WalletValuationService {
 		await this.logMinuteWalletValuation(userId, totalValue, roundedMinute);
 
 		if (roundedMinute.endsWith(':00:00.000Z')) {
-			await this.logHourWalletValuation(userId, totalValue, roundedMinute);
+			// await this.logHourWalletValuation(userId, totalValue, roundedMinute);
+			await this.createHourKlineValues(userId, totalValue, roundedMinute);
+		} else {
+			await this.updateWalletValuationKlineValues(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.HOUR);
 		}
 
 		if (roundedMinute.endsWith('T00:00:00.000Z')) {
-			await this.logDayWalletValuation(userId, totalValue, roundedMinute);
+			// await this.logDayWalletValuation(userId, totalValue, roundedMinute);
+			await this.createDayKlineValues(userId, totalValue, roundedMinute);
+		} else {
+			await this.updateWalletValuationKlineValues(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.DAY);
 		}
 	}
 
@@ -35,13 +41,36 @@ export class WalletValuationService {
 		await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
 	}
 
-	public logHourWalletValuation = async (userId: string, totalValue: string, roundedHour: string): Promise<void> => {
-		await this.logWalletValuation(userId, totalValue, roundedHour, VALUE_LOG_INTERVAL.HOUR);
+	// public logHourWalletValuation = async (userId: string, totalValue: string, roundedHour: string): Promise<void> => {
+	// 	await this.logWalletValuation(userId, totalValue, roundedHour, VALUE_LOG_INTERVAL.HOUR);
+	// }
+	//
+	// public logDayWalletValuation = async (userId: string, totalValue: string, roundedDay: string): Promise<void> => {
+	// 	await this.logWalletValuation(userId, totalValue, roundedDay, VALUE_LOG_INTERVAL.DAY);
+	// }
+
+	public createHourKlineValues = async (userId: string, totalValue: string, roundedHour: string): Promise<void> => {
+		const klineValues: Partial<KlineValues> = {
+			time: roundedHour,
+			open: totalValue,
+			lowest: totalValue,
+			highest: totalValue,
+			average: totalValue,
+			interval: VALUE_LOG_INTERVAL.HOUR
+		};
+		await this.unitOfWork.KlineValues.create(userId, klineValues);
 	}
 
-	public logDayWalletValuation = async (userId: string, totalValue: string, roundedDay: string): Promise<void> => {
-		await this.logWalletValuation(userId, totalValue, roundedDay, VALUE_LOG_INTERVAL.DAY);
-	}
+	public createDayKlineValues = async (userId: string, totalValue: string, roundedDay: string): Promise<void> => {
+		const klineValues: Partial<KlineValues> = {
+			time: roundedDay,
+			open: totalValue,
+			lowest: totalValue,
+			highest: totalValue,
+			average: totalValue,
+			interval: VALUE_LOG_INTERVAL.DAY
+		};
+		await this.unitOfWork.KlineValues.create(userId, klineValues);	}
 
 	public logWalletValuation = async (userId: string, totalValue: string, time: string, interval: VALUE_LOG_INTERVAL): Promise<void> => {
 		const walletValue: Partial<WalletValue> = {
@@ -61,6 +90,18 @@ export class WalletValuationService {
 		const walletValuation: WalletValue = await this.unitOfWork.WalletValuation.get(userId, interval, time);
 
 		if (!walletValuation) await this.unitOfWork.WalletValuation.create(userId, walletValue);
+	}
+
+	public updateWalletValuationKlineValues = async (userId: string, totalValue: string, time: string, interval: VALUE_LOG_INTERVAL):
+		Promise<void> => {
+		const klineValues: Partial<KlineValues> = await this.unitOfWork.KlineValues.get(userId, interval, time);
+
+		if (klineValues) {
+			if (totalValue > klineValues.highest) klineValues.highest = totalValue;
+			if (totalValue < klineValues.lowest) klineValues.lowest = totalValue;
+
+			await this.unitOfWork.KlineValues.update(userId, klineValues);
+		}
 	}
 
 	// public logWalletValuation = async (userId: string, totalValue: string): Promise<void> => {
