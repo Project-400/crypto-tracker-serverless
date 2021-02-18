@@ -10,6 +10,8 @@ export { ITransactionRepository } from './ITransactionRepository';
 export { IExchangeInfoRepository } from './IExchangeInfoRepository';
 export { ITraderBotRepository } from './ITraderBotRepository';
 export { ITraderBotLogDataRepository } from './ITraderBotLogDataRepository';
+export { IWalletValuationRepository } from './IWalletValuationRepository';
+export { IKlineValuesRepository } from './IKlineValuesRepository';
 
 export interface QueryKey {
 	pk?: string;
