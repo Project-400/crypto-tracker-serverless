@@ -34,20 +34,19 @@ export class KlineValuesRepository extends Repository implements IKlineValuesRep
 		}));
 	}
 
-	// public async update(userId: string, changes: Partial<WalletValue>):
-	// 	Promise<WalletValue> {
-	// 	delete changes.sk2;
-	// 	delete changes.sk3;
-	//
-	// 	changes.times.updatedAt = new Date().toISOString();
-	//
-	// 	return this.db.update(Object.assign(new WalletValuationItem(), {
-	// 		pk: `${Entity.WALLET_VALUATION}#${changes.time}`,
-	// 		sk: `${Entity.USER}#${userId}/`,
-	// 		...changes
-	// 	}), {
-	// 		onMissing: 'skip'
-	// 	});
-	// }
+	public async update(userId: string, changes: Partial<KlineValues>): Promise<KlineValues> {
+		delete changes.sk2;
+		delete changes.sk3;
+
+		changes.times.updatedAt = new Date().toISOString();
+
+		return this.db.update(Object.assign(new KlineValuesItem(), {
+			pk: `${Entity.KLINE_VALUES}#${changes.time}`,
+			sk: `${Entity.USER}#${userId}/${EntitySortType.INTERVAL}#${changes.interval}/${EntitySortType.TIME}#${changes.time}`,
+			...changes
+		}), {
+			onMissing: 'skip'
+		});
+	}
 
 }
