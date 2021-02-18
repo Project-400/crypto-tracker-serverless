@@ -1,5 +1,6 @@
 import { UnitOfWork } from '../../api-shared-modules/src/data-access';
 import { KlineValues, VALUE_LOG_INTERVAL, WalletValue } from '@crypto-tracker/common-types';
+import moment from 'moment';
 
 export class WalletValuationService {
 
@@ -28,6 +29,8 @@ export class WalletValuationService {
 
 		if (roundedMinute.endsWith(':00:00.000Z')) {
 			console.log('CREATE HOUR KV');
+			const previousHour: string = moment(roundedHour).subtract(1, 'hour').toISOString();
+			await this.updatePreviousKlineValues(userId, totalValue, previousHour, VALUE_LOG_INTERVAL.HOUR);
 			await this.createHourKlineValues(userId, totalValue, roundedHour);
 		} else {
 			console.log('UPDATE HOUR KV');
@@ -36,6 +39,8 @@ export class WalletValuationService {
 
 		if (roundedMinute.endsWith('T00:00:00.000Z')) {
 			console.log('CREATE DAY KV');
+			const previousDay: string = moment(roundedDay).subtract(24, 'hours').toISOString();
+			await this.updatePreviousKlineValues(userId, totalValue, previousDay, VALUE_LOG_INTERVAL.DAY);
 			await this.createDayKlineValues(userId, totalValue, roundedDay);
 		} else {
 			console.log('UPDATE DAY KV');
@@ -45,27 +50,25 @@ export class WalletValuationService {
 	}
 
 	public createHourKlineValues = async (userId: string, totalValue: string, roundedHour: string): Promise<void> => {
-		const klineValues: Partial<KlineValues> = {
-			time: roundedHour,
-			open: totalValue,
-			lowest: totalValue,
-			highest: totalValue,
-			average: totalValue,
-			interval: VALUE_LOG_INTERVAL.HOUR
-		};
-		await this.unitOfWork.KlineValues.create(userId, klineValues);
+		await this.unitOfWork.KlineValues.create(userId, roundedHour, totalValue, VALUE_LOG_INTERVAL.HOUR);
 	}
 
 	public createDayKlineValues = async (userId: string, totalValue: string, roundedDay: string): Promise<void> => {
-		const klineValues: Partial<KlineValues> = {
-			time: roundedDay,
-			open: totalValue,
-			lowest: totalValue,
-			highest: totalValue,
-			average: totalValue,
-			interval: VALUE_LOG_INTERVAL.DAY
-		};
-		await this.unitOfWork.KlineValues.create(userId, klineValues);	}
+		await this.unitOfWork.KlineValues.create(userId, roundedDay, totalValue, VALUE_LOG_INTERVAL.DAY);
+	}
+
+	public updatePreviousKlineValues = async (userId: string, totalValue: string, previousTime: string, interval: VALUE_LOG_INTERVAL):
+		Promise<void> => {
+		const klineValues: Partial<KlineValues> = await this.unitOfWork.KlineValues.get(userId, interval, previousTime);
+
+		if (klineValues) {
+			klineValues.lastValue = totalValue;
+			klineValues.close = totalValue;
+			klineValues.isClosed = true;
+
+			await this.unitOfWork.KlineValues.update(userId, klineValues);
+		}
+	}
 
 	public logWalletValuation = async (userId: string, totalValue: string, time: string, interval: VALUE_LOG_INTERVAL): Promise<void> => {
 		const walletValue: Partial<WalletValue> = {
@@ -86,6 +89,12 @@ export class WalletValuationService {
 		if (klineValues) {
 			if (totalValue > klineValues.highest) klineValues.highest = totalValue;
 			if (totalValue < klineValues.lowest) klineValues.lowest = totalValue;
+
+			klineValues.lastValue = totalValue;
+			klineValues.updateCount = klineValues.updateCount ? klineValues.updateCount + 1 : 1;
+			const change: number = Number(klineValues.lastValue) - Number(klineValues.open);
+			klineValues.change = change.toString();
+			klineValues.changePercentage = ((change / Number(klineValues.open)) * 100).toFixed(4);
 
 			await this.unitOfWork.KlineValues.update(userId, klineValues);
 		} else { // Kline doesn't exist for whatever reason - Possibly due to previous timeout or deployment. Fallback: Create new
