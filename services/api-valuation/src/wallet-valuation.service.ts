@@ -17,29 +17,39 @@ export class WalletValuationService {
 
 	public performValueLogging = async (userId: string, totalValue: string): Promise<void> => {
 		const minuteMillis: number = 1000 * 60;
+		const hourMillis: number = minuteMillis * 60;
+		const dayMillis: number = hourMillis * 24;
 		const date: Date = new Date();
 		const roundedMinute: string = new Date(Math.floor(date.getTime() / minuteMillis) * minuteMillis).toISOString();
+		const roundedHour: string = new Date(Math.floor(date.getTime() / hourMillis) * hourMillis).toISOString();
+		const roundedDay: string = new Date(Math.floor(date.getTime() / dayMillis) * dayMillis).toISOString();
 
-		await this.logMinuteWalletValuation(userId, totalValue, roundedMinute);
+		// await this.logMinuteWalletValuation(userId, totalValue, roundedMinute);
+		await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
 
 		if (roundedMinute.endsWith(':00:00.000Z')) {
 			// await this.logHourWalletValuation(userId, totalValue, roundedMinute);
-			await this.createHourKlineValues(userId, totalValue, roundedMinute);
+			console.log('CREATE HOUR KV');
+			await this.createHourKlineValues(userId, totalValue, roundedHour);
 		} else {
-			await this.updateWalletValuationKlineValues(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.HOUR);
+			console.log('UPDATE HOUR KV');
+			await this.updateWalletValuationKlineValues(userId, totalValue, roundedHour, VALUE_LOG_INTERVAL.HOUR);
 		}
 
 		if (roundedMinute.endsWith('T00:00:00.000Z')) {
 			// await this.logDayWalletValuation(userId, totalValue, roundedMinute);
-			await this.createDayKlineValues(userId, totalValue, roundedMinute);
+			console.log('CREATE DAY KV');
+			await this.createDayKlineValues(userId, totalValue, roundedDay);
 		} else {
-			await this.updateWalletValuationKlineValues(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.DAY);
+			console.log('UPDATE DAY KV');
+
+			await this.updateWalletValuationKlineValues(userId, totalValue, roundedDay, VALUE_LOG_INTERVAL.DAY);
 		}
 	}
 
-	public logMinuteWalletValuation = async (userId: string, totalValue: string, roundedMinute: string): Promise<void> => {
-		await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
-	}
+	// public logMinuteWalletValuation = async (userId: string, totalValue: string, roundedMinute: string): Promise<void> => {
+	// 	await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
+	// }
 
 	// public logHourWalletValuation = async (userId: string, totalValue: string, roundedHour: string): Promise<void> => {
 	// 	await this.logWalletValuation(userId, totalValue, roundedHour, VALUE_LOG_INTERVAL.HOUR);
@@ -79,13 +89,13 @@ export class WalletValuationService {
 			interval
 		};
 
-		if (interval === VALUE_LOG_INTERVAL.HOUR || interval === VALUE_LOG_INTERVAL.DAY) {
-			walletValue.klineValues = {
-				open: totalValue,
-				lowest: totalValue,
-				highest: totalValue
-			};
-		}
+		// if (interval === VALUE_LOG_INTERVAL.HOUR || interval === VALUE_LOG_INTERVAL.DAY) {
+		// 	walletValue.klineValues = {
+		// 		open: totalValue,
+		// 		lowest: totalValue,
+		// 		highest: totalValue
+		// 	};
+		// }
 
 		const walletValuation: WalletValue = await this.unitOfWork.WalletValuation.get(userId, interval, time);
 
@@ -101,6 +111,10 @@ export class WalletValuationService {
 			if (totalValue < klineValues.lowest) klineValues.lowest = totalValue;
 
 			await this.unitOfWork.KlineValues.update(userId, klineValues);
+		} else {
+			console.log(`NO ${interval} KV: ${time}`);
+			if (interval === VALUE_LOG_INTERVAL.HOUR) await this.createHourKlineValues(userId, totalValue, time);
+			if (interval === VALUE_LOG_INTERVAL.DAY) await this.createDayKlineValues(userId, totalValue, time);
 		}
 	}
 
