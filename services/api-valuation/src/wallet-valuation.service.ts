@@ -24,11 +24,9 @@ export class WalletValuationService {
 		const roundedHour: string = new Date(Math.floor(date.getTime() / hourMillis) * hourMillis).toISOString();
 		const roundedDay: string = new Date(Math.floor(date.getTime() / dayMillis) * dayMillis).toISOString();
 
-		// await this.logMinuteWalletValuation(userId, totalValue, roundedMinute);
 		await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
 
 		if (roundedMinute.endsWith(':00:00.000Z')) {
-			// await this.logHourWalletValuation(userId, totalValue, roundedMinute);
 			console.log('CREATE HOUR KV');
 			await this.createHourKlineValues(userId, totalValue, roundedHour);
 		} else {
@@ -37,7 +35,6 @@ export class WalletValuationService {
 		}
 
 		if (roundedMinute.endsWith('T00:00:00.000Z')) {
-			// await this.logDayWalletValuation(userId, totalValue, roundedMinute);
 			console.log('CREATE DAY KV');
 			await this.createDayKlineValues(userId, totalValue, roundedDay);
 		} else {
@@ -46,18 +43,6 @@ export class WalletValuationService {
 			await this.updateWalletValuationKlineValues(userId, totalValue, roundedDay, VALUE_LOG_INTERVAL.DAY);
 		}
 	}
-
-	// public logMinuteWalletValuation = async (userId: string, totalValue: string, roundedMinute: string): Promise<void> => {
-	// 	await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
-	// }
-
-	// public logHourWalletValuation = async (userId: string, totalValue: string, roundedHour: string): Promise<void> => {
-	// 	await this.logWalletValuation(userId, totalValue, roundedHour, VALUE_LOG_INTERVAL.HOUR);
-	// }
-	//
-	// public logDayWalletValuation = async (userId: string, totalValue: string, roundedDay: string): Promise<void> => {
-	// 	await this.logWalletValuation(userId, totalValue, roundedDay, VALUE_LOG_INTERVAL.DAY);
-	// }
 
 	public createHourKlineValues = async (userId: string, totalValue: string, roundedHour: string): Promise<void> => {
 		const klineValues: Partial<KlineValues> = {
@@ -89,14 +74,6 @@ export class WalletValuationService {
 			interval
 		};
 
-		// if (interval === VALUE_LOG_INTERVAL.HOUR || interval === VALUE_LOG_INTERVAL.DAY) {
-		// 	walletValue.klineValues = {
-		// 		open: totalValue,
-		// 		lowest: totalValue,
-		// 		highest: totalValue
-		// 	};
-		// }
-
 		const walletValuation: WalletValue = await this.unitOfWork.WalletValuation.get(userId, interval, time);
 
 		if (!walletValuation) await this.unitOfWork.WalletValuation.create(userId, walletValue);
@@ -111,32 +88,11 @@ export class WalletValuationService {
 			if (totalValue < klineValues.lowest) klineValues.lowest = totalValue;
 
 			await this.unitOfWork.KlineValues.update(userId, klineValues);
-		} else {
+		} else { // Kline doesn't exist for whatever reason - Possibly due to previous timeout or deployment. Fallback: Create new
 			console.log(`NO ${interval} KV: ${time}`);
 			if (interval === VALUE_LOG_INTERVAL.HOUR) await this.createHourKlineValues(userId, totalValue, time);
 			if (interval === VALUE_LOG_INTERVAL.DAY) await this.createDayKlineValues(userId, totalValue, time);
 		}
 	}
-
-	// public logWalletValuation = async (userId: string, totalValue: string): Promise<void> => {
-	// 	const minuteMillis: number = 1000 * 60;
-	// 	const hourMillis: number = 1000 * 60 * 60;
-	// 	const date: Date = new Date();
-	// 	const roundedMinute: string = new Date(Math.floor(date.getTime() / minuteMillis) * minuteMillis).toISOString();
-	// 	const roundedHour: string = new Date(Math.floor(date.getTime() / hourMillis) * hourMillis).toISOString();
-	// 	const walletValue: WalletValue = {
-	// 		value: totalValue,
-	// 		time: roundedMinute
-	// 	};
-	//
-	// 	const walletValuation: WalletValuation = await this.unitOfWork.WalletValuation.get(userId, roundedHour);
-	//
-	// 	if (walletValuation) {
-	// 		walletValuation.values.push(walletValue);
-	// 		await this.unitOfWork.WalletValuation.update(roundedHour, userId, walletValuation);
-	// 	} else {
-	// 		await this.unitOfWork.WalletValuation.create(userId, roundedHour, roundedMinute, walletValue);
-	// 	}
-	// }
 
 }
