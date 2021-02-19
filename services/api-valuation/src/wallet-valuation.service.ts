@@ -1,11 +1,14 @@
 import { UnitOfWork } from '../../api-shared-modules/src/data-access';
 import { KlineValues, VALUE_LOG_INTERVAL, WalletValuation } from '@crypto-tracker/common-types';
 import moment from 'moment';
-import DateTimeFunctions from '../../api-shared-modules/src/utils/datetime';
+import { DatetimeUtils } from '../../api-shared-modules/src/utils/datetime';
 
 export class WalletValuationService {
 
-	public constructor(private unitOfWork: UnitOfWork) { }
+	public constructor(
+		private unitOfWork: UnitOfWork,
+		private datetimeFunctions: DatetimeUtils
+		) { }
 
 	// public getWalletValuationLogs = async (userId: string, interval: VALUE_LOG_INTERVAL, count: number): Promise<WalletValuation[]> => {
 	// 	if (interval === VALUE_LOG_INTERVAL.MINUTE) {
@@ -18,9 +21,9 @@ export class WalletValuationService {
 	// }
 
 	public performValueLogging = async (userId: string, totalValue: string): Promise<void> => {
-		const roundedMinute: string = DateTimeFunctions.FloorMinute();
-		const roundedHour: string = DateTimeFunctions.FloorHour();
-		const roundedDay: string = DateTimeFunctions.FloorDay();
+		const roundedMinute: string = this.datetimeFunctions.FloorMinute();
+		const roundedHour: string = this.datetimeFunctions.FloorHour();
+		const roundedDay: string = this.datetimeFunctions.FloorDay();
 
 		const alreadyExists: boolean = await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
 
@@ -92,9 +95,6 @@ export class WalletValuationService {
 		console.log(userId, interval, time);
 		const klineValues: Partial<KlineValues> = await this.unitOfWork.KlineValues.get(userId, interval, time);
 
-		console.log('GOT KLINE:');
-		console.log(klineValues);
-
 		if (klineValues) {
 			if (totalValue > klineValues.highest) klineValues.highest = totalValue;
 			if (totalValue < klineValues.lowest) klineValues.lowest = totalValue;
@@ -105,13 +105,9 @@ export class WalletValuationService {
 			klineValues.change = change.toString();
 			klineValues.changePercentage = ((change / Number(klineValues.open)) * 100).toFixed(4);
 
-			console.log('klineValues');
-			console.log(klineValues);
-
 			const updated: KlineValues = await this.unitOfWork.KlineValues.update(userId, klineValues);
 			if (!updated) throw Error(`Updating KlineValues failed for user: ${userId} - time: ${time} - interval: ${interval}`);
 		} else { // Kline doesn't exist for whatever reason - Possibly due to previous timeout or deployment. Fallback: Create new
-			console.log(`NO ${interval} KV: ${time}`);
 			if (interval === VALUE_LOG_INTERVAL.HOUR) await this.createHourKlineValues(userId, totalValue, time);
 			if (interval === VALUE_LOG_INTERVAL.DAY) await this.createDayKlineValues(userId, totalValue, time);
 		}

@@ -11,14 +11,18 @@ import {
 import { when } from 'jest-when';
 import { VALUE_LOG_INTERVAL, WalletValuation } from '@crypto-tracker/common-types';
 import Mock = jest.Mock;
-import DateTimeFunctions from '../../api-shared-modules/src/utils/datetime';
+import { DatetimeUtils } from '../../api-shared-modules/src/utils/datetime';
 
 const mockFunctions: any = {
 	getWalletValuation: jest.fn(),
 	createWalletValuation: jest.fn(),
 	getKlineValues: jest.fn(),
 	createKlineValues: jest.fn(),
-	updateKlineValues: jest.fn()
+	updateKlineValues: jest.fn(),
+
+	floorMinute: jest.fn(),
+	floorHour: jest.fn(),
+	floorDay: jest.fn()
 };
 
 const MockedUnitOfWork: Mock = jest.fn().mockImplementation(() =>
@@ -34,6 +38,13 @@ const MockedUnitOfWork: Mock = jest.fn().mockImplementation(() =>
 		}
 	}));
 
+const MockedDatetimeUtils: Mock = jest.fn().mockImplementation(() =>
+	({
+		FloorMinute: mockFunctions.floorMinute,
+		FloorHour: mockFunctions.floorHour,
+		FloorDay: mockFunctions.floorDay
+	}));
+
 describe('Test Wallet Valuation Service', (): void => {
 
 	beforeEach(() => {
@@ -43,11 +54,15 @@ describe('Test Wallet Valuation Service', (): void => {
 
 	test('It should find an existing WalletValuation log and do nothing', async (done: jest.DoneCallback): Promise<void> => {
 		const mockedUnitOfWork: UnitOfWork = new MockedUnitOfWork();
-		const walletValuationService: WalletValuationService = new WalletValuationService(mockedUnitOfWork);
+		const mockedDatetimeUtils: DatetimeUtils = new MockedDatetimeUtils();
+		const walletValuationService: WalletValuationService = new WalletValuationService(mockedUnitOfWork, mockedDatetimeUtils);
 		const userId: string = 'test_user_id';
 		const totalValue: string = '10000';
 		const interval: VALUE_LOG_INTERVAL = VALUE_LOG_INTERVAL.MINUTE;
-		const roundedMinute: string = DateTimeFunctions.FloorMinute();
+
+		mockFunctions.floorMinute.mockReturnValue('2021-02-19T11:16:00.000Z');
+
+		const roundedMinute: string = mockFunctions.floorMinute();
 
 		when(mockFunctions.getWalletValuation)
 			.calledWith(userId, interval, roundedMinute)
@@ -68,12 +83,16 @@ describe('Test Wallet Valuation Service', (): void => {
 	test('It should find no existing WalletValuation, create a new one and update Hour & Day KlineValues',
 		async (done: jest.DoneCallback): Promise<void> => {
 		const mockedUnitOfWork: UnitOfWork = new MockedUnitOfWork();
-		const walletValuationService: WalletValuationService = new WalletValuationService(mockedUnitOfWork);
+		const mockedDatetimeUtils: DatetimeUtils = new MockedDatetimeUtils();
+		const walletValuationService: WalletValuationService = new WalletValuationService(mockedUnitOfWork, mockedDatetimeUtils);
 		const userId: string = 'test_user_id';
 		const totalValue: string = '120';
-		const roundedMinute: string = DateTimeFunctions.FloorMinute();
-		const roundedHour: string = DateTimeFunctions.FloorHour();
-		const roundedDay: string = DateTimeFunctions.FloorDay();
+		mockFunctions.floorMinute.mockReturnValue('2021-02-19T11:16:00.000Z');
+		mockFunctions.floorHour.mockReturnValue('2021-02-19T11:00:00.000Z');
+		mockFunctions.floorDay.mockReturnValue('2021-02-19T00:00:00.000Z');
+		const roundedMinute: string = mockFunctions.floorMinute();
+		const roundedHour: string = mockFunctions.floorHour();
+		const roundedDay: string = mockFunctions.floorDay();
 		const walletValuation: Partial<WalletValuation> = {
 			value: totalValue,
 			time: roundedMinute,
