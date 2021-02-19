@@ -6,5 +6,5 @@ export interface IWalletValuationRepository {
 	// getRange(userId: string, startDate: string, endDate: string): Promise<WalletValuation[]>;
 	create(userId: string, walletValue: Partial<WalletValue>): Promise<WalletValue>;
 	// createMinuteLog(userId: string, roundedMinute: string, walletValue: WalletValue): Promise<WalletValue>;
-	// update(roundedTime: string, userId: string, changes: Partial<WalletValue>): Promise<WalletValue>;
+	update(userId: string, changes: Partial<WalletValue>): Promise<WalletValue>;
 }
