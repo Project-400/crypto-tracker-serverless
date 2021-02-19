@@ -9,6 +9,9 @@ export class KlineValuesItem extends DynamoDbItem implements KlineValues {
 	public time: string;
 
 	@attribute()
+	public updateCount: number;
+
+	@attribute()
 	public open: string;
 
 	@attribute()
@@ -21,7 +24,13 @@ export class KlineValuesItem extends DynamoDbItem implements KlineValues {
 	public highest: string;
 
 	@attribute()
-	public average: string;
+	public lastValue: string;
+
+	@attribute()
+	public change: string;
+
+	@attribute()
+	public changePercentage: string;
 
 	@attribute()
 	public interval: VALUE_LOG_INTERVAL;
