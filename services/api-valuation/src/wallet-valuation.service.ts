@@ -30,28 +30,20 @@ export class WalletValuationService {
 		if (alreadyExists) return;
 
 		if (roundedMinute.endsWith(':00:00.000Z')) {
-			console.log('CREATE HOUR KV');
-			console.log(roundedHour);
 			const previousHour: string = moment(roundedHour).subtract(1, 'hour').toISOString();
 			await this.updatePreviousKlineValues(userId, totalValue, previousHour, VALUE_LOG_INTERVAL.HOUR);
 			const created: KlineValues = await this.createHourKlineValues(userId, totalValue, roundedHour);
 			if (!created) throw Error(`New Hour KlineValues was not created for user: ${userId} - time: ${roundedHour} - interval: ${VALUE_LOG_INTERVAL.HOUR}`);
 		} else {
-			console.log('UPDATE HOUR KV');
 			await this.updateWalletValuationKlineValues(userId, totalValue, roundedHour, VALUE_LOG_INTERVAL.HOUR);
 		}
 
 		if (roundedMinute.endsWith('T00:00:00.000Z')) {
-			console.log('CREATE DAY KV');
 			const previousDay: string = moment(roundedDay).subtract(24, 'hours').toISOString();
-			console.log('PREVIOUS DAY 2222');
-			console.log(previousDay);
 			await this.updatePreviousKlineValues(userId, totalValue, previousDay, VALUE_LOG_INTERVAL.DAY);
 			const created: KlineValues = await this.createDayKlineValues(userId, totalValue, roundedDay);
 			if (!created) throw Error(`New Day KlineValues was not created for user: ${userId} - time: ${roundedDay} - interval: ${VALUE_LOG_INTERVAL.DAY}`);
 		} else {
-			console.log('UPDATE DAY KV');
-
 			await this.updateWalletValuationKlineValues(userId, totalValue, roundedDay, VALUE_LOG_INTERVAL.DAY);
 		}
 	}
@@ -76,10 +68,7 @@ export class WalletValuationService {
 			klineValues.change = change.toString();
 			klineValues.changePercentage = ((change / Number(klineValues.open)) * 100).toFixed(4);
 
-			console.log(klineValues);
 			const updated: KlineValues = await this.unitOfWork.KlineValues.update(userId, klineValues);
-			console.log('_____UPDATED');
-			console.log(updated);
 
 			if (!updated) throw Error(`Updating previous KlineValues failed for user: ${userId} - previous time: ${previousTime} - interval: ${interval}`);
 		}
