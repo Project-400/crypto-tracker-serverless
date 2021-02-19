@@ -1,6 +1,6 @@
 import { UnitOfWork } from '../../api-shared-modules/src/data-access';
 import { KlineValues, VALUE_LOG_INTERVAL, WalletValuation } from '@crypto-tracker/common-types';
-import moment from 'moment';
+import * as moment from 'moment';
 import { DatetimeUtils } from '../../api-shared-modules/src/utils/datetime';
 
 export class WalletValuationService {
@@ -31,9 +31,11 @@ export class WalletValuationService {
 
 		if (roundedMinute.endsWith(':00:00.000Z')) {
 			console.log('CREATE HOUR KV');
+			console.log(roundedHour);
 			const previousHour: string = moment(roundedHour).subtract(1, 'hour').toISOString();
 			await this.updatePreviousKlineValues(userId, totalValue, previousHour, VALUE_LOG_INTERVAL.HOUR);
-			await this.createHourKlineValues(userId, totalValue, roundedHour);
+			const created: KlineValues = await this.createHourKlineValues(userId, totalValue, roundedHour);
+			if (!created) throw Error(`New Hour KlineValues was not created for user: ${userId} - time: ${roundedHour} - interval: ${VALUE_LOG_INTERVAL.HOUR}`);
 		} else {
 			console.log('UPDATE HOUR KV');
 			await this.updateWalletValuationKlineValues(userId, totalValue, roundedHour, VALUE_LOG_INTERVAL.HOUR);
@@ -42,8 +44,11 @@ export class WalletValuationService {
 		if (roundedMinute.endsWith('T00:00:00.000Z')) {
 			console.log('CREATE DAY KV');
 			const previousDay: string = moment(roundedDay).subtract(24, 'hours').toISOString();
+			console.log('PREVIOUS DAY 2222');
+			console.log(previousDay);
 			await this.updatePreviousKlineValues(userId, totalValue, previousDay, VALUE_LOG_INTERVAL.DAY);
-			await this.createDayKlineValues(userId, totalValue, roundedDay);
+			const created: KlineValues = await this.createDayKlineValues(userId, totalValue, roundedDay);
+			if (!created) throw Error(`New Day KlineValues was not created for user: ${userId} - time: ${roundedDay} - interval: ${VALUE_LOG_INTERVAL.DAY}`);
 		} else {
 			console.log('UPDATE DAY KV');
 
@@ -51,13 +56,11 @@ export class WalletValuationService {
 		}
 	}
 
-	private createHourKlineValues = async (userId: string, totalValue: string, roundedHour: string): Promise<void> => {
-		await this.unitOfWork.KlineValues.create(userId, roundedHour, totalValue, VALUE_LOG_INTERVAL.HOUR);
-	}
+	private createHourKlineValues = async (userId: string, totalValue: string, roundedHour: string): Promise<KlineValues> =>
+		this.unitOfWork.KlineValues.create(userId, roundedHour, totalValue, VALUE_LOG_INTERVAL.HOUR)
 
-	private createDayKlineValues = async (userId: string, totalValue: string, roundedDay: string): Promise<void> => {
-		await this.unitOfWork.KlineValues.create(userId, roundedDay, totalValue, VALUE_LOG_INTERVAL.DAY);
-	}
+	private createDayKlineValues = async (userId: string, totalValue: string, roundedDay: string): Promise<KlineValues> =>
+		this.unitOfWork.KlineValues.create(userId, roundedDay, totalValue, VALUE_LOG_INTERVAL.DAY)
 
 	private updatePreviousKlineValues = async (userId: string, totalValue: string, previousTime: string, interval: VALUE_LOG_INTERVAL):
 		Promise<void> => {
@@ -68,8 +71,17 @@ export class WalletValuationService {
 			klineValues.close = totalValue;
 			klineValues.isClosed = true;
 			klineValues.times.valueEndingAt = previousTime;
+			klineValues.updateCount = klineValues.updateCount ? klineValues.updateCount + 1 : 1;
+			const change: number = Number(klineValues.lastValue) - Number(klineValues.open);
+			klineValues.change = change.toString();
+			klineValues.changePercentage = ((change / Number(klineValues.open)) * 100).toFixed(4);
 
-			await this.unitOfWork.KlineValues.update(userId, klineValues);
+			console.log(klineValues);
+			const updated: KlineValues = await this.unitOfWork.KlineValues.update(userId, klineValues);
+			console.log('_____UPDATED');
+			console.log(updated);
+
+			if (!updated) throw Error(`Updating previous KlineValues failed for user: ${userId} - previous time: ${previousTime} - interval: ${interval}`);
 		}
 	}
 
@@ -92,7 +104,6 @@ export class WalletValuationService {
 
 	private updateWalletValuationKlineValues = async (userId: string, totalValue: string, time: string, interval: VALUE_LOG_INTERVAL):
 		Promise<void> => {
-		console.log(userId, interval, time);
 		const klineValues: Partial<KlineValues> = await this.unitOfWork.KlineValues.get(userId, interval, time);
 
 		if (klineValues) {
@@ -108,8 +119,17 @@ export class WalletValuationService {
 			const updated: KlineValues = await this.unitOfWork.KlineValues.update(userId, klineValues);
 			if (!updated) throw Error(`Updating KlineValues failed for user: ${userId} - time: ${time} - interval: ${interval}`);
 		} else { // Kline doesn't exist for whatever reason - Possibly due to previous timeout or deployment. Fallback: Create new
-			if (interval === VALUE_LOG_INTERVAL.HOUR) await this.createHourKlineValues(userId, totalValue, time);
-			if (interval === VALUE_LOG_INTERVAL.DAY) await this.createDayKlineValues(userId, totalValue, time);
+			if (interval === VALUE_LOG_INTERVAL.HOUR) {
+				const created: KlineValues = await this.createHourKlineValues(userId, totalValue, time);
+				if (!created) {
+					throw Error(`New Hour KlineValues (Past 00:00) was not created for user: ${userId} - time: ${time} - interval: ${interval}`);
+				}
+			} else if (interval === VALUE_LOG_INTERVAL.DAY) {
+				const created: KlineValues = await this.createDayKlineValues(userId, totalValue, time);
+				if (!created) {
+					throw Error(`New Day KlineValues (Past 00:00) was not created for user: ${userId} - time: ${time} - interval: ${interval}`);
+				}
+			}
 		}
 	}
 
