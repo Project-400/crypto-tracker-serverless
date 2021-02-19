@@ -13,10 +13,9 @@ import {
 	KlineValues_UpdatePreviousHour,
 	WalletValuation_CreateNewMinuteLog,
 	WalletValuation_GetExistingMinuteLog
-} from './mocks';
+} from '../mocks/wallet-valuation.service.mock';
 import { when } from 'jest-when';
 import { VALUE_LOG_INTERVAL, WalletValuation } from '@crypto-tracker/common-types';
-import Mock = jest.Mock;
 import { DatetimeUtils } from '../../api-shared-modules/src/utils/datetime';
 import * as moment from 'moment';
 import {
@@ -24,6 +23,7 @@ import {
 	mockKlineValuesFunctions,
 	mockWalletValuationFunctions
 } from '../../api-shared-modules/src/data-access/mocks/UnitOfWork';
+import Mock = jest.Mock;
 
 const mockDatetimeUtilFunctions: any = {
 	floorMinute: jest.fn(),
