@@ -25,7 +25,9 @@ export class WalletValuationService {
 		const roundedHour: string = new Date(Math.floor(date.getTime() / hourMillis) * hourMillis).toISOString();
 		const roundedDay: string = new Date(Math.floor(date.getTime() / dayMillis) * dayMillis).toISOString();
 
-		await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
+		const alreadyExists: boolean = await this.logWalletValuation(userId, totalValue, roundedMinute, VALUE_LOG_INTERVAL.MINUTE);
+
+		if (alreadyExists) return;
 
 		if (roundedMinute.endsWith(':00:00.000Z')) {
 			console.log('CREATE HOUR KV');
@@ -70,7 +72,7 @@ export class WalletValuationService {
 		}
 	}
 
-	public logWalletValuation = async (userId: string, totalValue: string, time: string, interval: VALUE_LOG_INTERVAL): Promise<void> => {
+	public logWalletValuation = async (userId: string, totalValue: string, time: string, interval: VALUE_LOG_INTERVAL): Promise<boolean> => {
 		const walletValue: Partial<WalletValue> = {
 			value: totalValue,
 			time,
@@ -79,7 +81,11 @@ export class WalletValuationService {
 
 		const walletValuation: WalletValue = await this.unitOfWork.WalletValuation.get(userId, interval, time);
 
-		if (!walletValuation) await this.unitOfWork.WalletValuation.create(userId, walletValue);
+		if (!walletValuation) {
+			await this.unitOfWork.WalletValuation.create(userId, walletValue);
+			return false;
+		}
+		return true; // Log for this time already exists
 	}
 
 	public updateWalletValuationKlineValues = async (userId: string, totalValue: string, time: string, interval: VALUE_LOG_INTERVAL):

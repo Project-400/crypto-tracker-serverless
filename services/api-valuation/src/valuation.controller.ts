@@ -75,7 +75,7 @@ export class ValuationController {
 
 			console.log(`CURRENT WALLET TOTAL: ${totalValue} at ${new Date().toISOString()}`);
 
-			return ResponseBuilder.ok({ });
+			return ResponseBuilder.ok({ totalValue });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
