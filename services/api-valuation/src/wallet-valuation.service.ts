@@ -8,17 +8,10 @@ export class WalletValuationService {
 	public constructor(
 		private unitOfWork: UnitOfWork,
 		private datetimeFunctions: DatetimeUtils
-		) { }
+	) { }
 
-	// public getWalletValuationLogs = async (userId: string, interval: VALUE_LOG_INTERVAL, count: number): Promise<WalletValuation[]> => {
-	// 	if (interval === VALUE_LOG_INTERVAL.MINUTE) {
-	// 		const millis: number = 1000 * 60;
-	//
-	// 	}
-	// 	const logs: WalletValuation[] = await this.unitOfWork.WalletValuation.getRange(userId, '', ''); // Attempt to get details from DB
-	//
-	// 	return logs;
-	// }
+	public getWalletValuation = async (userId: string, interval: VALUE_LOG_INTERVAL, time: string): Promise<WalletValuation> =>
+		this.unitOfWork.WalletValuation.getOld(userId, interval, time)
 
 	public performValueLogging = async (userId: string, totalValue: string): Promise<void> => {
 		const roundedMinute: string = this.datetimeFunctions.FloorMinute();
@@ -74,7 +67,7 @@ export class WalletValuationService {
 		}
 	}
 
-	private logWalletValuation = async (userId: string, totalValue: string, time: string, interval: VALUE_LOG_INTERVAL): Promise<boolean> => {
+	public logWalletValuation = async (userId: string, totalValue: string, time: string, interval: VALUE_LOG_INTERVAL): Promise<boolean> => {
 		const walletValuation: WalletValuation = await this.unitOfWork.WalletValuation.get(userId, interval, time);
 
 		if (!walletValuation) {

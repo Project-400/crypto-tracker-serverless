@@ -4,6 +4,7 @@ import { CoinCount, ValuationService } from './valuation.service';
 import { CoinsService } from '../../api-coins/src/coins.service';
 import { Coin } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import { WalletValuationService } from './wallet-valuation.service';
+import { VALUE_LOG_INTERVAL, WalletValuation } from '@crypto-tracker/common-types';
 
 export class ValuationController {
 
@@ -12,6 +13,31 @@ export class ValuationController {
 		private coinsService: CoinsService,
 		private walletValuationService: WalletValuationService
 	) { }
+
+	public retrieveValuationLog: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.pathParameters || !event.pathParameters.time)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
+
+		try {
+			console.log(event.pathParameters.time);
+			const log: any =
+				await this.walletValuationService.getWalletValuation(userId, VALUE_LOG_INTERVAL.MINUTE, event.pathParameters.time);
+
+			if (log && log.values) {
+				await Promise.all(log.values.map(async (value: any) => {
+					await this.walletValuationService.logWalletValuation(userId, value.value, value.time, VALUE_LOG_INTERVAL.MINUTE);
+				}));
+			}
+
+			console.log(log);
+			return ResponseBuilder.ok({ log });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
 
 	public getValuation: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		if (!event.pathParameters || !event.pathParameters.coins)

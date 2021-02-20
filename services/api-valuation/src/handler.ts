@@ -14,6 +14,7 @@ const walletValuationService: WalletValuationService = new WalletValuationServic
 const valuationService: ValuationService = new ValuationService(exchangeInfoService);
 const controller: ValuationController = new ValuationController(valuationService, coinsService, walletValuationService);
 
+export const retrieveValuationLog: ApiHandler = controller.retrieveValuationLog;
 export const getValuation: ApiHandler = controller.getValuation;
 export const getValuationForAllCoins: ApiHandler = controller.getValuationForAllCoins;
 export const logWalletValue: ApiHandler = controller.logWalletValue;

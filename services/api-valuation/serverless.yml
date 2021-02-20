@@ -38,6 +38,14 @@ plugins:
   - serverless-offline-scheduler
 
 functions:
+  retrieveValuationLog:
+    handler: src/handler.retrieveValuationLog
+    events:
+      - http:
+          path: /valuation/get/log/{time}
+          method: get
+          cors: true
+#          authorizer: aws_iam
   getValuation:
     handler: src/handler.getValuation
     events:
