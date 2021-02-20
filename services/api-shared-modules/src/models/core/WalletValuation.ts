@@ -21,3 +21,22 @@ export class WalletValuationItem extends DynamoDbItem implements WalletValuation
 	};
 
 }
+
+export class OldWalletValuationItem extends DynamoDbItem {
+
+	@attribute()
+	public values: Array<{ [s: string]: string }>;
+
+	@attribute()
+	public time: string;
+
+	@attribute()
+	public interval: VALUE_LOG_INTERVAL;
+
+	@attribute()
+	public times: {
+		createdAt: string;
+		updatedAt?: string;
+	};
+
+}

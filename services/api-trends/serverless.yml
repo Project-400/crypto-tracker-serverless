@@ -38,14 +38,14 @@ plugins:
   - serverless-offline-scheduler
 
 functions:
-#  logNewPriceBatch:
-#    handler: src/handler.logNewPriceBatch
-#    events:
-#      - schedule: rate(5 minutes)
-#      - http:
-#          path: /price-batch/log-new-price-batch
-#          method: get
-#          cors: true
+  logNewPriceBatch:
+    handler: src/handler.logNewPriceBatch
+    events:
+#      - schedule: rate(1 minute)
+      - http:
+          path: /price-batch/log-new-price-batch
+          method: get
+          cors: true
 #          authorizer: aws_iam
   savePriceChangeStats:
     handler: src/handler.savePriceChangeStats

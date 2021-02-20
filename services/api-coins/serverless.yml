@@ -37,8 +37,8 @@ plugins:
   - serverless-webpack
 
 functions:
-  getCoins:
-    handler: src/handler.getCoins
+  getAllCoins:
+    handler: src/handler.getAllCoins
     events:
       - http:
           path: /coins

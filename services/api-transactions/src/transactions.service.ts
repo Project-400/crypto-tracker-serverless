@@ -24,6 +24,8 @@ export class TransactionsService {
 			throw Error(`Unable to buy Currency via Binance. ${err}`);
 		}
 
+		console.log(response);
+
 		const transaction: Partial<Transaction> = {
 			request,
 			response,
@@ -32,6 +34,8 @@ export class TransactionsService {
 			quote: buyInfo.quote,
 			completed: response.status === 'FILLED'
 		};
+
+		console.log(transaction);
 
 		let savedTransaction: Transaction;
 

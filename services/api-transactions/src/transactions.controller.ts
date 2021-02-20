@@ -35,7 +35,7 @@ export class TransactionsController {
 		try {
 			const savedTransaction: Transaction = await this.transactionsService.buyCurrency(userId, buyInfo);
 
-			return ResponseBuilder.ok({ transaction: savedTransaction });
+			return ResponseBuilder.ok({ transaction: savedTransaction, buyInfo });
 		} catch (err) {
 			console.error(`Failed to buy currency: ${err.message}`);
 			return ResponseBuilder.internalServerError(err, err.message);
@@ -60,7 +60,7 @@ export class TransactionsController {
 		try {
 			const savedTransaction: Transaction = await this.transactionsService.sellCurrency(userId, sellInfo);
 
-			return ResponseBuilder.ok({ transaction: savedTransaction });
+			return ResponseBuilder.ok({ transaction: savedTransaction, sellInfo });
 		} catch (err) {
 			console.error(`Failed to sell currency: ${err.message}`);
 			return ResponseBuilder.internalServerError(err, err.message);

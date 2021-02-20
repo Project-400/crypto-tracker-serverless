@@ -6,7 +6,7 @@ const unitOfWork: UnitOfWork = new UnitOfWork();
 const coinsService: CoinsService = new CoinsService(unitOfWork);
 const controller: CoinsController = new CoinsController(coinsService);
 
-export const getCoins: ApiHandler = controller.getCoins;
+export const getAllCoins: ApiHandler = controller.getAllCoins;
 export const getSpecifiedCoins: ApiHandler = controller.getSpecifiedCoins;
 export const gatherUserCoins: ApiHandler = controller.gatherUserCoins;
 export const getInvestmentChange: ApiHandler = controller.getInvestmentChange;
