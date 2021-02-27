@@ -16,5 +16,6 @@ const controller: ValuationController = new ValuationController(valuationService
 
 export const retrieveValuationLog: ApiHandler = controller.retrieveValuationLog;
 export const getValuation: ApiHandler = controller.getValuation;
+export const getWalletKlineValues: ApiHandler = controller.getWalletKlineValues;
 export const getValuationForAllCoins: ApiHandler = controller.getValuationForAllCoins;
 export const logWalletValue: ApiHandler = controller.logWalletValue;

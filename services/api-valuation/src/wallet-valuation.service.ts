@@ -13,6 +13,29 @@ export class WalletValuationService {
 	public getWalletValuation = async (userId: string, interval: VALUE_LOG_INTERVAL, time: string): Promise<WalletValuation> =>
 		this.unitOfWork.WalletValuation.getOld(userId, interval, time)
 
+	public getWalletValuations = async (userId: string, interval: VALUE_LOG_INTERVAL, limit: number): Promise<KlineValues[]> => {
+		// let roundedStartTime: string;
+		// if (interval === VALUE_LOG_INTERVAL.MINUTE) roundedStartTime = this.datetimeFunctions.PreviousFloorMinute(pointCount);
+		// else if (interval === VALUE_LOG_INTERVAL.HOUR) roundedStartTime = this.datetimeFunctions.PreviousFloorHour(pointCount);
+		// else if (interval === VALUE_LOG_INTERVAL.DAY) roundedStartTime = this.datetimeFunctions.PreviousFloorDay(pointCount);
+		// else throw Error(`Invalid Log Interval value - ${interval} for request from user ${userId}`);
+		//
+		// let roundedEndTime: string;
+		// if (interval === VALUE_LOG_INTERVAL.MINUTE) roundedEndTime = this.datetimeFunctions.FloorMinute();
+		// else if (interval === VALUE_LOG_INTERVAL.HOUR) roundedEndTime = this.datetimeFunctions.FloorHour();
+		// else if (interval === VALUE_LOG_INTERVAL.DAY) roundedEndTime = this.datetimeFunctions.FloorDay();
+		// else throw Error(`Invalid Log Interval value - ${interval} for request from user ${userId}`);
+
+		// console.log(`Start from ${roundedStartTime}`);
+		// console.log(`End at ${roundedEndTime}`);
+
+		const walletValuations: KlineValues[] =
+			await this.unitOfWork.KlineValues.getRange(userId, interval, limit);
+		console.log('Result Valuations');
+		console.log(walletValuations);
+		return walletValuations;
+	}
+
 	public performValueLogging = async (userId: string, totalValue: string): Promise<void> => {
 		const roundedMinute: string = this.datetimeFunctions.FloorMinute();
 		const roundedHour: string = this.datetimeFunctions.FloorHour();

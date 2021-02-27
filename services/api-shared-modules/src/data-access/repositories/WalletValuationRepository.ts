@@ -18,32 +18,16 @@ export class WalletValuationRepository extends Repository implements IWalletValu
 		}
 	}
 
-	public async get(userId: string, interval: VALUE_LOG_INTERVAL, roundedTime: string): Promise<any> {
+	public async get(userId: string, interval: VALUE_LOG_INTERVAL, roundedTime: string): Promise<WalletValuation> {
 		try {
 			return await this.db.get(Object.assign(new WalletValuationItem(), {
 				pk: `${Entity.WALLET_VALUATION}#${roundedTime}`,
-				sk: `${Entity.USER}#${userId}/${EntitySortType.INTERVAL}#${interval}/${EntitySortType.TIME}#${roundedTime}`,
+				sk: `${Entity.USER}#${userId}/${EntitySortType.INTERVAL}#${interval}/${EntitySortType.TIME}#${roundedTime}`
 			}));
 		} catch (e) {
 			return undefined;
 		}
 	}
-
-	// public async create(userId: string, roundedHour: string, roundedMinute: string, walletValue: WalletValue): Promise<WalletValuation> {
-	// 	const date: string = new Date().toISOString();
-	//
-	// 	return this.db.put(Object.assign(new WalletValuationItem(), {
-	// 		pk: `${Entity.WALLET_VALUATION}#${roundedHour}`,
-	// 		sk: `${Entity.USER}#${userId}/${EntitySortType.TIME}#${roundedHour}`,
-	// 		sk2: `${Entity.WALLET_VALUATION}#${roundedHour}`,
-	// 		entity: Entity.WALLET_VALUATION,
-	// 		times: {
-	// 			createdAt: date,
-	// 			valueStartingAt: roundedMinute
-	// 		},
-	// 		values: [ walletValue ]
-	// 	}));
-	// }
 
 	public async create(userId: string, walletValue: Partial<WalletValuation>): Promise<WalletValuation> {
 		const date: string = new Date().toISOString();

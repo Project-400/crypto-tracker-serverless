@@ -54,6 +54,14 @@ functions:
           method: get
           cors: true
 #          authorizer: aws_iam
+  getWalletKlineValues:
+    handler: src/handler.getWalletKlineValues
+    events:
+      - http:
+          path: /kline/values
+          method: get
+          cors: true
+#          authorizer: aws_iam
   getValuationForAllCoins:
     handler: src/handler.getValuationForAllCoins
     events:

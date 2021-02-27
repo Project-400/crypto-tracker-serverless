@@ -4,6 +4,10 @@ import { Repository } from './Repository';
 import { Entity } from '../../types/entities';
 import { IKlineValuesRepository } from '../interfaces/IKlineValuesRepository';
 import { KlineValuesItem } from '../../models/core/KlineValues';
+import { QueryKey } from '../interfaces';
+import { beginsWith } from '@aws/dynamodb-expressions';
+import { QueryIterator, QueryOptions } from '@aws/dynamodb-data-mapper';
+import { DBIndex } from '../../types/db-indexes';
 
 export class KlineValuesRepository extends Repository implements IKlineValuesRepository {
 
@@ -16,6 +20,31 @@ export class KlineValuesRepository extends Repository implements IKlineValuesRep
 		} catch (e) {
 			return undefined;
 		}
+	}
+
+	public async getRange(userId: string, interval: VALUE_LOG_INTERVAL, limit: number): Promise<KlineValues[]> {
+		const keyCondition: QueryKey = {
+			entity: Entity.KLINE_VALUES,
+			// sk: between(
+			// 	`${Entity.USER}#${userId}/${EntitySortType.INTERVAL}#${interval}/${EntitySortType.TIME}#${startTime}`,
+			// 	`${Entity.USER}#${userId}/${EntitySortType.INTERVAL}#${interval}/${EntitySortType.TIME}#${endTime}`
+			// )
+			sk: beginsWith(`${Entity.USER}#${userId}/${EntitySortType.INTERVAL}#${interval}`)
+		};
+
+		console.log(`${Entity.USER}#${userId}/${EntitySortType.INTERVAL}#${interval}`);
+
+		const queryOptions: QueryOptions = {
+			indexName: DBIndex.SK,
+			scanIndexForward: false,
+			limit
+		};
+
+		const queryIterator: QueryIterator<KlineValues> = this.db.query(KlineValuesItem, keyCondition, queryOptions);
+		const pairs: KlineValues[] = [];
+		for await (const pair of queryIterator) pairs.push(pair);
+
+		return pairs;
 	}
 
 	public async create(userId: string, time: string, initValue: string, interval: VALUE_LOG_INTERVAL): Promise<KlineValues> {

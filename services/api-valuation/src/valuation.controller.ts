@@ -4,7 +4,7 @@ import { CoinCount, ValuationService } from './valuation.service';
 import { CoinsService } from '../../api-coins/src/coins.service';
 import { Coin } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import { WalletValuationService } from './wallet-valuation.service';
-import { VALUE_LOG_INTERVAL, WalletValuation } from '@crypto-tracker/common-types';
+import { KlineValues, VALUE_LOG_INTERVAL } from '@crypto-tracker/common-types';
 
 export class ValuationController {
 
@@ -77,18 +77,18 @@ export class ValuationController {
 		}
 	}
 
-	// public getWalletValuationLogs: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
-	// 	const auth: TokenVerification = Auth.VerifyToken('');
-	// 	const userId: string = auth.sub;
-	//
-	// 	try {
-	// 		const logs: WalletValuation[] = await this.walletValuationService.getWalletValuationLogs(userId, VALUE_LOG_INTERVAL.MINUTE, 10);
-	//
-	// 		return ResponseBuilder.ok({ logs });
-	// 	} catch (err) {
-	// 		return ResponseBuilder.internalServerError(err, err.message);
-	// 	}
-	// }
+	public getWalletKlineValues: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		const auth: TokenVerification = Auth.VerifyToken('');
+		const userId: string = auth.sub;
+
+		try {
+			const klines: KlineValues[] = await this.walletValuationService.getWalletValuations(userId, VALUE_LOG_INTERVAL.HOUR, 10);
+
+			return ResponseBuilder.ok({ klines });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
 
 	public logWalletValue: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		const auth: TokenVerification = Auth.VerifyToken('');
