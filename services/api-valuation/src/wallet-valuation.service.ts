@@ -112,8 +112,8 @@ export class WalletValuationService {
 		const klineValues: Partial<KlineValues> = await this.unitOfWork.KlineValues.get(userId, interval, time);
 
 		if (klineValues) {
-			if (totalValue > klineValues.highest) klineValues.highest = totalValue;
-			if (totalValue < klineValues.lowest) klineValues.lowest = totalValue;
+			if (Number(totalValue) > Number(klineValues.highest)) klineValues.highest = totalValue;
+			if (Number(totalValue) < Number(klineValues.lowest)) klineValues.lowest = totalValue;
 
 			klineValues.lastValue = totalValue;
 			klineValues.updateCount = klineValues.updateCount ? klineValues.updateCount + 1 : 1;
