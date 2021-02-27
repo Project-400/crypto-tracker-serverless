@@ -29,7 +29,7 @@
   "devDependencies": {
     "@shelf/jest-dynamodb": "^1.7.0",
     "@types/aws-lambda": "8.10.39",
-    "@types/jest": "^26.0.15",
+    "@types/jest": "^26.0.20",
     "@types/node": "^10.17.16",
     "@types/request-promise": "^4.1.45",
     "babel-cli": "^6.26.0",
