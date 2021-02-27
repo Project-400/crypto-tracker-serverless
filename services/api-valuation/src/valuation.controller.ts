@@ -78,11 +78,17 @@ export class ValuationController {
 	}
 
 	public getWalletKlineValues: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		if (!event.pathParameters || !event.pathParameters.limit || !event.pathParameters.interval)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
 		const auth: TokenVerification = Auth.VerifyToken('');
 		const userId: string = auth.sub;
 
 		try {
-			const klines: KlineValues[] = await this.walletValuationService.getWalletValuations(userId, VALUE_LOG_INTERVAL.HOUR, 10);
+			const limit: number = Number(event.pathParameters.limit);
+			const interval: VALUE_LOG_INTERVAL = VALUE_LOG_INTERVAL[event.pathParameters.interval.toUpperCase()];
+
+			const klines: KlineValues[] = await this.walletValuationService.getWalletValuations(userId, interval, limit);
 
 			return ResponseBuilder.ok({ klines });
 		} catch (err) {
