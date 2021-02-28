@@ -61,6 +61,14 @@ functions:
           method: get
           cors: true
 #          authorizer: aws_iam
+  getAllValidSymbols:
+    handler: src/handler.getAllValidSymbols
+    events:
+      - http:
+          path: /exchange-info/valid-symbols
+          method: get
+          cors: true
+#          authorizer: aws_iam
 #
 #resources:
 #    - ${file(../resources/cognito-policy.yml)}

@@ -61,6 +61,12 @@ export class ExchangeInfoService {
 		return symbols.filter((s: ExchangeInfoSymbol) => s.status !== 'TRADING');
 	}
 
+	public getTradingSymbolData = async (): Promise<ExchangeInfoSymbol[]> => { // Invalid pairs (exchange info) that are not trading
+		const symbols: ExchangeInfoSymbol[] = await this.requestExchangeInfo();
+
+		return symbols.filter((s: ExchangeInfoSymbol) => s.status === 'TRADING');
+	}
+
 	public getNonTradingPairs = async (): Promise<string[]> => { // Invalid symbol names that are not trading
 		const exchangeInfoDto: ExchangeInfoSymbol[] = await this.getNonTradingSymbolData();
 
@@ -110,7 +116,7 @@ export class ExchangeInfoService {
 		return this.unitOfWork.ExchangeInfo.update(updatedInfo);
 	}
 
-	private requestExchangeInfo = async (): Promise<ExchangeInfoSymbol[]> => {
+	public requestExchangeInfo = async (): Promise<ExchangeInfoSymbol[]> => {
 		const info: GetExchangeInfoDto = await BinanceApi.GetExchangeInfo();
 		return info.symbols;
 	}

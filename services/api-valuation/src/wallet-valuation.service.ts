@@ -31,8 +31,7 @@ export class WalletValuationService {
 
 		const walletValuations: KlineValues[] =
 			await this.unitOfWork.KlineValues.getRange(userId, interval, limit);
-		console.log('Result Valuations');
-		console.log(walletValuations);
+
 		return walletValuations;
 	}
 
