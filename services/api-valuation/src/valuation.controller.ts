@@ -14,7 +14,7 @@ export class ValuationController {
 		private walletValuationService: WalletValuationService
 	) { }
 
-	public retrieveValuationLog: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+	public retrieveValuationLog: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => { // old data
 		if (!event.pathParameters || !event.pathParameters.time)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 
@@ -71,7 +71,7 @@ export class ValuationController {
 		try {
 			const { values, totalValue }: { values: CoinCount[]; totalValue: string } = await this.getValuationForAllWalletCoins(userId);
 
-			return ResponseBuilder.ok({ values, totalValue });
+			return ResponseBuilder.ok({ values, totalValue, coinCount: values.length });
 		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
@@ -120,7 +120,8 @@ export class ValuationController {
 				coinCount: c.free
 			}));
 
-		const values: CoinCount[] = await this.valuationService.getValuation(coinCounts);
+		const values: CoinCount[] = (await this.valuationService.getValuation(coinCounts))
+			.filter((v: CoinCount) => v.usdValue); // Remove coins with no value
 		const totalValue: string = this.valuationService.calculateValueTotal(values);
 
 		return { values, totalValue };

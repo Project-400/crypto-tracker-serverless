@@ -8,6 +8,7 @@ import {
 	ErrorCode
 } from '../../api-shared-modules/src';
 import { ExchangePairsService } from './exchange-pairs.service';
+import { SymbolPairs } from '@crypto-tracker/common-types';
 
 export class ExchangePairsController {
 
@@ -36,6 +37,27 @@ export class ExchangePairsController {
 			return ResponseBuilder.ok({ info: pair });
 		} catch (err) {
 			console.log(err);
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	/*
+	* Example:
+	*
+	* {
+	* 	ALPHA: [ 'BTC', 'USDT', 'ETH' ],
+	* 	SUSHI: [ 'BTC', 'USDT', 'BNB' ]
+	* }
+	*
+	* */
+
+	public updatePairsBySymbols: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		try {
+			const pairs: { [s: string]: string[] } = await this.exchangePairsService.requestPairsBySymbols();
+			await this.exchangePairsService.saveSymbolPairs(pairs);
+
+			return ResponseBuilder.ok({ });
+		} catch (err) {
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}

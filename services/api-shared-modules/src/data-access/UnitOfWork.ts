@@ -10,7 +10,8 @@ import {
 	TraderBotLogDataRepository,
 	PriceChangeStatsRepository,
 	WalletValuationRepository,
-	KlineValuesRepository
+	KlineValuesRepository,
+	SymbolPairsRepository
 } from './repositories';
 import {
 	IUserRepository,
@@ -24,7 +25,8 @@ import {
 	ITraderBotLogDataRepository,
 	IPriceChangeStatsRepository,
 	IWalletValuationRepository,
-	IKlineValuesRepository
+	IKlineValuesRepository,
+	ISymbolPairsRepository
 } from './interfaces';
 import { DataMapper } from '@aws/dynamodb-data-mapper';
 import { DynamoDB } from 'aws-sdk';
@@ -43,6 +45,7 @@ export class UnitOfWork {
 	public TraderBot: ITraderBotRepository;
 	public WalletValuation: IWalletValuationRepository;
 	public KlineValues: IKlineValuesRepository;
+	public SymbolPairs: ISymbolPairsRepository;
 
 	public constructor() {
 		const db: DataMapper = new DataMapper({ client: new DynamoDB({ region: 'eu-west-1' }) });
@@ -59,6 +62,7 @@ export class UnitOfWork {
 		this.TraderBot = new TraderBotRepository(db);
 		this.WalletValuation = new WalletValuationRepository(db);
 		this.KlineValues = new KlineValuesRepository(db);
+		this.SymbolPairs = new SymbolPairsRepository(db);
 	}
 
 }

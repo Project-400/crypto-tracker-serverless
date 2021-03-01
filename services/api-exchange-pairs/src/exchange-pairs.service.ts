@@ -2,7 +2,7 @@ import { UnitOfWork } from '../../api-shared-modules/src/data-access';
 import { ExchangePair } from '../../api-shared-modules/src/types';
 import { GetExchangeInfoDto } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces/get-exchange-info.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
-import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
+import { ExchangeInfoSymbol, SymbolPairs } from '@crypto-tracker/common-types';
 
 export class ExchangePairsService {
 
@@ -40,6 +40,20 @@ export class ExchangePairsService {
 		}
 
 		return pair;
+	}
+
+	public requestPairsBySymbols = async (): Promise<{ [s: string]: string[] }> => {
+		const binancePairs: Array<Partial<ExchangePair>> = await this.requestExchangePairs();
+
+		return binancePairs.reduce((pairs: { [s: string]: string[] }, symbol: ExchangePair) => {
+			if (pairs[symbol.base]) pairs[symbol.base].push(symbol.quote);
+			else pairs[symbol.base] = [symbol.quote];
+			return pairs;
+		}, { });
+	}
+
+	public saveSymbolPairs = async (pairs: { [s: string]: string[] }): Promise<void> => {
+		await this.unitOfWork.SymbolPairs.create(pairs);
 	}
 
 	public requestExchangePairs = async (): Promise<Array<Partial<ExchangePair>>> => {

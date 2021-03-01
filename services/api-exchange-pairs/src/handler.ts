@@ -8,3 +8,4 @@ const controller: ExchangePairsController = new ExchangePairsController(exchange
 
 export const gatherAllExchangePairs: ApiHandler = controller.gatherAllExchangePairs;
 export const getSymbolExchangePair: ApiHandler = controller.getSymbolExchangePair;
+export const updatePairsBySymbols: ApiHandler = controller.updatePairsBySymbols;

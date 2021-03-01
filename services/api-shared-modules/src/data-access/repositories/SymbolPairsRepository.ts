@@ -13,7 +13,7 @@ export class SymbolPairsRepository extends Repository implements ISymbolPairsRep
 		}));
 	}
 
-	public async create(symbolPairs: SymbolPairs): Promise<SymbolPairs> {
+	public async create(symbolPairs: { [s: string]: string[] }): Promise<SymbolPairs> {
 		const date: string = new Date().toISOString();
 
 		return this.db.put(Object.assign(new SymbolPairsItem(), {

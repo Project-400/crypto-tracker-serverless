@@ -10,3 +10,4 @@ export { TraderBotRepository } from './TraderBotRepository';
 export { TraderBotLogDataRepository } from './TraderBotLogDataRepository';
 export { WalletValuationRepository } from './WalletValuationRepository';
 export { KlineValuesRepository } from './KlineValuesRepository';
+export { SymbolPairsRepository } from './SymbolPairsRepository';
