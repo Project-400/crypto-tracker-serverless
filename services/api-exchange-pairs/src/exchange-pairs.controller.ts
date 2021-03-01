@@ -62,4 +62,14 @@ export class ExchangePairsController {
 		}
 	}
 
+	public getPairsBySymbols: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		try {
+			const symbolPairs: SymbolPairs = await this.exchangePairsService.getPairsBySymbols();
+
+			return ResponseBuilder.ok({ pairs: symbolPairs.pairs });
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
 }

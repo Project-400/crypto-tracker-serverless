@@ -52,6 +52,8 @@ export class ExchangePairsService {
 		}, { });
 	}
 
+	public getPairsBySymbols = async (): Promise<SymbolPairs> => this.unitOfWork.SymbolPairs.get();
+
 	public saveSymbolPairs = async (pairs: { [s: string]: string[] }): Promise<void> => {
 		await this.unitOfWork.SymbolPairs.create(pairs);
 	}

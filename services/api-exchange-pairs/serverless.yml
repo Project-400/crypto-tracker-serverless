@@ -61,6 +61,14 @@ functions:
           method: put
           cors: true
 #          authorizer: aws_iam
+  getPairsBySymbols:
+    handler: src/handler.getPairsBySymbols
+    events:
+      - http:
+          path: /symbol-pairs
+          method: get
+          cors: true
+#          authorizer: aws_iam
 #
 #resources:
 #    - ${file(../resources/cognito-policy.yml)}
