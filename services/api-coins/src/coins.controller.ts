@@ -9,10 +9,11 @@ import {
 import { Coin } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import Auth, { TokenVerification } from '../../_auth/verify';
 import { CoinsService } from './coins.service';
+import { ProfitsService } from './profits.service';
 
 export class CoinsController {
 
-	public constructor(private coinsService: CoinsService) { }
+	public constructor(private coinsService: CoinsService, private profitsService: ProfitsService) { }
 
 	public getAllCoins: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
 		const auth: TokenVerification = Auth.VerifyToken('');
@@ -65,10 +66,12 @@ export class CoinsController {
 		const coin: string = event.pathParameters.coin.toUpperCase();
 
 		try {
-			const changes: any = this.coinsService.getInvestmentChange(coin);
+			const changes: any = await this.profitsService.getInvestmentChange(coin);
 
-			return ResponseBuilder.ok({ trades: changes.sortedTrades.length, diff: changes.diff, details: changes.details });
+			// return ResponseBuilder.ok({ trades: changes.sortedTrades, diff: changes.diff, details: changes.details });
+			return ResponseBuilder.ok({ changes });
 		} catch (err) {
+			console.log(err);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
