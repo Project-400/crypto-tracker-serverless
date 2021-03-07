@@ -42,8 +42,8 @@ export default class BinanceApi {
 	* A maximum of 1000 trades can be returned in a single call. Pagination will be required for large volumes.
 	* */
 
-	public static async GetSymbolTrades(symbol: string): Promise<Trade[]> {
-		const data: any = BinanceApi.BinanceData({ symbol });
+	public static async GetSymbolTrades(symbol: string, startTime?: number): Promise<Trade[]> {
+		const data: any = BinanceApi.BinanceData({ symbol, startTime });
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_SYMBOL_TRADES, data);
 
 		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
@@ -71,6 +71,19 @@ export default class BinanceApi {
 
 	public static async GetAllSymbolPrices(): Promise<GetAllSymbolPricesDto> {
 		const url: string = BinanceEndpoints.GetAllSymbolPrices();
+
+		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
+	}
+
+	/*
+	*
+	* TODO: Add details
+	*
+	* */
+
+	public static async GetKlineData(symbol: string, interval: string, startTime?: number, endTime?: number, limit?: number):
+		Promise<GetAllSymbolPricesDto> {
+		const url: string = BinanceEndpoints.GetKlineData(symbol, interval, startTime, endTime, limit);
 
 		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
 	}

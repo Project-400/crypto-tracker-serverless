@@ -51,6 +51,14 @@ export default class BinanceEndpoints {
 
 	public static GetAllSymbolPrices = (): string => `${BINANCE_API_DOMAIN}/api/v3/ticker/price`;
 
+	public static GetKlineData = (symbol: string, interval: string, startTime?: number, endTime?: number, limit?: number): string => {
+		let url: string = `${BINANCE_API_DOMAIN}/api/v3/klines?symbol=${symbol}&interval=${interval}`;
+		if (startTime) url = `${url}&startTime=${startTime}`;
+		if (endTime) url = `${url}&endTime=${endTime}`;
+		if (limit) url = `${url}&limit=${limit}`;
+		return url;
+	}
+
 }
 
 export enum BinanceEndpoint {
