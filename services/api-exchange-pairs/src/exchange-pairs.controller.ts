@@ -20,6 +20,7 @@ export class ExchangePairsController {
 
 			return ResponseBuilder.ok({ pairs });
 		} catch (err) {
+			console.error(err);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
@@ -36,7 +37,7 @@ export class ExchangePairsController {
 
 			return ResponseBuilder.ok({ info: pair });
 		} catch (err) {
-			console.log(err);
+			console.error(err);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
@@ -58,6 +59,7 @@ export class ExchangePairsController {
 
 			return ResponseBuilder.ok({ });
 		} catch (err) {
+			console.error(err);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
@@ -68,6 +70,7 @@ export class ExchangePairsController {
 
 			return ResponseBuilder.ok({ pairs: symbolPairs.pairs });
 		} catch (err) {
+			console.error(err);
 			return ResponseBuilder.internalServerError(err, err.message);
 		}
 	}
