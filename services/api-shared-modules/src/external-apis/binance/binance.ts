@@ -82,7 +82,7 @@ export default class BinanceApi {
 	* */
 
 	public static async GetKlineData(symbol: string, interval: string, startTime?: number, endTime?: number, limit?: number):
-		Promise<GetAllSymbolPricesDto> {
+		Promise<any> {
 		const url: string = BinanceEndpoints.GetKlineData(symbol, interval, startTime, endTime, limit);
 
 		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
