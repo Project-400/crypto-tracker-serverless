@@ -65,14 +65,14 @@ export class ProfitsService {
 		let totalInvestedDollars: number = 0;
 		// let totalInvestedValueMinusCommission: number = 0 - coinDustLogTotals.totalInvestedValueMinusCommission;
 		let totalInvestedDollarsCommission: number = 0;
-		let currentValue: number = 0;
+		// let currentValue: number = 0;
 		let currentDollarsValue: number = 0;
 		let currentProfitLoss: number = 0;
-		let takenProfitLoss: number = 0;
+		// let takenProfitLoss: number = 0;
 		let usdPrice: number = 0;
 
 		await Promise.all(trades.map(async (trade: Trade) => {
-			let btcPrice: number = 0;
+			// let btcPrice: number = 0;
 
 			const qty: number = Number(trade.qty);
 			const price: number = Number(trade.price);
@@ -80,12 +80,12 @@ export class ProfitsService {
 
 			const klineData: any = await BinanceApi.GetKlineData('BTCUSDT', '1m', time, time + 60000, 1);
 
-			btcPrice = trade.symbol.endsWith('BTC') ? price : price / BTCUSDT_Price;
+			// btcPrice = trade.symbol.endsWith('BTC') ? price : price / BTCUSDT_Price;
 			// btcPrice = (Number(klineData[0][1]) + Number(klineData[0][4])) / 2;
 			const prevBtcUsdtPrice: number = (Number(klineData[0][1]) + Number(klineData[0][4])) / 2; // Average between open and close
 			usdPrice = price * prevBtcUsdtPrice;
-			const thisTradeInvestedValue: number = qty * btcPrice;
-			const currentTotalValue: number = totalQty * btcPrice;
+			// const thisTradeInvestedValue: number = qty * btcPrice;
+			// const currentTotalValue: number = totalQty * btcPrice;
 
 			const thisTradeInvestedDollars: number = qty * usdPrice;
 
@@ -116,20 +116,20 @@ export class ProfitsService {
 				totalQty -= Number(trade.commission);
 			}
 
-			const thisTradeProfitLoss: number = currentValue - totalInvestedDollars;
+			// const thisTradeProfitLoss: number = currentDollarsValue - totalInvestedDollars;
 			// const thisTradeProfitLoss: number = currentValue - totalInvestedValue;
 
-			if (!trade.isBuyer) {
-				const percentageSold: number = (100 / currentTotalValue) * thisTradeInvestedValue;
-				const profitLossSold: number = (thisTradeProfitLoss / 100) * percentageSold;
-				takenProfitLoss += profitLossSold;
-				currentProfitLoss = thisTradeProfitLoss - profitLossSold;
-			}
+			// if (!trade.isBuyer) {
+			// 	const percentageSold: number = (100 / currentTotalValue) * thisTradeInvestedValue;
+			// 	const profitLossSold: number = (thisTradeProfitLoss / 100) * percentageSold;
+			// 	takenProfitLoss += profitLossSold;
+			// 	currentProfitLoss = thisTradeProfitLoss - profitLossSold;
+			// }
 		}));
 
-		currentValue = currentCoinBtcPrice * totalQty;
+		// currentValue = currentCoinBtcPrice * totalQty;
 		currentDollarsValue = coinUsdPrice * totalQty;
-		currentProfitLoss = currentValue - totalInvestedDollars;
+		currentProfitLoss = currentDollarsValue - totalInvestedDollars;
 		// currentProfitLoss = currentValue - totalInvestedValueMinusCommission;
 		// const diff: number = Number((((currentValue - totalInvestedValueMinusCommission) /
 		// totalInvestedValueMinusCommission) * 100).toFixed(2));
@@ -142,9 +142,10 @@ export class ProfitsService {
 			totalInvestedDollarsCommission,
 			currentDollarsValue,
 			// totalInvestedValueMinusCommission: this.BTCtoUSDTRounded(BTCUSDT_Price, totalInvestedValueMinusCommission),
-			currentValue: this.BTCtoUSDTRounded(BTCUSDT_Price, currentValue),
-			currentProfitLoss: this.BTCtoUSDTRounded(BTCUSDT_Price, currentProfitLoss),
-			takenProfitLoss: this.BTCtoUSDTRounded(BTCUSDT_Price, takenProfitLoss)
+			// currentValue: this.BTCtoUSDTRounded(BTCUSDT_Price, currentValue),
+			// currentProfitLoss: this.BTCtoUSDTRounded(BTCUSDT_Price, currentProfitLoss),
+			currentProfitLoss,
+			// takenProfitLoss: this.BTCtoUSDTRounded(BTCUSDT_Price, takenProfitLoss)
 			// diff
 		};
 
