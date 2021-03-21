@@ -4,6 +4,7 @@ import { BinanceTransactionSide, BinanceTransactionType } from '../../api-shared
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 import { BuyCurrencyData, SellCurrencyData } from './transactions.interfaces';
 import { ExchangeCurrencyTransactionFull } from '@crypto-tracker/common-types';
+import { TransactionsFakeDataGenerator } from './transactions.fake-data-generator';
 
 export class TransactionsService {
 
@@ -19,7 +20,9 @@ export class TransactionsService {
 
 		let response: ExchangeCurrencyTransactionFull;
 		try {
-			response = await BinanceApi.BuyCurrency(request, buyInfo.isTest);
+			response = buyInfo.isTest ?
+				await TransactionsFakeDataGenerator.GenerateFakeBuyTransaction(buyInfo.symbol, buyInfo.quantity, buyInfo.base) :
+				await BinanceApi.BuyCurrency(request, buyInfo.isTest);
 		} catch (err) {
 			throw Error(`Unable to buy Currency via Binance. ${err}`);
 		}
@@ -54,6 +57,10 @@ export class TransactionsService {
 
 		let response: ExchangeCurrencyTransactionFull;
 		try {
+			response = sellInfo.isTest ?
+				await TransactionsFakeDataGenerator.GenerateFakeSellTransaction(sellInfo.symbol, sellInfo.quantity, sellInfo.base) :
+				await BinanceApi.BuyCurrency(request, sellInfo.isTest);
+
 			response = await BinanceApi.SellCurrency(request, sellInfo.isTest);
 		} catch (err) {
 			throw Error(`Unable to sell Currency via Binance. ${err}`);
