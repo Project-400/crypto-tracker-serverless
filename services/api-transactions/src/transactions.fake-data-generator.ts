@@ -67,7 +67,7 @@ export class TransactionsFakeDataGenerator {
 			status: BinanceOrderStatus.FILLED,
 			timeInForce: BinanceTimeInForce.GTC,
 			type: BinanceTransactionType.MARKET,
-			side: BinanceTransactionSide.BUY,
+			side: BinanceTransactionSide.SELL,
 			fills: [
 				{
 					price: price.toString(),

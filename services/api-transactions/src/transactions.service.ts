@@ -59,9 +59,7 @@ export class TransactionsService {
 		try {
 			response = sellInfo.isTest ?
 				await TransactionsFakeDataGenerator.GenerateFakeSellTransaction(sellInfo.symbol, sellInfo.quantity, sellInfo.base) :
-				await BinanceApi.BuyCurrency(request, sellInfo.isTest);
-
-			response = await BinanceApi.SellCurrency(request, sellInfo.isTest);
+				await BinanceApi.SellCurrency(request, sellInfo.isTest);
 		} catch (err) {
 			throw Error(`Unable to sell Currency via Binance. ${err}`);
 		}
