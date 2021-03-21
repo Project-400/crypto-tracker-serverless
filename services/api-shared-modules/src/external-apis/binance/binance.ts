@@ -46,6 +46,8 @@ export default class BinanceApi {
 		const data: any = BinanceApi.BinanceData({ symbol, startTime });
 		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_SYMBOL_TRADES, data);
 
+		console.log(url);
+
 		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
 	}
 
@@ -115,6 +117,40 @@ export default class BinanceApi {
 
 	public static async GetExchangeInfo(): Promise<GetExchangeInfoDto> {
 		const url: string = BinanceEndpoints.GetExchangeInfo();
+
+		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
+	}
+
+	/*
+	*
+	* TODO: Add details
+	*
+	* */
+
+	public static async GetAccountSnapshot(): Promise<any> {
+		console.log((new Date().getTime() - (24 * 60 * 60 * 1000 * 10)));
+		const data: any = BinanceApi.BinanceData({
+			type: 'SPOT'
+			// startTime: (new Date().getTime() - (24 * 60 * 60 * 1000 * 10)),
+			// endTime: new Date().getTime()
+		});
+		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_ACCOUNT_SNAPSHOT, data);
+
+		console.log(url);
+		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
+	}
+
+	/*
+	*
+	* TODO: Add details
+	*
+	* */
+
+	public static async GetDepositHistory(): Promise<any> {
+		// console.log((new Date().getTime() - (24 * 60 * 60 * 1000 * 10)));
+		// const data: any = BinanceApi.BinanceData({ });
+		const data: any = BinanceApi.BinanceData();
+		const url: string = BinanceEndpoints.SignatureEndpoint(BinanceEndpoint.GET_DEPOSIT_HISTORY, data);
 
 		return JSON.parse(await HttpApi.get(url, true, BinanceApi.headers));
 	}

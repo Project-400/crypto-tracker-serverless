@@ -17,6 +17,10 @@ export default class BinanceEndpoints {
 				return BinanceEndpoints.GetSymbolTrades(stringifiedData, signature);
 			case BinanceEndpoint.GET_DUST_LOGS:
 				return BinanceEndpoints.GetDustLogs(stringifiedData, signature);
+			case BinanceEndpoint.GET_ACCOUNT_SNAPSHOT:
+				return BinanceEndpoints.GetAccountSnapshot(stringifiedData, signature);
+			case BinanceEndpoint.GET_DEPOSIT_HISTORY:
+				return BinanceEndpoints.GetDepositHistory(stringifiedData, signature);
 			case BinanceEndpoint.BUY_CURRENCY:
 				return BinanceEndpoints.BuyCurrency(stringifiedData, signature, isTest);
 			case BinanceEndpoint.SELL_CURRENCY:
@@ -47,6 +51,10 @@ export default class BinanceEndpoints {
 
 	public static GetExchangeInfo = (): string => `${BINANCE_API_DOMAIN}/api/v3/exchangeInfo`;
 
+	public static GetAccountSnapshot = (data: string, signature: string): string => `${BINANCE_API_DOMAIN}/sapi/v1/accountSnapshot?${data}&signature=${signature}`;
+
+	public static GetDepositHistory = (data: string, signature: string): string => `${BINANCE_API_DOMAIN}/sapi/v1/capital/deposit/hisrec?${data}&signature=${signature}`;
+
 	public static GetSymbolPrice = (symbol: string): string => `${BINANCE_API_DOMAIN}/api/v3/ticker/price?symbol=${symbol}`;
 
 	public static GetAllSymbolPrices = (): string => `${BINANCE_API_DOMAIN}/api/v3/ticker/price`;
@@ -69,6 +77,8 @@ export enum BinanceEndpoint {
 	GET_SYMBOL_PRICE,
 	GET_ALL_SYMBOL_PRICE,
 	GET_EXCHANGE_INFO,
+	GET_ACCOUNT_SNAPSHOT,
+	GET_DEPOSIT_HISTORY,
 	BUY_CURRENCY,
 	SELL_CURRENCY
 }
