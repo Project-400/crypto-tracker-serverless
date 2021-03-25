@@ -6,4 +6,4 @@ const unitOfWork: UnitOfWork = new UnitOfWork();
 const ec2DeploymentsService: Ec2DeploymentsService = new Ec2DeploymentsService(unitOfWork);
 const controller: Ec2DeploymentsController = new Ec2DeploymentsController(ec2DeploymentsService);
 
-export const updateLatestDeployment: ApiHandler = controller.updateLatestDeployment;
+export const addLatestDeployment: ApiHandler = controller.addLatestDeployment;

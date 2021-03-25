@@ -29,6 +29,8 @@ provider:
         - dynamodb:PutItem
         - dynamodb:UpdateItem
         - dynamodb:DeleteItem
+        - codepipeline:PutJobSuccessResult
+        - codepipeline:PutJobFailureResult
       Resource:
         - '*'
 
@@ -38,12 +40,12 @@ plugins:
   - serverless-offline-scheduler
 
 functions:
-  updateLatestDeployment:
-    handler: src/handler.updateLatestDeployment
+  addLatestDeployment:
+    handler: src/handler.addLatestDeployment
     events:
       - http:
           path: /deployment
-          method: put
+          method: post
           cors: true
 #          authorizer: aws_iam
 
