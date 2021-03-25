@@ -7,5 +7,6 @@ export enum EntitySortType {
 	DEVICE = 'device',
 	CONNECTION = 'connection',
 	BOT_TYPE = 'botType',
-	INTERVAL = 'interval'
+	INTERVAL = 'interval',
+	PIPELINE_JOB_ID = 'pipelineJobId'
 }

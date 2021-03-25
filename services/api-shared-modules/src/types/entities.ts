@@ -11,5 +11,6 @@ export enum Entity {
 	TRADER_BOT_LOG_DATA = 'traderBotLogData',
 	TRADER_BOT = 'traderBot',
 	WALLET_VALUATION = 'walletValuation',
-	KLINE_VALUES = 'klineValues'
+	KLINE_VALUES = 'klineValues',
+	EC2_INSTANCE_DEPLOYMENT = 'ec2Deployment'
 }

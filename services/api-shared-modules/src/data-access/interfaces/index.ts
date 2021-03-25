@@ -13,6 +13,7 @@ export { ITraderBotLogDataRepository } from './ITraderBotLogDataRepository';
 export { IWalletValuationRepository } from './IWalletValuationRepository';
 export { IKlineValuesRepository } from './IKlineValuesRepository';
 export { ISymbolPairsRepository } from './ISymbolPairsRepository';
+export { IEc2DeploymentsRepository } from './IEc2DeploymentsRepository';
 
 export interface QueryKey {
 	pk?: string;

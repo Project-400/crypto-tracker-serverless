@@ -11,3 +11,4 @@ export { TraderBotLogDataRepository } from './TraderBotLogDataRepository';
 export { WalletValuationRepository } from './WalletValuationRepository';
 export { KlineValuesRepository } from './KlineValuesRepository';
 export { SymbolPairsRepository } from './SymbolPairsRepository';
+export { Ec2DeploymentsRepository } from './Ec2DeploymentsRepository';

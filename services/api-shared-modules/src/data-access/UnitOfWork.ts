@@ -11,7 +11,8 @@ import {
 	PriceChangeStatsRepository,
 	WalletValuationRepository,
 	KlineValuesRepository,
-	SymbolPairsRepository
+	SymbolPairsRepository,
+	Ec2DeploymentsRepository
 } from './repositories';
 import {
 	IUserRepository,
@@ -26,7 +27,8 @@ import {
 	IPriceChangeStatsRepository,
 	IWalletValuationRepository,
 	IKlineValuesRepository,
-	ISymbolPairsRepository
+	ISymbolPairsRepository,
+	IEc2DeploymentsRepository
 } from './interfaces';
 import { DataMapper } from '@aws/dynamodb-data-mapper';
 import { DynamoDB } from 'aws-sdk';
@@ -46,6 +48,7 @@ export class UnitOfWork {
 	public WalletValuation: IWalletValuationRepository;
 	public KlineValues: IKlineValuesRepository;
 	public SymbolPairs: ISymbolPairsRepository;
+	public Ec2Deployments: IEc2DeploymentsRepository;
 
 	public constructor() {
 		const db: DataMapper = new DataMapper({ client: new DynamoDB({ region: 'eu-west-1' }) });
@@ -63,6 +66,7 @@ export class UnitOfWork {
 		this.WalletValuation = new WalletValuationRepository(db);
 		this.KlineValues = new KlineValuesRepository(db);
 		this.SymbolPairs = new SymbolPairsRepository(db);
+		this.Ec2Deployments = new Ec2DeploymentsRepository(db);
 	}
 
 }

@@ -7,7 +7,7 @@ import {
 } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 import BinanceApi from '../../api-shared-modules/src/external-apis/binance/binance';
 import { ExchangePair } from '../../api-shared-modules/src/types';
-import { KlineValues, Trade } from '@crypto-tracker/common-types';
+import { Trade } from '@crypto-tracker/common-types';
 import _ from 'underscore';
 import { ExchangePairsService } from '../../api-exchange-pairs/src/exchange-pairs.service';
 import { PairPriceList } from '../../api-valuation/src/valuation.service';
@@ -51,9 +51,6 @@ export class ProfitsService {
 			coinBtcPrice, coinEthPrice, coinBnbPrice, BTCUSDT_Price, ETHUSDT_Price, BNBBUSD_Price);
 		const currentCoinBtcPrice: number = coinBtcPrice || (coinUsdPrice / BTCUSDT_Price);
 
-		console.log('coinUsdPrice');
-		console.log(coinUsdPrice);
-
 		const exchangePairs: ExchangePairsService = new ExchangePairsService(this.unitOfWork);
 		const pairs: Array<Partial<ExchangePair>> = await exchangePairs.requestExchangePairs();
 		const coinPairs: Array<Partial<ExchangePair>> = pairs.filter((p: ExchangePair) => p.base === coin);
@@ -65,8 +62,6 @@ export class ProfitsService {
 		// const trades: Trade[] = await this.getSymbolTrades(coinPairs, lastDustLogDate);
 
 		let totalQty: number = 0 - coinDustLogTotals.totalQty;
-		console.log('totalQty');
-		console.log(totalQty);
 		// let totalInvestedValue: number = 0 - coinDustLogTotals.totalInvestedValue;
 		let totalInvestedDollars: number = 0;
 		// let totalInvestedValueMinusCommission: number = 0 - coinDustLogTotals.totalInvestedValueMinusCommission;
@@ -79,42 +74,26 @@ export class ProfitsService {
 
 		for (const trade of trades) {
 			const qty: number = Number(trade.qty);
-			const price: number = Number(trade.price);
-			const time: number = Number(trade.time);
+			// const price: number = Number(trade.price);
+			// const time: number = Number(trade.time);
 
 			const { thisTradeInvestedDollars, usdPrice }: { thisTradeInvestedDollars: number; usdPrice: number } =
 				await this.getPreviousInvestedValue(trade);
 
-			// console.log('PRICE');
-			// console.log(price);
-			// console.log(prevBtcUsdtPrice);
-			// console.log(usdPrice);
-			// console.log(thisTradeInvestedDollars);
-
 			if (trade.isBuyer) {
 				totalInvestedDollars += thisTradeInvestedDollars;
-
-				// totalInvestedValue += thisTradeInvestedValue;
-				// totalInvestedValueMinusCommission += thisTradeInvestedValue;
 				totalQty += qty;
 			}
 			if (!trade.isBuyer) {
 				totalInvestedDollars -= thisTradeInvestedDollars;
-
-				// totalInvestedValue -= thisTradeInvestedValue;
-				// totalInvestedValueMinusCommission -= thisTradeInvestedValue;
 				totalQty -= qty;
 			}
-
 			if (trade.commissionAsset === coin) {
 				totalInvestedDollarsCommission += (Number(trade.commission) * usdPrice);
-
-				// totalInvestedValueMinusCommission -= (Number(trade.commission) * btcPrice);
 				totalQty -= Number(trade.commission);
 			}
 
 			const thisTradeProfitLoss: number = currentDollarsValue - totalInvestedDollars;
-			// const thisTradeProfitLoss: number = currentValue - totalInvestedValue;
 
 			if (!trade.isBuyer) {
 				const percentageSold: number = (100 / totalInvestedDollars) * thisTradeInvestedDollars;
@@ -123,35 +102,23 @@ export class ProfitsService {
 				currentProfitLoss = thisTradeProfitLoss - profitLossSold;
 			}
 		}
-		// }));
 
-		// currentValue = currentCoinBtcPrice * totalQty;
 		currentDollarsValue = coinUsdPrice * totalQty;
-		console.log(totalQty);
-		console.log(currentDollarsValue);
 		currentProfitLoss = currentDollarsValue - totalInvestedDollars;
-		// currentProfitLoss = currentValue - totalInvestedValueMinusCommission;
-		// const diff: number = Number((((currentValue - totalInvestedValueMinusCommission) /
-		// totalInvestedValueMinusCommission) * 100).toFixed(2));
 
 		const details: any = {
 			totalQty: Number(totalQty.toFixed(9)),
 			currentPrice: coinUsdPrice,
-			// currentPrice: Number(this.BTCtoUSDT(BTCUSDT_Price, currentCoinBtcPrice).toFixed(7)),
-			// totalInvestedValue: this.BTCtoUSDTRounded(BTCUSDT_Price, totalInvestedValue),
 			totalInvestedDollars,
 			totalInvestedDollarsCommission,
 			currentDollarsValue,
-			// totalInvestedValueMinusCommission: this.BTCtoUSDTRounded(BTCUSDT_Price, totalInvestedValueMinusCommission),
-			// currentValue: this.BTCtoUSDTRounded(BTCUSDT_Price, currentValue),
-			// currentProfitLoss: this.BTCtoUSDTRounded(BTCUSDT_Price, currentProfitLoss),
 			currentProfitLoss,
 			takenProfitLoss
-			// takenProfitLoss: this.BTCtoUSDTRounded(BTCUSDT_Price, takenProfitLoss)
-			// diff
 		};
 
 		return {
+			// accountSnapshot: await BinanceApi.GetAccountSnapshot(),
+			depositHistory: await BinanceApi.GetDepositHistory(),
 			counts: {
 				dustLogs: coinDustlogs.length,
 				trades: trades.length
@@ -224,9 +191,9 @@ export class ProfitsService {
 
 	private bnbToUsd = (bnbValue: number, bnbUsdtPrice: number): number => bnbUsdtPrice * bnbValue;
 
-	private BTCtoUSDT = (btcPrice: number, btcValue: number): number => (btcValue * btcPrice);
+	// private BTCtoUSDT = (btcPrice: number, btcValue: number): number => (btcValue * btcPrice);
 
-	private BTCtoUSDTRounded = (btcPrice: number, btcValue: number): number => Number(this.BTCtoUSDT(btcPrice, btcValue).toFixed(2));
+	// private BTCtoUSDTRounded = (btcPrice: number, btcValue: number): number => Number(this.BTCtoUSDT(btcPrice, btcValue).toFixed(2));
 
 	private getSymbolTrades = async (coinPairs: Array<Partial<ExchangePair>>, fromDate?: number): Promise<Trade[]> => {
 		const trades: Trade[] = [];
@@ -235,6 +202,7 @@ export class ProfitsService {
 
 		await Promise.all(
 			coinPairs.map(async (pair: Partial<ExchangePair>) => {
+				if (pair.base === 'DOGE') console.log(pair);
 				const t: Trade[] = await BinanceApi.GetSymbolTrades(pair.symbol, fromDate);
 				trades.push(...t);
 			})

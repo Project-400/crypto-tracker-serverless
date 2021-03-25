@@ -33,7 +33,6 @@ export class TraderBotLogDataItem extends DynamoDbItem implements IBotTradeData 
 	@attribute()
 	public sellDataSet: boolean;
 
-
 	@attribute()
 	public lowercaseSymbol: string;
 
@@ -148,5 +147,17 @@ export class TraderBotLogDataItem extends DynamoDbItem implements IBotTradeData 
 
 	@attribute()
 	public startTime: number;
+
+	@attribute()
+	public buyTransactionType: string;
+
+	@attribute()
+	public sellQty: string;
+
+	@attribute()
+	public sellTransactionType: string;
+
+	@attribute()
+	public tradeDataId: string;
 
 }

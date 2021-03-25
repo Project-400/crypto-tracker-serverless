@@ -1,5 +1,14 @@
-export { UserItem } from './User';
-export { SubscriptionItem } from './Subscription';
+export { TraderBotLogDataItem } from './BotTradeData';
+export { CoinItem } from './Coin';
+export { Ec2InstanceDeploymentItem } from './Ec2InstanceDeployment';
+export { ExchangeInfoSymbolItem } from './ExchangeInfo';
+export { ExchangePairItem } from './ExchangePair';
+export { KlineValuesItem } from './KlineValues';
 export { PriceBatchItem } from './PriceBatch';
 export { PriceChangeStatsItem } from './PriceChangeStats';
-export { ExchangePairItem } from './ExchangePair';
+export { SubscriptionItem } from './Subscription';
+export { SymbolPairsItem } from './SymbolPairs';
+export { TraderBotItem } from './TraderBot';
+export { TransactionItem } from './Transaction';
+export { UserItem } from './User';
+export { WalletValuationItem } from './WalletValuation';
