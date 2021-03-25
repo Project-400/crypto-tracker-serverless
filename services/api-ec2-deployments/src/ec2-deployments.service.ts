@@ -13,7 +13,7 @@ export class Ec2DeploymentsService {
 
 	public constructor(private unitOfWork: UnitOfWork) { }
 
-	public updateLatestDeployment = async (codePipelineJob: CodePipeline.Job): Promise<boolean> => {
+	public updateLatestDeployment = async (codePipelineJob: CodePipeline.Job): Promise<Ec2InstanceDeployment> => {
 		const sourceArtifact: Artifact = codePipelineJob.data.inputArtifacts.find((a: Artifact) => a.name === 'SourceArtifact');
 		const buildArtifact: Artifact = codePipelineJob.data.inputArtifacts.find((a: Artifact) => a.name === 'ExpressBuildArtifact');
 		const buildFileLocation: string = `s3://${buildArtifact.location.s3Location.bucketName}/${buildArtifact.location.s3Location.objectKey}`;
@@ -36,34 +36,27 @@ export class Ec2DeploymentsService {
 			buildFileLocation
 		};
 
-		const deploymentLog: Ec2InstanceDeployment = await this.unitOfWork.Ec2Deployments.create(deployment);
-
-		return !!deploymentLog;
+		return this.unitOfWork.Ec2Deployments.create(deployment);
 	}
 
 	public publishDeploymentToTopic = async (codePipelineJob: CodePipeline.Job): Promise<boolean> => {
-		const buildArtifact: Artifact = codePipelineJob.data.inputArtifacts.find((a: Artifact) => a.name === 'ExpressBuildArtifact');
-		const buildFileLocation: string = `s3://${buildArtifact.location.s3Location.bucketName}/${buildArtifact.location.s3Location.objectKey}`;
 		const userParameters: ActionConfigurationKey = codePipelineJob.data.actionConfiguration.configuration.UserParameters;
 		const userParametersObject: DeploymentUserParameters = JSON.parse(userParameters);
 		const appName: string = userParametersObject.appName || 'Unknown';
 
 		const sns: SNS = new SNS({ apiVersion: '2010-03-31' });
 
+		const ec2Deployment: Ec2InstanceDeployment = await this.unitOfWork.Ec2Deployments.get(appName, codePipelineJob.id);
+
 		const snsParams: SNS.PublishInput = {
-			Message: JSON.stringify({ appName, buildFileLocation }),
+			Message: JSON.stringify({ ec2Deployment }),
 			TopicArn: `arn:aws:sns:${AWS_REGION}:${AWS_ACCOUNT_ID}:${AWS_NEW_DEPLOYMENT_SNS_TOPIC}`
 		};
 
 		return new Promise((resolve: any, reject: any): void => {
 			sns.publish(snsParams, (err: AWS.AWSError, data: AWS.SNS.PublishResponse): void => {
-				if (err) {
-					console.log('err pub');
-					reject(false);
-				} else {
-					console.log('success pub');
-					resolve(true);
-				}
+				if (err) reject(false);
+				else resolve(true);
 			});
 		});
 	}
