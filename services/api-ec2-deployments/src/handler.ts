@@ -7,3 +7,4 @@ const ec2DeploymentsService: Ec2DeploymentsService = new Ec2DeploymentsService(u
 const controller: Ec2DeploymentsController = new Ec2DeploymentsController(ec2DeploymentsService);
 
 export const addLatestDeployment: ApiHandler = controller.addLatestDeployment;
+export const publishDeploymentToTopic: ApiHandler = controller.publishDeploymentToTopic;
