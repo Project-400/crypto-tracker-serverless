@@ -89,7 +89,7 @@ export class Ec2DeploymentsController {
 		}
 	}
 
-	public getLatestDeploymentLog: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<any> => {
+	public getLatestDeploymentFileLocation: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<any> => {
 		if (!event.pathParameters || !event.pathParameters.appName)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 
@@ -103,7 +103,24 @@ export class Ec2DeploymentsController {
 					statusCode: 200,
 					body: JSON.stringify(latestDeploy.buildFileLocation)
 				};
-				// return ResponseBuilder.ok({ fileLocation: latestDeploy.buildFileLocation });
+			}
+
+			return ResponseBuilder.internalServerError(new Error('No deployment found'));
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);		}
+	}
+
+	public getLatestDeploymentLog: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<any> => {
+		if (!event.pathParameters || !event.pathParameters.appName)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const appName: string = event.pathParameters.appName;
+
+		try {
+			const latestDeploy: Ec2InstanceDeployment = await this.ec2DeploymentsService.getLatestDeploymentLog(appName);
+
+			if (latestDeploy) {
+				return ResponseBuilder.ok({ latestDeploy });
 			}
 
 			return ResponseBuilder.internalServerError(new Error('No deployment found'));

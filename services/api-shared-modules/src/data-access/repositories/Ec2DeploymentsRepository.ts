@@ -9,7 +9,7 @@ import { ConditionExpression, EqualityExpressionPredicate, equals } from '@aws/d
 
 export class Ec2DeploymentsRepository extends Repository implements IEc2DeploymentsRepository {
 
-	public async get(appName: string, codePipelineJobId: string): Promise<Ec2InstanceDeployment> {
+	public async get(appName: string): Promise<Ec2InstanceDeployment> {
 		const predicate: EqualityExpressionPredicate = equals(appName);
 
 		const equalsExpression: ConditionExpression = {

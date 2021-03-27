@@ -8,4 +8,5 @@ const controller: Ec2DeploymentsController = new Ec2DeploymentsController(ec2Dep
 
 export const addLatestDeployment: ApiHandler = controller.addLatestDeployment;
 export const publishDeploymentToTopic: ApiHandler = controller.publishDeploymentToTopic;
+export const getLatestDeploymentFileLocation: ApiHandler = controller.getLatestDeploymentFileLocation;
 export const getLatestDeploymentLog: ApiHandler = controller.getLatestDeploymentLog;
