@@ -1,4 +1,4 @@
-import { ApiContext, ApiEvent, ApiHandler } from '../../api-shared-modules/src';
+import { ApiContext, ApiEvent, ApiHandler, ErrorCode, ResponseBuilder } from '../../api-shared-modules/src';
 import { Ec2DeploymentsService } from './ec2-deployments.service';
 import { CodePipeline } from 'aws-sdk';
 import { PutJobFailureResultInput, PutJobSuccessResultInput } from 'aws-sdk/clients/codepipeline';
@@ -87,6 +87,28 @@ export class Ec2DeploymentsController {
 			};
 			return codePipeline.putJobFailureResult(failedPipelineParams).promise();
 		}
+	}
+
+	public getLatestDeploymentLog: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<any> => {
+		if (!event.pathParameters || !event.pathParameters.appName)
+			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
+
+		const appName: string = event.pathParameters.appName;
+
+		try {
+			const latestDeploy: Ec2InstanceDeployment = await this.ec2DeploymentsService.getLatestDeploymentLog(appName);
+
+			if (latestDeploy) {
+				return {
+					statusCode: 200,
+					body: JSON.stringify(latestDeploy.buildFileLocation)
+				};
+				// return ResponseBuilder.ok({ fileLocation: latestDeploy.buildFileLocation });
+			}
+
+			return ResponseBuilder.internalServerError(new Error('No deployment found'));
+		} catch (err) {
+			return ResponseBuilder.internalServerError(err, err.message);		}
 	}
 
 }

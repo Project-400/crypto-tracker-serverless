@@ -46,7 +46,7 @@ export class Ec2DeploymentsService {
 
 		const sns: SNS = new SNS({ apiVersion: '2010-03-31' });
 
-		const ec2Deployment: Ec2InstanceDeployment = await this.unitOfWork.Ec2Deployments.get(appName, codePipelineJob.id);
+		const ec2Deployment: Ec2InstanceDeployment = await this.getLatestDeploymentLog(appName);
 
 		const snsParams: SNS.PublishInput = {
 			Message: JSON.stringify({ ec2Deployment }),
@@ -59,6 +59,10 @@ export class Ec2DeploymentsService {
 				else resolve(true);
 			});
 		});
+	}
+
+	public getLatestDeploymentLog = async (appName: string): Promise<Ec2InstanceDeployment> => {
+		return this.unitOfWork.Ec2Deployments.get(appName);
 	}
 
 }

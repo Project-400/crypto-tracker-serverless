@@ -57,6 +57,14 @@ functions:
 #          method: post
 #          cors: true
 #          authorizer: aws_iam
+  getLatestDeploymentLog:
+    handler: src/handler.getLatestDeploymentLog
+    events:
+      - http:
+          path: /deployment/latest/{appName}
+          method: get
+          cors: true
+#          authorizer: aws_iam
 
 #
 #resources:
