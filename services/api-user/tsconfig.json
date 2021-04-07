@@ -1,0 +1,24 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "es2017",
+      "esnext.asynciterable"
+    ],
+    "moduleResolution": "node",
+    "noUnusedLocals": true,
+    "noUnusedParameters": false,
+    "sourceMap": true,
+    "target": "es2017",
+    "outDir": "lib",
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators":true,
+    "allowJs": true,
+    "allowSyntheticDefaultImports": true
+  },
+  "exclude": [
+    "node_modules",
+    "tests",
+    "mocks"
+  ],
+  "types": ["node", "jest"]
+}
