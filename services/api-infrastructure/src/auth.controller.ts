@@ -18,8 +18,8 @@ export class AuthController {
 
 		try {
 			user.userType = 'User';
-			user.firstName = cognitoUser.given_name;
-			user.lastName = cognitoUser.family_name;
+			// user.firstName = cognitoUser.given_name;
+			// user.lastName = cognitoUser.family_name;
 
 			await this.unitOfWork.Users.createAfterSignUp(cognitoUser.sub, { ...user });
 
