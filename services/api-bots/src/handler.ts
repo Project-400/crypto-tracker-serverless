@@ -8,6 +8,7 @@ const controller: BotsController = new BotsController(botsService);
 
 export const getTraderBot: ApiHandler = controller.getTraderBot;
 export const getAllTradingBots: ApiHandler = controller.getAllTradingBots;
+export const getAllUserTradingBots: ApiHandler = controller.getAllUserTradingBots;
 export const getAllTradingBotsByState: ApiHandler = controller.getAllTradingBotsByState;
 export const getAllUserTradingBotsByState: ApiHandler = controller.getAllUserTradingBotsByState;
 export const createTraderBot: ApiHandler = controller.createTraderBot;

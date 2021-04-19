@@ -59,11 +59,18 @@ functions:
           path: /trader-bot/all
           method: get # Pass LastEvaluatedKey via headers
           cors: true
+  getAllUserTradingBots:
+    handler: src/handler.getAllUserTradingBots
+    events:
+      - http:
+          path: /trader-bot/user/{userSub}/{limit}
+          method: get
+          cors: true
   getAllUserTradingBotsByState:
     handler: src/handler.getAllUserTradingBotsByState
     events:
       - http:
-          path: /trader-bot/user/all-by-state # Pass in a list of bot states, eg. PAUSED,FINISHED
+          path: /trader-bot/user/all-by-state/{userSub} # Pass in a list of bot states, eg. PAUSED,FINISHED
           method: get # Pass LastEvaluatedKey via headers
           cors: true
   getAllTradingBotsByState:

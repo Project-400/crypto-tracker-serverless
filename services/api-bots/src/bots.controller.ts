@@ -65,7 +65,25 @@ export class BotsController {
 		try {
 			const bots: BotsPageResponse = await this.botsService.getAllUserTradingBotsByState(userId, states, lastEvaluatedKey, limit);
 
-			return ResponseBuilder.ok({ bots });
+			return ResponseBuilder.ok({ ...bots });
+		} catch (err) {
+			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
+			return ResponseBuilder.internalServerError(err, err.message);
+		}
+	}
+
+	public getAllUserTradingBots: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		// const auth: TokenVerification = Auth.VerifyToken('');
+		// const userId: string = auth.sub;
+		console.log(event);
+		const userId: string = event.pathParameters.userSub;
+		const limit: number = Number(event.pathParameters.limit);
+		const lastEvaluatedKey: LastEvaluatedKey = event.headers.lastEvaluatedKey ? JSON.parse(event.headers.lastEvaluatedKey) : undefined;
+
+		try {
+			const bots: BotsPageResponse = await this.botsService.getAllUserTradingBots(userId, lastEvaluatedKey, limit);
+
+			return ResponseBuilder.ok({ ...bots });
 		} catch (err) {
 			if (err.name === 'ItemNotFoundException') return ResponseBuilder.notFound(ErrorCode.GeneralError, 'Trader Bot not found');
 			return ResponseBuilder.internalServerError(err, err.message);

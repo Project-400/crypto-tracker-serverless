@@ -24,6 +24,11 @@ export class BotsService {
 		return this.unitOfWork.TraderBot.getAllByUserAndStates(userId, states, lastEvaluatedKey, limit || 10);
 	}
 
+	public getAllUserTradingBots = async (userId: string, lastEvaluatedKey?: LastEvaluatedKey, limit?: number):
+		Promise<BotsPageResponse> => {
+		return this.unitOfWork.TraderBot.getAllByUser(userId, lastEvaluatedKey, limit || 10);
+	}
+
 	public getAllTradingBotsByState = async (states: string[], lastEvaluatedKey?: LastEvaluatedKey, limit?: number):
 		Promise<BotsPageResponse> => {
 		this.validateBotStates(states);
