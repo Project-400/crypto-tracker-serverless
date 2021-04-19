@@ -9,7 +9,6 @@ import {
 import { ExchangeInfoSymbol } from '@crypto-tracker/common-types';
 import { ExchangeInfoService } from './exchange-info.service';
 import { GatherAllExchangeInfoCounts } from './exchange-info.interfaces';
-import { Coin } from '../../api-shared-modules/src/external-apis/binance/binance.interfaces';
 
 export class ExchangeInfoController {
 
@@ -27,6 +26,9 @@ export class ExchangeInfoController {
 	}
 
 	public getSymbolExchangeInfo: ApiHandler = async (event: ApiEvent, context: ApiContext): Promise<ApiResponse> => {
+		console.log(event);
+		console.log(context);
+
 		if (!event.pathParameters || !event.pathParameters.symbol)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 

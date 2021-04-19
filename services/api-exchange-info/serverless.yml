@@ -53,6 +53,9 @@ functions:
           method: get
           cors: true
 #          authorizer: aws_iam
+          authorizer:
+            name: authorizer
+            arn: arn:aws:cognito-idp:eu-west-1:068475715603:userpool/eu-west-1_WZGooFKut
   getNonMainstreamPairs:
     handler: src/handler.getNonMainstreamPairs
     events:
@@ -60,7 +63,7 @@ functions:
           path: /exchange-info/non-mainstream
           method: get
           cors: true
-#          authorizer: aws_iam
+          authorizer: aws_iam
   getAllValidSymbols:
     handler: src/handler.getAllValidSymbols
     events:
@@ -70,5 +73,5 @@ functions:
           cors: true
 #          authorizer: aws_iam
 #
-#resources:
-#    - ${file(../resources/cognito-policy.yml)}
+resources:
+    - ${file(../resources/cognito-policy.yml)}
