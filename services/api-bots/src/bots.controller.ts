@@ -54,8 +54,9 @@ export class BotsController {
 		if (!event.queryStringParameters || !event.queryStringParameters.states)
 			return ResponseBuilder.badRequest(ErrorCode.BadRequest, 'Invalid request parameters');
 
-		const auth: TokenVerification = Auth.VerifyToken('');
-		const userId: string = auth.sub;
+		// const auth: TokenVerification = Auth.VerifyToken('');
+		// const userId: string = auth.sub;
+		const userId: string = event.pathParameters.userSub;
 		const limit: number = Number(event.queryStringParameters.limit);
 		const combinedStates: string = event.queryStringParameters.states;
 		const states: string[] = combinedStates.split(',').map((s: string) => s.toUpperCase().trim());
